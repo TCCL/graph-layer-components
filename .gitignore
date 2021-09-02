@@ -1,0 +1,5 @@
+#
+# .gitignore - @tccl/graph-layer-components
+#
+
+/node_modules/
