@@ -2,4 +2,5 @@
 # .gitignore - @tccl/graph-layer-components
 #
 
+/dist/
 /node_modules/
