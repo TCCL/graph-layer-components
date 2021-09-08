@@ -1,8 +1,8 @@
 // rollup.config.js - @tccl/graph-layer-components
 
-import { nodeResolve } from '@rollup/plugin-node-resolve';
-import vue from 'rollup-plugin-vue';
-import css from 'rollup-plugin-css-only';
+import { nodeResolve } from "@rollup/plugin-node-resolve";
+import vue from "rollup-plugin-vue";
+import css from "rollup-plugin-css-only";
 
 export default {
   plugins: [
@@ -11,13 +11,14 @@ export default {
       css: false
     }),
     css({
-      output: 'graph-layer-components.css'
+      output: "graph-layer-components.css"
     })
   ],
 
-  input: './src/main.js',
+  input: "./src/index.js",
   output: {
-    file: 'dist/graph-layer-components.js',
-    format: 'umd'
+    file: "dist/graph-layer-components.js",
+    format: "umd",
+    name: "GraphLayer"
   }
 };
