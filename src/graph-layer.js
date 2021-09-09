@@ -152,8 +152,8 @@ class GraphLayer {
       return null;
     }
 
-    const componentId = elem.attributes[attrName];
-    if (!(componentId in components)) {
+    const componentId = elem.attributes[attrName].value;
+    if (!(componentId in Components)) {
       return null;
     }
 
@@ -168,7 +168,7 @@ class GraphLayer {
 
     args.graphLayer = this;
 
-    const ctor = Vue.extend(components[componentId]);
+    const ctor = Vue.extend(Components[componentId]);
     const inst = new ctor({
       propsData: args
     });
