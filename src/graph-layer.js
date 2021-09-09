@@ -39,7 +39,7 @@ class GraphLayer {
       // The base URL of the graph-layer proxy endpoint. This can contain a
       // scheme/host if the graph-layer instance is running on another
       // domain/port.
-      baseURL: "/graph/layer",
+      baseUrl: "/graph/layer",
 
       // The name of the cookie storing the graph-layer session ID. Components
       // will avoid calls to graph-layer if 1) this option is non-empty and 2)
@@ -67,6 +67,20 @@ class GraphLayer {
         this.options[key] = options[key];
       }
     }
+  }
+
+  fetch(resource,init) {
+    if (typeof resource === "string") {
+      let url = this.options.baseUrl;
+      if (url.length > 0 && url[url.length-1] != "/" && resource[0] != "/") {
+        url += "/";
+      }
+      url += resource;
+
+      return fetch(url,init);
+    }
+
+    return fetch(resource,init);
   }
 
   /**
@@ -160,8 +174,10 @@ class GraphLayer {
     const args = {};
     for (let i = 0;i < elem.attributes.length;++i) {
       const attr = elem.attributes[i];
-      if (attr.name.substring(0,attr.length) == attrName && attr.name != attrName) {
-        const name = hyphen2kebab(attr.name.substring(attr.length));
+      if (attr.name.substring(0,attrName.length) == attrName
+          && attr.name != attrName)
+      {
+        const name = hyphen2kebab(attr.name.substring(attrName.length));
         args[name] = attr.value;
       }
     }
