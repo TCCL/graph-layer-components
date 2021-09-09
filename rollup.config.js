@@ -3,6 +3,7 @@
 import { nodeResolve } from "@rollup/plugin-node-resolve";
 import vue from "rollup-plugin-vue";
 import css from "rollup-plugin-css-only";
+import replace from "@rollup/plugin-replace";
 
 export default {
   plugins: [
@@ -12,6 +13,10 @@ export default {
     }),
     css({
       output: "graph-layer-components.css"
+    }),
+    replace({
+      preventAssignment: true,
+      'process.env.NODE_ENV': JSON.stringify( 'production' )
     })
   ],
 
