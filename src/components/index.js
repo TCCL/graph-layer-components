@@ -1,6 +1,6 @@
 // components/index.js
 
-import User from "./User.vue";
+import User from "./User";
 
 // NOTE: The export object keys used here denote the library's component IDs
 // used when loading components via a scan operation.

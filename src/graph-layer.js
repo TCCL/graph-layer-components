@@ -3,6 +3,7 @@
 import Vue from "vue";
 
 import * as Components from "./components";
+import globals from "./globals.js";
 
 function hyphen2kebab(name) {
   let result = "";
@@ -34,7 +35,7 @@ function hyphen2kebab(name) {
 class GraphLayer {
   constructor() {
     // Apply default options.
-    this.options = {
+    this.options = Vue.observable({
       // The base URL of the graph-layer proxy endpoint. This can contain a
       // scheme/host if the graph-layer instance is running on another
       // domain/port.
@@ -43,8 +44,21 @@ class GraphLayer {
       // The name of the cookie storing the graph-layer session ID. Components
       // will avoid calls to graph-layer if 1) this option is non-empty and 2)
       // the browser does not have a session cookie.
-      cookieId: "GRAPH_LAYER_SESSID"
-    };
+      cookieId: "GRAPH_LAYER_SESSID",
+
+      // The theme class to apply to themeable components.
+      theme: "default"
+    });
+  }
+
+  getOption(key) {
+    return this.options[key];
+  }
+
+  setOption(key,value) {
+    if (key in this.options) {
+      this.options[key] = value;
+    }
   }
 
   setOptions(options) {
@@ -56,13 +70,16 @@ class GraphLayer {
   }
 
   /**
-   * Vue install method.
+   * Vue install method. This registers this GraphLayer instance as the default
+   * instance.
    */
   install() {
     // NOTE: Do not use 'this' in this function.
     Object.values(Components).forEach((component) => {
       Vue.component(component.name,component);
     });
+
+    globals.graphLayer = this;
   }
 
   /**
@@ -140,7 +157,7 @@ class GraphLayer {
       return null;
     }
 
-    const args = [];
+    const args = {};
     for (let i = 0;i < elem.attributes.length;++i) {
       const attr = elem.attributes[i];
       if (attr.name.substring(0,attr.length) == attrName && attr.name != attrName) {
@@ -148,6 +165,8 @@ class GraphLayer {
         args[name] = attr.value;
       }
     }
+
+    args.graphLayer = this;
 
     const ctor = Vue.extend(components[componentId]);
     const inst = new ctor({
