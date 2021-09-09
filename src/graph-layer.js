@@ -172,12 +172,11 @@ class GraphLayer {
     }
 
     const args = {};
+    const prefix = attrName + "--";
     for (let i = 0;i < elem.attributes.length;++i) {
       const attr = elem.attributes[i];
-      if (attr.name.substring(0,attrName.length) == attrName
-          && attr.name != attrName)
-      {
-        const name = hyphen2kebab(attr.name.substring(attrName.length));
+      if (attr.name.substring(0,prefix.length) == prefix) {
+        const name = hyphen2kebab(attr.name.substring(prefix.length));
         args[name] = attr.value;
       }
     }
