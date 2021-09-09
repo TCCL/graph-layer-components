@@ -5,7 +5,8 @@
   "module": "src/index.js",
   "main": "dist/graph-layer-components.js",
   "scripts": {
-    "build": "rollup --config"
+    "build": "rollup --config",
+    "build-test": "rollup --config ./test/rollup.config.js"
   },
   "repository": {
     "type": "git",
