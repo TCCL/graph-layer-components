@@ -1,0 +1,18 @@
+/* test/src/base.css */
+
+.testbed-wrapper {
+  display: flex;
+  flex-flow: row wrap;
+}
+
+.testbed-wrapper > .region-wrapper {
+  flex: 1 0 50%;
+}
+
+.testbed-wrapper > .region-wrapper > .region {
+  padding: 3%;
+  min-height: 180px;
+  display: flex;
+  flex-flow: column nowrap;
+  justify-content: space-around;
+}

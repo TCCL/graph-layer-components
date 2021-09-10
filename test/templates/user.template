@@ -1,1 +1,26 @@
-<div data-graph-layer="user" data-graph-layer--me="1"></div>
+<h3>Graph Layer Components / User Component</h3>
+
+<div class="testbed-wrapper">
+  <div class="region-wrapper">
+    <div class="region">
+      <div><b>Me</b></div>
+      <hr>
+      <div data-graph-layer="user" data-graph-layer--me="1"></div>
+    </div>
+  </div>
+  <div class="region-wrapper">
+    <div class="region">
+      <div data-graph-layer="userInputTest"></div>
+    </div>
+  </div>
+  <div class="region-wrapper">
+    <div class="region">
+      <div data-graph-layer="userInputTest"></div>
+    </div>
+  </div>
+  <div class="region-wrapper">
+    <div class="region">
+      <div data-graph-layer="userInputTest"></div>
+    </div>
+  </div>
+</div>
