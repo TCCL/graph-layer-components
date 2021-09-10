@@ -5,7 +5,7 @@
 </template>
 
 <script>
-  import GraphLayerMixin from "../../mixins/GraphLayerMixin.js";
+  import GraphLayerMixin from "../../core/mixins/GraphLayerMixin.js";
 
   export default {
     name: "Avatar",
@@ -37,10 +37,7 @@
         let endpoint = this.endpoint;
         endpoint += "/photo/$value";
 
-        this.$fetch(endpoint).then((response) => {
-
-          return response.blob();
-        }).then((value) => {
+        this.$fetchBlob(endpoint).then((value) => {
           this.setUrl(value);
         });
       },
@@ -60,5 +57,16 @@
 </script>
 
 <style scoped>
+  .graph-layer-user-avatar {
+    display: inline-flex;
+    justify-content: center;
+  }
 
+  .graph-layer-user-avatar > img {
+    border-radius: 50%;
+    border: 1px solid var(--user-avatar-border-color);
+    width: 100%;
+    height: 100%;
+    box-shadow: 0px 2px 12px 0px var(--user-avatar-shadow-color);
+  }
 </style>

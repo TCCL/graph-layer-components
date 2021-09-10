@@ -5,12 +5,18 @@
     class="graph-layer-user"
     :class="[$themeClass]"
     >
-    <avatar :endpoint="endpoint" />
+    <avatar ref="avatar" :endpoint="endpoint" />
+    <div class="user-info">
+      <div class="name">{{ userInfo.displayName }}</div>
+      <div class="job-title caption">{{ userInfo.jobTitle }}</div>
+      <div class="emailAddress"><a :href="emailLink">{{ userInfo.mail }}</a></div>
+    </div>
   </graph-layer-wrapper>
 </template>
 
 <script>
-  import GraphLayerMixin from "../../mixins/GraphLayerMixin.js";
+  import GraphLayerMixin from "../../core/mixins/GraphLayerMixin.js";
+  import LoadErrorMixin from "../../core/mixins/LoadErrorMixin.js";
   import Avatar from "./Avatar.vue";
 
   export default {
@@ -20,10 +26,13 @@
       Avatar
     },
 
-    mixins: [GraphLayerMixin],
+    mixins: [
+      GraphLayerMixin,
+      LoadErrorMixin
+    ],
 
     data: () => ({
-
+      userInfo: {}
     }),
 
     props: {
@@ -58,19 +67,65 @@
         }
 
         return null;
+      },
+
+      emailLink() {
+        if (!this.userInfo.mail) {
+          return "#";
+        }
+
+        return "mailto:" + this.userInfo.mail;
       }
     },
 
     created() {
-
+      this.load();
     },
 
     methods: {
+      load() {
+        if (!this.endpoint) {
+          return;
+        }
 
+        const select = [
+          "displayName",
+          "jobTitle",
+          "mail"
+        ];
+
+        const params = new URLSearchParams();
+        params.append("$select",select.join(","));
+
+        let endpoint = this.endpoint;
+        endpoint += "?" + params.toString();
+
+        this.$fetchJson(endpoint).then((data) => {
+          this.userInfo = data;
+        });
+      }
+    },
+
+    watch: {
+      endpoint() {
+        this.load();
+      }
     }
   };
 </script>
 
 <style scoped>
+  .graph-layer-user {
+    display: flex;
+    align-items: center;
+  }
 
+  .avatar {
+    flex: 1 1 auto;
+  }
+
+  .user-info {
+    flex: 8 0 auto;
+    margin-left: 1em;
+  }
 </style>
