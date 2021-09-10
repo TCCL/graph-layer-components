@@ -1,2 +1,16 @@
 /* themes/default.css */
 
+.graph-layer--theme-default {
+  /* General properties: */
+  --color-black: #000;
+  --color-soft-black: #555;
+  --color-light-gray: #eee;
+  --color-dark-gray: rgba(0,0,0,0.54);
+
+  /* Base elements */
+  --caption-color: var(--color-dark-gray);
+
+  /* User */
+  --user-avatar-border-color: var(--color-black);
+  --user-avatar-shadow-color: var(--color-soft-black);
+}

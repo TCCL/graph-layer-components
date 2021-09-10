@@ -1,0 +1,9 @@
+/* core/base.css - graph-layer-wrapper */
+
+.graph-layer-wrapper .caption {
+  color: var(--caption-color);
+  font-size: 12px;
+  font-weight: 400;
+  letter-spacing: .02em;
+  line-height: 17px;
+}
