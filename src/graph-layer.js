@@ -49,6 +49,11 @@ class GraphLayer {
       // The theme class to apply to themeable components.
       theme: "default"
     });
+
+    this.components = {};
+    for (const key in Components) {
+      this.components[key] = Components[key];
+    }
   }
 
   getOption(key) {
@@ -67,6 +72,19 @@ class GraphLayer {
         this.options[key] = options[key];
       }
     }
+  }
+
+  /**
+   * Registers an additional component that can be created via scan
+   * functionality.
+   *
+   * @param {string} id
+   *  The component ID.
+   * @param {object} component
+   *  The component object.
+   */
+  registerScanComponent(id,component) {
+    this.components[id] = component;
   }
 
   fetch(resource,init) {
@@ -167,7 +185,7 @@ class GraphLayer {
     }
 
     const componentId = elem.attributes[attrName].value;
-    if (!(componentId in Components)) {
+    if (!(componentId in this.components)) {
       return null;
     }
 
@@ -183,7 +201,7 @@ class GraphLayer {
 
     args.graphLayer = this;
 
-    const ctor = Vue.extend(Components[componentId]);
+    const ctor = Vue.extend(this.components[componentId]);
     const inst = new ctor({
       propsData: args
     });
