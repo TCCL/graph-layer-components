@@ -1,7 +1,7 @@
 <template>
   <div class="user-input-test">
     <label>Enter the <code>userPrincipleName</code>:</label>
-    <input type="text" v-model="inputValue" />
+    <input type="text" v-model="inputValue" @keyup.enter="commit" />
     <button @click="commit">Render</button>
     <hr>
     <graph-layer-user v-if="ready" :user-principle-name="userPrincipleName" />

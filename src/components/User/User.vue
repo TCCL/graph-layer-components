@@ -5,7 +5,7 @@
     class="graph-layer-user"
     :class="[$themeClass]"
     >
-    <avatar ref="avatar" :endpoint="endpoint" />
+    <avatar ref="avatar" :endpoint="endpoint" :display-name="userInfo.displayName" />
     <div class="user-info">
       <div class="name">{{ userInfo.displayName }}</div>
       <div class="job-title caption">{{ userInfo.jobTitle }}</div>

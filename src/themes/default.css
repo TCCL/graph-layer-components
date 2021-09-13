@@ -13,4 +13,6 @@
   /* User */
   --user-avatar-border-color: var(--color-black);
   --user-avatar-shadow-color: var(--color-soft-black);
+  --user-avatar-color: var(--color-soft-black);
+  --user-avatar-background-color: var(--color-white);
 }
