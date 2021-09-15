@@ -1,5 +1,12 @@
 <template>
   <div class="graph-layer-drive-explorer">
+    <div class="header">
+      <div class="column name">Name</div>
+      <div class="column">Size</div>
+      <div class="column">Last Modified By</div>
+      <div class="column">Last Modified On</div>
+    </div>
+
     <div class="entry-wrapper" v-for="item in currentListing">
       <folder-entry
         v-if="item.folder"
@@ -179,5 +186,24 @@
 </script>
 
 <style scoped>
+  .header {
+    display: flex;
+    border-bottom: 2px solid var(--drive-item-row-border-color);
+  }
+  .header > .column {
+    font-size: 16px;
+    font-weight: bold;
+    padding: 0.5em 0;
+    flex: 2 0;
+  }
+  .header > .column.name {
+    flex: 6 0;
+  }
 
+  .entry-wrapper {
+    border-bottom: 1px solid var(--drive-item-row-border-color);
+  }
+  .entry-wrapper:last-child {
+    border-bottom: none;
+  }
 </style>

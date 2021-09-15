@@ -6,13 +6,20 @@
   --color-soft-black: #555;
   --color-light-gray: #eee;
   --color-dark-gray: rgba(0,0,0,0.54);
+  --color-light-blue: #448aff;
 
   /* Base elements */
   --caption-color: var(--color-dark-gray);
+  --anchor-color: var(--color-light-blue);
+  --icon-color: var(--color-light-blue);
 
   /* User */
   --user-avatar-border-color: var(--color-black);
   --user-avatar-shadow-color: var(--color-soft-black);
   --user-avatar-color: var(--color-soft-black);
   --user-avatar-background-color: var(--color-white);
+
+  /* Drive */
+  --drive-item-selected-background-color: var(--color-light-gray);
+  --drive-item-row-border-color: var(--color-light-gray);
 }

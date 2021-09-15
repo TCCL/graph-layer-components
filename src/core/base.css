@@ -7,3 +7,7 @@
   letter-spacing: .02em;
   line-height: 17px;
 }
+
+.graph-layer-wrapper a {
+  color: var(--anchor-color);
+}
