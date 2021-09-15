@@ -87,15 +87,28 @@ class GraphLayer {
     this.components[id] = component;
   }
 
-  fetch(resource,init) {
-    if (typeof resource === "string") {
-      let url = this.options.baseUrl;
-      if (url.length > 0 && url[url.length-1] != "/" && resource[0] != "/") {
-        url += "/";
-      }
-      url += resource;
+  fetch(_resource,init) {
+    let resource = _resource;
 
-      return fetch(url,init);
+    let path;
+    if (typeof resource === "string") {
+      path = resource;
+    }
+    else if (resource instanceof URL) {
+      path = resource.pathname;
+    }
+
+    // Prepare base URL to prepend to resource path name.
+    let url = this.options.baseUrl;
+    if (url.length > 0 && url[url.length-1] != "/" && path[0] != "/") {
+      url += "/";
+    }
+
+    if (typeof resource === "string") {
+      resource = url + resource;
+    }
+    else if (resource instanceof URL) {
+      resource.pathname = url + resource.pathname;
     }
 
     return fetch(resource,init);

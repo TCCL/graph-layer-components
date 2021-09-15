@@ -6,15 +6,21 @@
     :class="[$themeClass]"
     >
 
+    <drive-explorer :endpoint="endpoint" :top="top" />
   </graph-layer-wrapper>
 </template>
 
 <script>
   import GraphLayerMixin from "../../core/mixins/GraphLayerMixin.js";
   import LoadErrorMixin from "../../core/mixins/LoadErrorMixin.js";
+  import DriveExplorer from "./DriveExplorer.vue";
 
   export default {
     name: "GraphLayerDrive",
+
+    components: {
+      DriveExplorer
+    },
 
     mixins: [
       GraphLayerMixin,
@@ -49,6 +55,11 @@
       me: {
         type: [Boolean,String],
         default: false
+      },
+
+      top: {
+        type: [Number,String],
+        default: null
       }
     },
 
