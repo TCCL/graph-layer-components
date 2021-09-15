@@ -2,6 +2,7 @@
 
 import globals from "../../globals.js";
 import * as WrapperComponents from "../Wrapper";
+import Icon from "../icons";
 
 function findParentItem($parent,key,subkey) {
   if (!$parent) {
@@ -16,7 +17,10 @@ function findParentItem($parent,key,subkey) {
 }
 
 export default {
-  components: WrapperComponents,
+  components: {
+    ...WrapperComponents,
+    Icon
+  },
 
   props: {
     graphLayer: {

@@ -3,6 +3,7 @@
 import { nodeResolve } from "@rollup/plugin-node-resolve";
 import vue from "rollup-plugin-vue";
 import css from "rollup-plugin-css-only";
+import svg from "rollup-plugin-svg";
 import replace from "@rollup/plugin-replace";
 
 export default {
@@ -14,6 +15,7 @@ export default {
     css({
       output: "test.css"
     }),
+    svg(),
     replace({
       preventAssignment: true,
       'process.env.NODE_ENV': JSON.stringify( 'development' )
