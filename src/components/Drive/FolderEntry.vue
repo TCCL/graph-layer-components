@@ -11,7 +11,7 @@
       <span v-else>{{ modifiedBy }}</span>
     </div>
     <div class="modified-on">
-      <span class="caption">{{ modifiedOn }}</span>
+      <span class="caption">{{ modifiedDistance }}</span>
     </div>
   </div>
 </template>
@@ -81,6 +81,7 @@
   }
 
   .graph-layer-drive-folder-entry > .modified-on {
-    text-align: right;
+    display: flex;
+    flex-flow: row-reverse;
   }
 </style>

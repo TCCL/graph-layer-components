@@ -4,7 +4,7 @@
       <div class="column name">Name</div>
       <div class="column">Size</div>
       <div class="column">Last Modified By</div>
-      <div class="column">Last Modified On</div>
+      <div class="column last-modified">Last Modified</div>
     </div>
 
     <div class="entry-wrapper" v-for="item in currentListing">
@@ -198,6 +198,9 @@
   }
   .header > .column.name {
     flex: 6 0;
+  }
+  .header > .column.last-modified {
+    text-align: right;
   }
 
   .entry-wrapper {

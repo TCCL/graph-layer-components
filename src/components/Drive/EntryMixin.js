@@ -1,5 +1,7 @@
 // components/Drive/EntryMixin.js
 
+import { formatDistanceToNow, parseISO } from "date-fns";
+
 import GraphLayerMixin from "../../core/mixins/GraphLayerMixin.js";
 import { formatByteSize } from "../../core/helpers.js";
 
@@ -40,7 +42,11 @@ export default {
     },
 
     modifiedOn() {
-      return this.item.lastModifiedDateTime;
+      return parseISO(this.item.lastModifiedDateTime);
+    },
+
+    modifiedDistance() {
+      return formatDistanceToNow(this.modifiedOn,{ addSuffix:true });
     }
   },
 
