@@ -2,24 +2,24 @@
 
 .graph-layer--theme-default {
   /* General properties: */
-  --color-black: #000;
-  --color-soft-black: #555;
-  --color-light-gray: #eee;
-  --color-dark-gray: rgba(0,0,0,0.54);
-  --color-light-blue: #448aff;
+  --graph-layer-color-black: #000;
+  --graph-layer-color-soft-black: #555;
+  --graph-layer-color-light-gray: #eee;
+  --graph-layer-color-dark-gray: rgba(0,0,0,0.54);
+  --graph-layer-color-primary: #3185fc;
+  --graph-layer-color-secondary: #34e5ff;
+  --graph-layer-color-accent: #b74f6f;
 
   /* Base elements */
-  --caption-color: var(--color-dark-gray);
-  --anchor-color: var(--color-light-blue);
-  --icon-color: var(--color-light-blue);
+  --graph-layer-caption-color: var(--graph-layer-color-dark-gray);
+  --graph-layer-anchor-color: var(--graph-layer-color-primary);
 
   /* User */
-  --user-avatar-border-color: var(--color-black);
-  --user-avatar-shadow-color: var(--color-soft-black);
-  --user-avatar-color: var(--color-soft-black);
-  --user-avatar-background-color: var(--color-white);
+  --graph-layer-user-avatar-border-color: var(--graph-layer-color-black);
+  --graph-layer-user-avatar-shadow-color: var(--graph-layer-color-soft-black);
+  --graph-layer-user-avatar-color: var(--graph-layer-color-soft-black);
 
   /* Drive */
-  --drive-item-selected-background-color: var(--color-light-gray);
-  --drive-item-row-border-color: var(--color-light-gray);
+  --graph-layer-drive-row-border-color: var(--graph-layer-color-light-gray);
+  --graph-layer-drive-item-selected-background-color: var(--graph-layer-color-light-gray);
 }

@@ -1,7 +1,7 @@
 <template>
   <div class="graph-layer-drive-file-entry">
     <div class="navigate" @click="navigate" :title="item.name">
-      <icon i="file" /><a class="text" @click="navigate">{{ item.name }}</a>
+      <icon i="file" class="secondary" /><a class="text" @click="navigate">{{ item.name }}</a>
     </div>
     <div class="size">
       <span class="caption">{{ sizeFormatted }}</span>
@@ -51,22 +51,21 @@
     display: flex;
     flex-flow: row nowrap;
   }
+  .graph-layer-drive-file-entry:hover {
+    background-color: var(--graph-layer-drive-item-selected-background-color);
+  }
 
   .graph-layer-drive-file-entry > .navigate {
     flex: 6 0;
     cursor: pointer;
     user-select: none;
-    font-size: 16px;
+    font-size: 14px;
     padding: 4px;
-    margin-right: 5px;
     display: flex;
     align-items: center;
   }
-  .graph-layer-drive-file-entry > .navigate > .icon {
+  .graph-layer-drive-file-entry > .navigate >>> .icon {
     margin-right: 5px;
-  }
-  .graph-layer-drive-file-entry > .navigate:hover {
-    background-color: var(--drive-item-selected-background-color);
   }
   .graph-layer-drive-file-entry > .navigate:hover > .text {
     text-decoration: underline;

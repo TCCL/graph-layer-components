@@ -3,14 +3,22 @@
 
   export default {
     name: "Icon",
+    functional: true,
 
-    render(h) {
+    render(h,context) {
       const e = h("i",{
         domProps: {
-          innerHTML: getIconSvg(this.$props.i)
+          innerHTML: getIconSvg(context.props.i)
         },
 
-        "class": "icon"
+        "class": [
+          "icon",
+          context.data.staticClass,
+          context.data.class
+        ],
+
+        attrs: context.data.attrs,
+        style: context.data.style
       });
 
       return e;
@@ -29,6 +37,12 @@
   }
 
   .icon >>> svg {
-    fill: var(--icon-color);
+    fill: var(--graph-layer-color-primary);
+  }
+  .icon.secondary >>> svg {
+    fill: var(--graph-layer-color-secondary);
+  }
+  .icon.accent >>> svg {
+    fill: var(--graph-layer-color-accent);
   }
 </style>

@@ -1,7 +1,17 @@
 /* core/base.css - graph-layer-wrapper */
 
+.graph-layer-wrapper .primary {
+  color: var(--graph-layer-color-primary);
+}
+.graph-layer-wrapper .secondary {
+  color: var(--graph-layer-color-secondary);
+}
+.graph-layer-wrapper .accent {
+  color: var(--graph-layer-color-accent);
+}
+
 .graph-layer-wrapper .caption {
-  color: var(--caption-color);
+  color: var(--graph-layer-caption-color);
   font-size: 12px;
   font-weight: 400;
   letter-spacing: .02em;
@@ -9,5 +19,5 @@
 }
 
 .graph-layer-wrapper a {
-  color: var(--anchor-color);
+  color: var(--graph-layer-anchor-color);
 }

@@ -51,22 +51,21 @@
     display: flex;
     flex-flow: row nowrap;
   }
+  .graph-layer-drive-folder-entry:hover {
+    background-color: var(--graph-layer-drive-item-selected-background-color);
+  }
 
   .graph-layer-drive-folder-entry > .navigate {
     flex: 6 0;
     cursor: pointer;
     user-select: none;
-    font-size: 16px;
+    font-size: 14px;
     padding: 4px;
-    margin-right: 5px;
     display: flex;
     align-items: center;
   }
-  .graph-layer-drive-folder-entry > .navigate > .icon {
+  .graph-layer-drive-folder-entry > .navigate >>> .icon {
     margin-right: 5px;
-  }
-  .graph-layer-drive-folder-entry > .navigate:hover {
-    background-color: var(--drive-item-selected-background-color);
   }
   .graph-layer-drive-folder-entry > .navigate:hover > .text {
     text-decoration: underline;

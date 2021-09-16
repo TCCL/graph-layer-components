@@ -98,10 +98,9 @@
     height: 96px;
     overflow: hidden;
     border-radius: 50%;
-    border: 1px solid var(--user-avatar-border-color);
-    box-shadow: 0px 2px 12px 0px var(--user-avatar-shadow-color);
-    color: var(--user-avatar-color);
-    background-color: var(--user-avatar-background-color);
+    border: 1px solid var(--graph-layer-user-avatar-border-color);
+    box-shadow: 0px 2px 12px 0px var(--graph-layer-user-avatar-shadow-color);
+    color: var(--graph-layer-user-avatar-color);
   }
 
   .graph-layer-user-avatar > img {

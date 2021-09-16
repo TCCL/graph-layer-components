@@ -1,7 +1,7 @@
 // core/helpers.js
 
 function extractQueryParam(_query,name) {
-  if (typeof _query !== "string" || query.length == 0) {
+  if (typeof _query !== "string" || _query.length == 0) {
     return null;
   }
 

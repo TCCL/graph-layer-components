@@ -188,10 +188,10 @@
 <style scoped>
   .header {
     display: flex;
-    border-bottom: 2px solid var(--drive-item-row-border-color);
+    border-bottom: 2px solid var(--graph-layer-drive-row-border-color);
   }
   .header > .column {
-    font-size: 16px;
+    font-size: 12px;
     font-weight: bold;
     padding: 0.5em 0;
     flex: 2 0;
@@ -201,7 +201,7 @@
   }
 
   .entry-wrapper {
-    border-bottom: 1px solid var(--drive-item-row-border-color);
+    border-bottom: 1px solid var(--graph-layer-drive-row-border-color);
   }
   .entry-wrapper:last-child {
     border-bottom: none;
