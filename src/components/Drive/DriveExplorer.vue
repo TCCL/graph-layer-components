@@ -1,5 +1,9 @@
 <template>
-  <div class="graph-layer-drive-explorer">
+  <graph-layer-wrapper
+    :loading-state="$loadingState"
+    :error-state="$errorState"
+    class="graph-layer-drive-explorer"
+    >
     <div class="header">
       <div class="column name">Name</div>
       <div class="column">Size</div>
@@ -11,6 +15,7 @@
       <folder-entry
         v-if="item.folder"
         :item="item"
+        @click="navigateItem(item)"
         />
 
       <file-entry
@@ -18,11 +23,16 @@
         :item="item"
         />
     </div>
-  </div>
+
+    <div v-if="currentListing.length == 0" class="empty">
+      <span class="caption">This folder is empty.</span>
+    </div>
+  </graph-layer-wrapper>
 </template>
 
 <script>
   import GraphLayerMixin from "../../core/mixins/GraphLayerMixin.js";
+  import LoadErrorMixin from "../../core/mixins/LoadErrorMixin.js";
   import FolderEntry from "./FolderEntry.vue";
   import FileEntry from "./FileEntry.vue";
   import { extractQueryParam } from "../../core/helpers.js";
@@ -37,7 +47,7 @@
     const parts = driveKey.split(":");
     return {
       id: parts[0],
-      page: parts[1]
+      page: parseInt(parts[1])
     };
   }
 
@@ -49,15 +59,16 @@
       FolderEntry
     },
 
-    mixins: [GraphLayerMixin],
-
-    driveInfo: new Map(),
-    skipTokens: new Map(),
+    mixins: [
+      GraphLayerMixin,
+      LoadErrorMixin
+    ],
 
     data: () => ({
       id: "",
       page: 0,
-      nav: []
+      nav: [],
+      pathParts: []
     }),
 
     props: {
@@ -96,6 +107,9 @@
     },
 
     created() {
+      this.$options.driveInfo = new Map();
+      this.$options.skipTokens = new Map();
+
       this.load();
     },
 
@@ -115,7 +129,7 @@
           endpoint += "/root/children";
         }
         else {
-          endpoint += "/" + encodeURIComponent(id) + "/children";
+          endpoint += "/items/" + encodeURIComponent(id) + "/children";
         }
 
         const url = new URL(endpoint,window.location.origin);
@@ -144,6 +158,11 @@
         });
       },
 
+      navigateItem(item) {
+        this.pathParts.push(item.name);
+        this.navigate(item.id);
+      },
+
       navigate(id,_page) {
         const page = _page || 0;
         const driveKey = makeDriveKey(id,page);
@@ -164,9 +183,10 @@
 
       goBack() {
         if (this.nav.length > 1) {
-          const { id, page } = parseKey(this.nav.pop());
-          this.id = id;
-          this.page = page;
+          this.nav.pop();
+          this.pathParts.pop();
+          const { id, page } = parseDriveKey(this.nav[this.nav.length - 1]);
+          this.navigate(id,page);
         }
       },
 
@@ -174,12 +194,17 @@
         this.$options.driveInfo.clear();
         this.id = "";
         this.nav.splice(0);
+        this.pathParts.splice(0);
       }
     },
 
     watch: {
       endpoint() {
         this.load();
+      },
+
+      pathParts() {
+        this.$emit('pathParts:update',this.pathParts);
       }
     }
   };
@@ -208,5 +233,13 @@
   }
   .entry-wrapper:last-child {
     border-bottom: none;
+  }
+
+  .empty {
+    display: flex;
+    justify-content: center;
+  }
+  .empty > span {
+    margin: 2em;
   }
 </style>

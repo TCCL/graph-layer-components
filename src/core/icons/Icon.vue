@@ -34,6 +34,7 @@
   .icon {
     display: inline-block;
     width: 24px;
+    height: 24px;
   }
 
   .icon >>> svg {

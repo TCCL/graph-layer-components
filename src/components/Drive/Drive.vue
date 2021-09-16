@@ -5,8 +5,22 @@
     class="graph-layer-drive"
     :class="[$themeClass]"
     >
+    <div class="title-region">
+      <div v-if="canGoBack" class="back" @click="goBack">
+        <icon i="arrow-back" />
+      </div>
+      <div class="title-bar">
+        <span class="name">{{ driveInfo.name }}</span>
+        <span v-for="part in pathParts">/ {{ part }}</span>
+      </div>
+    </div>
 
-    <drive-explorer :endpoint="endpoint" :top="top" />
+    <drive-explorer
+      ref="explorer"
+      :endpoint="endpoint"
+      :top="top"
+      @pathParts:update="pathParts = $event"
+      />
   </graph-layer-wrapper>
 </template>
 
@@ -28,7 +42,8 @@
     ],
 
     data: () => ({
-
+      driveInfo: {},
+      pathParts: []
     }),
 
     props: {
@@ -86,19 +101,53 @@
         }
 
         return null;
-      }
+      },
+
+      canGoBack() {
+        return this.pathParts.length > 0;
+      },
     },
 
     created() {
-
+      this.load();
     },
 
     methods: {
+      load() {
+        this.$fetchJson(this.endpoint).then((driveInfo) => {
+          this.driveInfo = driveInfo;
+        });
+      },
 
+      goBack() {
+        this.$refs.explorer.goBack();
+      }
+    },
+
+    watch: {
+      endpoint() {
+        this.load();
+      }
     }
   };
 </script>
 
 <style scoped>
-
+  .title-region {
+    display: flex;
+    align-items: center;
+    border-bottom: 3px solid var(--graph-layer-drive-divider-color);
+    padding: 0.75em 0;
+  }
+  .title-region > .back {
+    flex: 1 0;
+    cursor: pointer;
+    display: flex;
+  }
+  .title-region > .back:hover {
+    background-color: var(--graph-layer-drive-item-selected-background-color);
+  }
+  .title-region > .title-bar {
+    flex: 11 0;
+  }
 </style>

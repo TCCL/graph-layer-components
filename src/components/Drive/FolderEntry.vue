@@ -1,7 +1,7 @@
 <template>
   <div class="graph-layer-drive-folder-entry">
     <div class="navigate" @click="navigate" :title="item.name">
-      <icon i="folder" /><a class="text" @click="navigate">{{ item.name }}</a>
+      <icon i="folder" /><a class="text">{{ item.name }}</a>
     </div>
     <div class="size">
       <span class="caption">{{ sizeFormatted }}</span>
@@ -41,7 +41,9 @@
     },
 
     methods: {
-
+      navigate() {
+        this.$emit('click',this.item.id);
+      }
     }
   };
 </script>
@@ -83,5 +85,6 @@
   .graph-layer-drive-folder-entry > .modified-on {
     display: flex;
     flex-flow: row-reverse;
+    margin-right: 4px;
   }
 </style>

@@ -48,11 +48,5 @@ export default {
     modifiedDistance() {
       return formatDistanceToNow(this.modifiedOn,{ addSuffix:true });
     }
-  },
-
-  methods: {
-    navigate() {
-
-    }
   }
 };

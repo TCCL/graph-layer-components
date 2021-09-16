@@ -1,7 +1,7 @@
 <template>
   <div class="graph-layer-drive-file-entry">
     <div class="navigate" @click="navigate" :title="item.name">
-      <icon i="file" class="secondary" /><a class="text" @click="navigate">{{ item.name }}</a>
+      <icon i="file" class="secondary" /><a class="text">{{ item.name }}</a>
     </div>
     <div class="size">
       <span class="caption">{{ sizeFormatted }}</span>
@@ -41,7 +41,11 @@
     },
 
     methods: {
-
+      navigate() {
+        if (this.item.webUrl) {
+          window.open(this.item.webUrl,"_blank");
+        }
+      }
     }
   };
 </script>

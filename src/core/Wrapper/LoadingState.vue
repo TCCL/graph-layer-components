@@ -42,5 +42,6 @@
 
   .message {
     font-size: 1.5em;
+    margin: 2em;
   }
 </style>
