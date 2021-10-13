@@ -1,8 +1,11 @@
 // mixins/GraphLayerMixin.js
 
+import Cookies from "js-cookie";
+
 import globals from "../../globals.js";
 import * as WrapperComponents from "../Wrapper";
 import Icon from "../icons";
+import { nop } from "../helpers.js";
 
 function findParentItem($parent,key,subkey) {
   if (!$parent) {
@@ -16,6 +19,13 @@ function findParentItem($parent,key,subkey) {
   return findParentProp($parent.$parent,key,subkey);
 }
 
+function modifyPromise(promise) {
+  promise._then = promise.then;
+  promise.then = function(handlerfn,errfn) {
+    return this._then(handlerfn,errfn || nop);
+  };
+}
+
 export default {
   components: {
     ...WrapperComponents,
@@ -26,6 +36,11 @@ export default {
     graphLayer: {
       type: Object,
       default: null
+    },
+
+    shared: {
+      type: [Boolean,String],
+      default: false
     }
   },
 
@@ -91,26 +106,57 @@ export default {
     $fetch(resource,init) {
       this.$loadingState = true;
       this.$errorState = null;
-      return this.$graphLayer.fetch(resource,init).then((result) => {
-        this.$loadingState = false;
-        return result;
 
-      }).catch((error) => {
+      let promise;
+      if (!this.$hasSession() && !this.shared) {
+        promise = Promise.reject({
+          error: "Content Unavailable",
+          message: "You are not signed into Microsoft Graph and cannot view this content.",
+        });
+      }
+      else {
+        promise = this.$graphLayer.fetch(resource,init).then((response) => {
+          if (!response.ok) {
+            return Promise.reject(response.json());
+          }
+
+          this.$loadingState = false;
+          return response;
+        });
+      }
+
+      promise.catch((error) => {
         this.$loadingState = false;
         this.$errorState = error;
       });
+
+      modifyPromise(promise);
+      return promise;
     },
 
     $fetchBlob(resource,init) {
-      return this.$fetch(resource,init).then((response) => {
+      const promise = this.$fetch(resource,init)._then((response) => {
         return response.blob();
       });
+
+      modifyPromise(promise);
+      return promise;
     },
 
     $fetchJson(resource,init) {
-      return this.$fetch(resource,init).then((response) => {
+      const promise = this.$fetch(resource,init)._then((response) => {
         return response.json();
       });
+
+      modifyPromise(promise);
+      return promise;
+    },
+
+    $hasSession() {
+      const cookieId = this.$graphLayer.getOption("cookieId");
+      const sessionId = Cookies.get(cookieId);
+
+      return !!sessionId;
     }
   }
 };

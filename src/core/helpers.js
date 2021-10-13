@@ -1,5 +1,9 @@
 // core/helpers.js
 
+function nop() {
+
+}
+
 function extractQueryParam(_query,name) {
   if (typeof _query !== "string" || _query.length == 0) {
     return null;
@@ -46,6 +50,7 @@ function formatByteSize(nbytes) {
 }
 
 export {
+  nop,
   extractQueryParam,
   formatByteSize
 };
