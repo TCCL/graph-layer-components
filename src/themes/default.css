@@ -9,6 +9,7 @@
   --graph-layer-color-primary: #3185fc;
   --graph-layer-color-secondary: #34e5ff;
   --graph-layer-color-accent: #b74f6f;
+  --graph-layer-color-error: #ffaaaa;
 
   /* Base elements */
   --graph-layer-caption-color: var(--graph-layer-color-dark-gray);

@@ -1,11 +1,17 @@
 <template functional>
   <div class="graph-layer-wrapper">
-    <loading-state v-if="props.loadingState && !props.hideLoading" />
+    <loading-state
+      v-if="props.loadingState && !props.hideLoading"
+      :class="[data.staticClass,data.class]"
+      />
 
     <error-state
       v-else-if="!props.loadingState && props.errorState"
       :error="props.errorState"
-      />
+      :class="[data.staticClass,data.class]"
+      >
+
+    </error-state>
 
     <div
       v-show="!props.loadingState && !props.errorState"
