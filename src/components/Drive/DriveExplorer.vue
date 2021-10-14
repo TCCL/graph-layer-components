@@ -103,6 +103,8 @@
         if (this.currentInfo) {
           return this.currentInfo.hasNext;
         }
+
+        return false;
       }
     },
 
@@ -164,19 +166,29 @@
       },
 
       navigate(id,_page) {
+        this.loadPage(id,_page,(driveKey) => {
+          this.nav.push(driveKey);
+        });
+      },
+
+      loadPage(id,_page,donefn) {
         const page = _page || 0;
         const driveKey = makeDriveKey(id,page);
 
         if (this.$options.driveInfo.has(driveKey)) {
           this.id = id;
           this.page = page;
-          this.nav.push(driveKey);
+          if (typeof donefn === "function") {
+            donefn(driveKey);
+          }
         }
         else {
           this.fetchListing(id,page).then(() => {
             this.id = id;
             this.page = page;
-            this.nav.push(driveKey);
+            if (typeof donefn === "function") {
+              donefn(driveKey);
+            }
           });
         }
       },
@@ -186,7 +198,7 @@
           this.nav.pop();
           this.pathParts.pop();
           const { id, page } = parseDriveKey(this.nav[this.nav.length - 1]);
-          this.navigate(id,page);
+          this.loadPage(id,page);
         }
       },
 
