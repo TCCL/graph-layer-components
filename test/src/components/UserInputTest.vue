@@ -1,9 +1,11 @@
 <template>
-  <div class="user-input-test">
-    <label>Enter the <code>userPrincipleName</code>:</label>
-    <input type="text" v-model="inputValue" @keyup.enter="commit" />
-    <button @click="commit">Render</button>
-    <hr>
+  <div class="graph-layer-wrapper scrollable-flex user-input-test">
+    <div class="controls">
+      <label>Enter the <code>userPrincipleName</code>:</label>
+      <input type="text" v-model="inputValue" @keyup.enter="commit" />
+      <button @click="commit">Render</button>
+      <hr>
+    </div>
     <graph-layer-user v-if="ready" :user-principle-name="userPrincipleName" />
   </div>
 </template>
@@ -45,7 +47,7 @@
 </script>
 
 <style scoped>
-  .user-input-test > input {
+  .user-input-test > .controls > input {
     width: 25em;
   }
 </style>

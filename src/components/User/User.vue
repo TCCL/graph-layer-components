@@ -2,14 +2,16 @@
   <graph-layer-wrapper
     :loading-state="$loadingState"
     :error-state="$errorState"
-    class="graph-layer-user"
+    class="graph-layer-user-wrapper justify-around"
     :class="[$themeClass]"
     >
-    <avatar ref="avatar" :endpoint="endpoint" :display-name="userInfo.displayName" />
-    <div class="user-info">
-      <div class="name">{{ userInfo.displayName }}</div>
-      <div class="job-title caption">{{ userInfo.jobTitle }}</div>
-      <div class="emailAddress"><a :href="emailLink">{{ userInfo.mail }}</a></div>
+    <div class="graph-layer-user">
+      <avatar ref="avatar" :endpoint="endpoint" :display-name="userInfo.displayName" />
+      <div class="user-info">
+        <div class="name">{{ userInfo.displayName }}</div>
+        <div class="job-title caption">{{ userInfo.jobTitle }}</div>
+        <div class="emailAddress"><a :href="emailLink">{{ userInfo.mail }}</a></div>
+      </div>
     </div>
   </graph-layer-wrapper>
 </template>
@@ -117,7 +119,9 @@
 <style scoped>
   .graph-layer-user {
     display: flex;
+    flex-flow: row nowrap;
     align-items: center;
+    padding-left: 1em;
   }
 
   .avatar {

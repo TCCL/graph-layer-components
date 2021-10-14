@@ -2,6 +2,7 @@
   <graph-layer-wrapper
     :loading-state="$loadingState"
     :error-state="$errorState"
+    wrapper-class="no-scroll"
     class="graph-layer-drive"
     :class="[$themeClass]"
     >
@@ -13,6 +14,13 @@
         <span class="name">{{ driveInfo.name }}</span>
         <span v-for="part in pathParts">/ {{ part }}</span>
       </div>
+    </div>
+
+    <div class="header">
+      <div class="column name">Name</div>
+      <div class="column">Size</div>
+      <div class="column">Last Modified By</div>
+      <div class="column last-modified">Last Modified</div>
     </div>
 
     <drive-explorer
@@ -149,5 +157,22 @@
   }
   .title-region > .title-bar {
     flex: 11 0;
+  }
+
+  .header {
+    display: flex;
+    border-bottom: 2px solid var(--graph-layer-drive-row-border-color);
+  }
+  .header > .column {
+    font-size: 12px;
+    font-weight: bold;
+    padding: 0.5em 0;
+    flex: 2 0;
+  }
+  .header > .column.name {
+    flex: 6 0;
+  }
+  .header > .column.last-modified {
+    text-align: right;
   }
 </style>

@@ -4,11 +4,8 @@
     :error-state="$errorState"
     class="graph-layer-drive-explorer"
     >
-    <div class="header">
-      <div class="column name">Name</div>
-      <div class="column">Size</div>
-      <div class="column">Last Modified By</div>
-      <div class="column last-modified">Last Modified</div>
+    <div v-if="currentListing.length == 0" class="empty">
+      <span class="caption">This folder is empty.</span>
     </div>
 
     <div class="entry-wrapper" v-for="item in currentListing">
@@ -24,27 +21,25 @@
         />
     </div>
 
-    <div v-if="currentListing.length == 0" class="empty">
-      <span class="caption">This folder is empty.</span>
-    </div>
+    <div v-if="hasNext || page > 0" class="page-buttons-wrapper">
+      <div class="page-buttons">
+        <div class="page-back-button-wrapper button-wrapper">
+          <icon
+            i="arrow-left"
+            class="button primary"
+            :class="{ disabled:page<=0 }"
+            @click="pageBack"
+            />
+        </div>
 
-    <div v-if="hasNext || page > 0" class="page-buttons">
-      <div class="page-back-button-wrapper button-wrapper">
-        <icon
-          i="arrow-left"
-          class="button primary"
-          :class="{ disabled:page<=0 }"
-          @click="pageBack"
-          />
-      </div>
-
-      <div class="page-forward-button-wrapper button-wrapper">
-        <icon
-          i="arrow-right"
-          class="button primary"
-          :class="{ disabled:!hasNext }"
-          @click="pageForward"
-          />
+        <div class="page-forward-button-wrapper button-wrapper">
+          <icon
+            i="arrow-right"
+            class="button primary"
+            :class="{ disabled:!hasNext }"
+            @click="pageForward"
+            />
+        </div>
       </div>
     </div>
   </graph-layer-wrapper>
@@ -268,23 +263,6 @@
 </script>
 
 <style scoped>
-  .header {
-    display: flex;
-    border-bottom: 2px solid var(--graph-layer-drive-row-border-color);
-  }
-  .header > .column {
-    font-size: 12px;
-    font-weight: bold;
-    padding: 0.5em 0;
-    flex: 2 0;
-  }
-  .header > .column.name {
-    flex: 6 0;
-  }
-  .header > .column.last-modified {
-    text-align: right;
-  }
-
   .entry-wrapper {
     border-bottom: 1px solid var(--graph-layer-drive-row-border-color);
   }
@@ -300,10 +278,17 @@
     margin: 2em;
   }
 
+  .page-buttons-wrapper {
+    flex: 1 0;
+    margin-top: 1em;
+    display: flex;
+    flex-flow: column nowrap;
+    justify-content: flex-end;
+  }
+
   .page-buttons {
     display: flex;
     justify-content: center;
-    margin: 2em;
   }
   .page-buttons > .button-wrapper {
     flex: 0 0 20%;

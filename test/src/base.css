@@ -6,13 +6,15 @@
 }
 
 .testbed-wrapper > .region-wrapper {
-  flex: 1 0 50%;
+  flex: 0 0 50%;
+  overflow: hidden;
 }
 
 .testbed-wrapper > .region-wrapper > .region {
   padding: 3%;
-  min-height: 180px;
+  min-height: 360px;
+  max-height: 360px;
   display: flex;
   flex-flow: column nowrap;
-  justify-content: space-around;
+  justify-content: flex-start;
 }
