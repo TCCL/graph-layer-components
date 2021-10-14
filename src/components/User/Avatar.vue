@@ -62,7 +62,7 @@
         let endpoint = this.endpoint;
         endpoint += "/photo/$value";
 
-        this.$fetchBlob(endpoint).then((value) => {
+        this.$fetchBlob(endpoint,null,true).then((value) => {
           this.setUrl(value);
         });
       },

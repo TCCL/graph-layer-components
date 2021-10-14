@@ -103,7 +103,7 @@ export default {
   },
 
   methods: {
-    $fetch(resource,init) {
+    $fetch(resource,init,ignoreError) {
       this.$loadingState = true;
       this.$errorState = null;
 
@@ -117,7 +117,7 @@ export default {
       else {
         promise = this.$graphLayer.fetch(resource,init).then((response) => {
           if (!response.ok) {
-            return Promise.reject(response.json());
+            return response.json().then((json) => Promise.reject(json));
           }
 
           this.$loadingState = false;
@@ -127,15 +127,17 @@ export default {
 
       promise.catch((error) => {
         this.$loadingState = false;
-        this.$errorState = error;
+        if (!ignoreError) {
+          this.$errorState = error;
+        }
       });
 
       modifyPromise(promise);
       return promise;
     },
 
-    $fetchBlob(resource,init) {
-      const promise = this.$fetch(resource,init)._then((response) => {
+    $fetchBlob(resource,init,ignoreError) {
+      const promise = this.$fetch(resource,init,ignoreError)._then((response) => {
         return response.blob();
       });
 
@@ -143,8 +145,8 @@ export default {
       return promise;
     },
 
-    $fetchJson(resource,init) {
-      const promise = this.$fetch(resource,init)._then((response) => {
+    $fetchJson(resource,init,ignoreError) {
+      const promise = this.$fetch(resource,init,ignoreError)._then((response) => {
         return response.json();
       });
 
