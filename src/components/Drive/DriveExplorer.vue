@@ -27,6 +27,26 @@
     <div v-if="currentListing.length == 0" class="empty">
       <span class="caption">This folder is empty.</span>
     </div>
+
+    <div v-if="hasNext || page > 0" class="page-buttons">
+      <div class="page-back-button-wrapper button-wrapper">
+        <icon
+          i="arrow-left"
+          class="button primary"
+          :class="{ disabled:page<=0 }"
+          @click="pageBack"
+          />
+      </div>
+
+      <div class="page-forward-button-wrapper button-wrapper">
+        <icon
+          i="arrow-right"
+          class="button primary"
+          :class="{ disabled:!hasNext }"
+          @click="pageForward"
+          />
+      </div>
+    </div>
   </graph-layer-wrapper>
 </template>
 
@@ -145,7 +165,7 @@
         }
 
         return this.$fetchJson(url).then((result) => {
-          const skipToken = extractQueryParam(result["@odata.nextLink"]);
+          const skipToken = extractQueryParam(result["@odata.nextLink"],"$skiptoken");
           if (skipToken) {
             const nextKey = makeDriveKey(id,page+1);
             this.$options.skipTokens.set(nextKey,skipToken);
@@ -161,6 +181,15 @@
       },
 
       navigateItem(item) {
+        // Ensure top nav item has latest page before navigation if the page
+        // number changed.
+        if (this.nav.length > 0) {
+          const { id, page } = parseDriveKey(this.nav[this.nav.length - 1]);
+          if (page != this.page) {
+            this.nav[this.nav.length-1] = this.driveKey;
+          }
+        }
+
         this.pathParts.push(item.name);
         this.navigate(item.id);
       },
@@ -200,6 +229,22 @@
           const { id, page } = parseDriveKey(this.nav[this.nav.length - 1]);
           this.loadPage(id,page);
         }
+      },
+
+      pageBack() {
+        if (this.page <= 0) {
+          return;
+        }
+
+        this.loadPage(this.id,this.page-1);
+      },
+
+      pageForward() {
+        if (!this.hasNext) {
+          return;
+        }
+
+        this.loadPage(this.id,this.page+1);
       },
 
       reset() {
@@ -253,5 +298,18 @@
   }
   .empty > span {
     margin: 2em;
+  }
+
+  .page-buttons {
+    display: flex;
+    justify-content: center;
+    margin: 2em;
+  }
+  .page-buttons > .button-wrapper {
+    flex: 0 0 20%;
+    text-align: center;
+  }
+  .page-buttons > .button-wrapper >>> .icon {
+    width: 36px;
   }
 </style>

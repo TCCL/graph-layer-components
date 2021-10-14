@@ -18,7 +18,8 @@
         ],
 
         attrs: context.data.attrs,
-        style: context.data.style
+        style: context.data.style,
+        on: context.listeners
       });
 
       return e;
@@ -35,6 +36,19 @@
     display: inline-block;
     width: 24px;
     height: 24px;
+  }
+
+  .icon.button {
+    cursor: pointer;
+    opacity: 0.9;
+  }
+  .icon.button:hover {
+    opacity: 1;
+  }
+  .icon.button.disabled {
+    cursor: initial;
+    opacity: 0.2;
+    fill: var(--graph-layer-color-light-gray);
   }
 
   .icon >>> svg {
