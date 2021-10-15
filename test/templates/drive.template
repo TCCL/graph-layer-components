@@ -11,4 +11,14 @@
       <div data-graph-layer="drive" data-graph-layer--me="1" data-graph-layer--top="2"></div>
     </div>
   </div>
+  <div class="region-wrapper">
+    <div class="region">
+      <div data-graph-layer="driveInputTest"></div>
+    </div>
+  </div>
+  <div class="region-wrapper">
+    <div class="region">
+      <div data-graph-layer="driveInputTest"></div>
+    </div>
+  </div>
 </div>
