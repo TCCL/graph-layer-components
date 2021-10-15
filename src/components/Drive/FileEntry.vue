@@ -82,6 +82,7 @@
     flex: 2 0;
     display: flex;
     align-items: center;
+    font-size: 14px;
   }
 
   .graph-layer-drive-file-entry > .modified-on {

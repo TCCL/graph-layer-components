@@ -11,7 +11,7 @@
         <icon i="arrow-back" />
       </div>
       <div class="title-bar">
-        <span class="name">{{ driveInfo.name }}</span>
+        <span class="name">{{ driveName }}</span>
         <span v-for="part in pathParts">/ {{ part }}</span>
       </div>
     </div>
@@ -51,7 +51,9 @@
 
     data: () => ({
       driveInfo: {},
-      pathParts: []
+      pathParts: [],
+      siteInfo: null,
+      groupInfo: null,
     }),
 
     props: {
@@ -111,6 +113,23 @@
         return null;
       },
 
+      driveName() {
+        let parts = [];
+
+        if (this.siteInfo) {
+          parts.push(this.siteInfo.displayName);
+        }
+        else if (this.groupInfo) {
+          parts.push(this.groupInfo.displayName);
+        }
+
+        if (this.driveInfo.name) {
+          parts.push(this.driveInfo.name);
+        }
+
+        return parts.join(" / ");
+      },
+
       canGoBack() {
         return this.pathParts.length > 0;
       },
@@ -125,6 +144,20 @@
         this.$fetchJson(this.endpoint).then((driveInfo) => {
           this.driveInfo = driveInfo;
         });
+
+        if (this.siteId) {
+          const uri = "/sites/" + this.siteId;
+          this.$fetchJson(uri,null,true).then((siteInfo) => {
+            this.siteInfo = siteInfo;
+          });
+        }
+
+        if (this.groupId) {
+          const uri = "/groups/" + this.groupId;
+          this.$fetchJson(uri,null,true).then((groupInfo) => {
+            this.groupInfo = groupInfo;
+          });
+        }
       },
 
       goBack() {
