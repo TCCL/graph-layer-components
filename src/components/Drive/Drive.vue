@@ -122,6 +122,9 @@
         else if (this.groupInfo) {
           parts.push(this.groupInfo.displayName);
         }
+        else if (this.driveInfo.owner && this.driveInfo.owner.group) {
+          parts.push(this.driveInfo.owner.group.displayName);
+        }
 
         if (this.driveInfo.name) {
           parts.push(this.driveInfo.name);
@@ -141,21 +144,28 @@
 
     methods: {
       load() {
+        this.driveInfo = {};
+        this.groupInfo = null;
+        this.siteInfo = null;
+
         this.$fetchJson(this.endpoint).then((driveInfo) => {
           this.driveInfo = driveInfo;
+
+          // Fetch group info if we do not have group display name via 'owner'
+          // property.
+          if (this.groupId && (!this.driveInfo.owner || !this.driveInfo.owner.group)) {
+            const uri = "/groups/" + this.groupId;
+            this.$fetchJson(uri,null,true).then((groupInfo) => {
+              this.groupInfo = groupInfo;
+            });
+          }
         });
 
+        // Fetch site info to use site display name.
         if (this.siteId) {
           const uri = "/sites/" + this.siteId;
           this.$fetchJson(uri,null,true).then((siteInfo) => {
             this.siteInfo = siteInfo;
-          });
-        }
-
-        if (this.groupId) {
-          const uri = "/groups/" + this.groupId;
-          this.$fetchJson(uri,null,true).then((groupInfo) => {
-            this.groupInfo = groupInfo;
           });
         }
       },
