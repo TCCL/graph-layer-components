@@ -3,7 +3,8 @@
    <label>Select the kind of object and specify and ID:</label>
    <div class="controls">
       <select v-model="driveType">
-        <option value="">-none selected</option>
+        <option value="">-none selected-</option>
+        <option value="id">Drive</option>
         <option value="siteId">Site</option>
         <option value="groupId">Group</option>
       </select>

@@ -6,6 +6,7 @@ import folderSvg from "./folder.svg";
 import arrowBackSvg from "./arrow-back.svg";
 import arrowLeftSvg from "./arrow-left.svg";
 import arrowRightSvg from "./arrow-right.svg";
+import arrowDownSvg from "./arrow-down.svg";
 import externalLinkSvg from "./external-link.svg";
 
 export default function (iconId) {
@@ -20,6 +21,8 @@ export default function (iconId) {
     return arrowLeftSvg;
   case "arrow-right":
     return arrowRightSvg;
+  case "arrow-down":
+    return arrowDownSvg;
   case "external-link":
     return externalLinkSvg;
   }

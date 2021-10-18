@@ -1,6 +1,7 @@
 // components/index.js
 
 import Drive from "./Drive";
+import DrivePicker from "./DrivePicker";
 import User from "./User";
 
 // NOTE: The export object keys used here denote the library's component IDs
@@ -8,5 +9,6 @@ import User from "./User";
 
 export {
   Drive as drive,
+  DrivePicker as drivePicker,
   User as user
 }

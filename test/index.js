@@ -10,6 +10,10 @@ function get_drive(service,req,res) {
   service.render(req,res,"Drive","drive",{});
 }
 
+function get_drive_picker(service,req,res) {
+  service.render(req,res,"DrivePicker","drive-picker",{});
+}
+
 module.exports = {
   title: "Graph Layer Components",
 
@@ -21,7 +25,8 @@ module.exports = {
 
   routes: [
     ["/graph-layer-components/userinfo",get_user,"User"],
-    ["/graph-layer-components/drive",get_drive,"Drive"]
+    ["/graph-layer-components/drive",get_drive,"Drive"],
+    ["/graph-layer-components/drive-picker",get_drive_picker,"DrivePicker"]
   ],
 
   assets: {

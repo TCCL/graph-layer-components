@@ -24,4 +24,7 @@
   --graph-layer-drive-divider-color: var(--graph-layer-color-secondary);
   --graph-layer-drive-row-border-color: var(--graph-layer-color-light-gray);
   --graph-layer-drive-item-selected-background-color: var(--graph-layer-color-light-gray);
+
+  /* Drive Picker */
+  --graph-layer-drive-selected-background-color: var(--graph-layer-color-light-gray);
 }
