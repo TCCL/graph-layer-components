@@ -83,7 +83,7 @@
       id: "",
       page: 0,
       nav: [],
-      pathParts: []
+      items: []
     }),
 
     props: {
@@ -185,7 +185,7 @@
           }
         }
 
-        this.pathParts.push(item.name);
+        this.items.push(item);
         this.navigate(item.id);
       },
 
@@ -220,7 +220,7 @@
       goBack() {
         if (this.nav.length > 1) {
           this.nav.pop();
-          this.pathParts.pop();
+          this.items.pop();
           const { id, page } = parseDriveKey(this.nav[this.nav.length - 1]);
           this.loadPage(id,page);
         }
@@ -246,7 +246,7 @@
         this.$options.driveInfo.clear();
         this.id = "";
         this.nav.splice(0);
-        this.pathParts.splice(0);
+        this.items.splice(0);
       }
     },
 
@@ -255,8 +255,8 @@
         this.load();
       },
 
-      pathParts() {
-        this.$emit('pathParts:update',this.pathParts);
+      items() {
+        this.$emit('change',this.items);
       }
     }
   };

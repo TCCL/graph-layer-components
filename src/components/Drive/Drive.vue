@@ -14,6 +14,14 @@
         <span class="name">{{ driveName }}</span>
         <span v-for="part in pathParts">/ {{ part }}</span>
       </div>
+      <div class="toolbar">
+        <icon
+          i="external-link"
+          class="button"
+          @click="openDrive"
+          title="Open in Microsoft file viewer"
+          />
+      </div>
     </div>
 
     <div class="header">
@@ -27,7 +35,7 @@
       ref="explorer"
       :endpoint="endpoint"
       :top="top"
-      @pathParts:update="pathParts = $event"
+      @change="items = $event"
       />
   </graph-layer-wrapper>
 </template>
@@ -51,9 +59,9 @@
 
     data: () => ({
       driveInfo: {},
-      pathParts: [],
+      items: [],
       siteInfo: null,
-      groupInfo: null,
+      groupInfo: null
     }),
 
     props: {
@@ -125,6 +133,9 @@
         else if (this.driveInfo.owner && this.driveInfo.owner.group) {
           parts.push(this.driveInfo.owner.group.displayName);
         }
+        else if (this.driveInfo.owner && this.driveInfo.owner.user) {
+          parts.push(this.driveInfo.owner.user.displayName);
+        }
 
         if (this.driveInfo.name) {
           parts.push(this.driveInfo.name);
@@ -134,8 +145,20 @@
       },
 
       canGoBack() {
-        return this.pathParts.length > 0;
+        return this.items.length > 0;
       },
+
+      currentItem() {
+        if (this.items.length > 0) {
+          return this.items[this.items.length-1];
+        }
+
+        return this.driveInfo;
+      },
+
+      pathParts() {
+        return this.items.map((item) => item.name);
+      }
     },
 
     created() {
@@ -172,6 +195,14 @@
 
       goBack() {
         this.$refs.explorer.goBack();
+      },
+
+      openDrive() {
+        if (!this.currentItem.webUrl) {
+          return;
+        }
+
+        window.open(this.currentItem.webUrl,"_blank");
       }
     },
 
@@ -199,7 +230,11 @@
     background-color: var(--graph-layer-drive-item-selected-background-color);
   }
   .title-region > .title-bar {
-    flex: 11 0;
+    flex: 10 0;
+  }
+  .title-region > .toolbar {
+    flex: 1 0;
+    text-align: right;
   }
 
   .header {
