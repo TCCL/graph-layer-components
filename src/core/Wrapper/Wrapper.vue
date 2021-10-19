@@ -1,5 +1,8 @@
 <template functional>
-  <div class="graph-layer-wrapper scrollable-flex" :class="props.wrapperClass">
+  <div
+    class="graph-layer-wrapper"
+    :class="(props.scroll ? ' scroll' : '')"
+    >
     <loading-state
       v-if="props.loadingState && !props.hideLoading"
       :class="[data.staticClass,data.class]"
@@ -15,7 +18,7 @@
 
     <div
       v-show="!props.loadingState && !props.errorState"
-      class="graph-layer-content scrollable-flex"
+      class="graph-layer-content"
       :class="[data.staticClass,data.class]"
       v-bind="data.attrs"
       >
@@ -44,9 +47,9 @@
         default: false
       },
 
-      wrapperClass: {
-        type: String,
-        default: ""
+      scroll: {
+        type: Boolean,
+        default: false
       }
     }
   };
@@ -55,14 +58,21 @@
 <style scoped>
   .graph-layer-wrapper {
     overflow: hidden;
+    flex: 1 0;
+    display: flex;
+    flex-flow: column nowrap;
   }
 
   .graph-layer-wrapper > .graph-layer-content {
-    overflow: auto;
-    justify-content: flex-start;
-  }
-  .graph-layer-wrapper.no-scroll > .graph-layer-content {
     overflow: hidden;
+    flex: 1 0;
+    display: flex;
+    justify-content: flex-start;
+    flex-flow: column nowrap;
+  }
+  .graph-layer-wrapper.scroll > .graph-layer-content {
+    overflow: auto;
+    flex: 1 0 1px;
   }
   .graph-layer-wrapper > .graph-layer-content.justify-around {
     justify-content: space-around;

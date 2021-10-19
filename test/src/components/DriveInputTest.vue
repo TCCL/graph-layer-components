@@ -1,5 +1,5 @@
 <template>
-  <div class="graph-layer-wrapper scrollable-flex drive-input-test"> 
+  <div class="graph-layer input-test drive-input-test"> 
    <label>Select the kind of object and specify and ID:</label>
    <div class="controls">
       <select v-model="driveType">

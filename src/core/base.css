@@ -22,9 +22,7 @@
   color: var(--graph-layer-anchor-color);
 }
 
-.graph-layer-wrapper.scrollable-flex,
-.graph-layer-wrapper .scrollable-flex {
-  flex: 1 0 1px;
+.graph-layer {
   display: flex;
   flex-flow: column nowrap;
 }

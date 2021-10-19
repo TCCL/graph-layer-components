@@ -2,7 +2,7 @@
 
 <div class="testbed-wrapper">
   <div class="region-wrapper">
-    <div class="region">
+    <div class="region graph-layer">
       <div data-graph-layer="drivePicker" data-graph-layer--form-element="driveId"></div>
     </div>
   </div>

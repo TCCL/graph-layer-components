@@ -1,8 +1,5 @@
 <template>
-  <div
-    class="drive-tree-picker scrollable-flex"
-    :class="classes"
-    >
+  <div class="drive-tree-picker" :class="classes">
     <div class="header" @click="select">
       <icon :i="active ? 'arrow-down' : 'arrow-right'" />
 
@@ -13,7 +10,7 @@
     </div>
 
     <graph-layer-wrapper
-      v-show="active"
+      v-if="active"
       :loading-state="$loadingState"
       :error-state="$errorState"
       class="graph-layer-drive-tree-picker-inner"
@@ -203,8 +200,5 @@
 
   .drive-tree-picker .drive-tree-options {
     flex: 0 0;
-  }
-  .drive-tree-picker .drive-tree-options.active {
-    flex: 1 0;
   }
 </style>

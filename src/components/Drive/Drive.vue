@@ -2,7 +2,6 @@
   <graph-layer-wrapper
     :loading-state="$loadingState"
     :error-state="$errorState"
-    wrapper-class="no-scroll"
     class="graph-layer-drive"
     :class="[$themeClass]"
     >

@@ -4,6 +4,7 @@
     :error-state="$errorState"
     class="graph-layer-drive-picker"
     :class="[$themeClass]"
+    scroll
     >
     <div class="title-bar">
       <span>Select a drive</span>
@@ -183,8 +184,5 @@
 
   .drive-tree-picker {
     flex: 0 0;
-  }
-  .drive-tree-picker.active {
-    flex: 1 0;
   }
 </style>

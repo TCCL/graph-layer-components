@@ -3,6 +3,7 @@
     :loading-state="$loadingState"
     :error-state="$errorState"
     class="graph-layer-drive-explorer"
+    scroll
     >
     <div v-if="currentListing.length == 0" class="empty">
       <span class="caption">This folder is empty.</span>

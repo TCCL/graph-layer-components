@@ -1,16 +1,11 @@
 <template>
-  <div class="drive-tree-options scrollable-flex" :class="classes">
+  <div class="drive-tree-options" :class="classes">
     <div class="header" @click="select" :title="info.title">
       <icon :i="active ? 'arrow-down' : 'arrow-right'" />
       <span>{{ info.name }}</span>
     </div>
 
-    <graph-layer-wrapper
-      v-show="active"
-      :loading-state="$loadingState"
-      :error-state="$errorState"
-      class="graph-layer-drive-tree-options-inner"
-      >
+    <div v-if="active" class="entry-wrapper">
       <div
         v-for="entry in entries"
         class="entry"
@@ -18,20 +13,18 @@
         >
         <span>{{ entry.name }}</span>
       </div>
-    </graph-layer-wrapper>
+    </div>
   </div>
 </template>
 
 <script>
   import GraphLayerMixin from "../../core/mixins/GraphLayerMixin.js";
-  import LoadErrorMixin from "../../core/mixins/LoadErrorMixin.js";
 
   export default {
     name: "DriveTreeOptions",
 
     mixins: [
-      GraphLayerMixin,
-      LoadErrorMixin
+      GraphLayerMixin
     ],
 
     data: () => ({

@@ -1,5 +1,5 @@
 <template>
-  <div class="graph-layer-wrapper scrollable-flex user-input-test">
+  <div class="graph-layer input-test user-input-test">
     <div class="controls">
       <label>Enter the <code>userPrincipleName</code>:</label>
       <input type="text" v-model="inputValue" @keyup.enter="commit" />
