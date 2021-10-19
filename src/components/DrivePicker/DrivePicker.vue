@@ -9,7 +9,6 @@
       <span>Select a drive</span>
     </div>
 
-    
     <drive-tree-picker
       v-if="!meOff"
       class="me"
@@ -52,7 +51,6 @@
 
 <script>
   import GraphLayerMixin from "../../core/mixins/GraphLayerMixin.js";
-  import LoadErrorMixin from "../../core/mixins/LoadErrorMixin.js";
   import DriveTreePicker from "./DriveTreePicker.vue";
 
   function driveType2PropName(driveType) {
@@ -81,8 +79,7 @@
     },
 
     mixins: [
-      GraphLayerMixin,
-      LoadErrorMixin
+      GraphLayerMixin
     ],
 
     data: () => ({
@@ -150,6 +147,10 @@
 
       storageValue() {
         if (this.driveType != "" && this.driveType != "id") {
+          if (!this.id) {
+            return "";
+          }
+
           return driveType2PropName(this.driveType) + ":" + this.id;
         }
 
