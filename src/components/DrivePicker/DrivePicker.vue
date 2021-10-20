@@ -6,25 +6,12 @@
     :class="[$themeClass]"
     scroll
     >
-    <div class="title-bar">
-      <span>Select a drive</span>
-    </div>
-
-    <drive-tree-picker
-      v-if="!meOff"
-      class="me"
-      type="me"
-      :id.sync="ids.me"
-      :active="driveType == 'me'"
-      @select="selectPicker"
-      />
-
     <drive-tree-picker
       v-if="!usersOff"
       class="user"
       type="user"
-      :id.sync="ids.user"
-      :active="driveType == 'user'"
+      :value.sync="selectedValue"
+      :active="selectedType == 'user'"
       @select="selectPicker"
       />
 
@@ -32,8 +19,8 @@
       v-if="!groupsOff"
       class="group"
       type="group"
-      :id.sync="ids.site"
-      :active="driveType == 'group'"
+      :value.sync="selectedValue"
+      :active="selectedType == 'group'"
       @select="selectPicker"
       />
 
@@ -41,8 +28,8 @@
       v-if="!sitesOff"
       class="site"
       type="site"
-      :id.sync="ids.site"
-      :active="driveType == 'site'"
+      :value.sync="selectedValue"
+      :active="selectedType == 'site'"
       @select="selectPicker"
       />
 
@@ -53,24 +40,6 @@
 <script>
   import GraphLayerMixin from "../../core/mixins/GraphLayerMixin.js";
   import DriveTreePicker from "./DriveTreePicker.vue";
-
-  function driveType2PropName(driveType) {
-    switch (driveType) {
-    case "me":
-      return "me";
-
-    case "group":
-      return "groupId";
-
-    case "site":
-      return "siteId";
-
-    case "user":
-      return "userIdOrPrincipleName";
-    }
-
-    throw Error("Invalid drive type");
-  }
 
   export default {
     name: "GraphLayerDrivePicker",
@@ -84,27 +53,16 @@
     ],
 
     data: () => ({
+      selectedType: "",
+      parentId: "",
       driveType: "",
-
-      ids: {
-        id: null,
-        me: null,
-        user: null,
-        group: null,
-        site: null
-      }
+      driveId: ""
     }),
 
     props: {
-      // Returns the drive ID string or { key, value } object.
       value: {
-        type: [String, Object],
+        type: String,
         default: ""
-      },
-
-      meOff: {
-        type: Boolean,
-        default: false
       },
 
       usersOff: {
@@ -129,59 +87,97 @@
     },
 
     computed: {
-      id() {
-        switch (this.driveType) {
-          // Special case: 'me' resource is a Boolean toggle.
-        case "me":
-          return this.ids.me ? "1" : "0";
-
-        case "user":
-          return this.ids.user;
-        case "group":
-          return this.ids.group;
-        case "site":
-          return this.ids.site;
+      storageValue() {
+        if (this.selectedType == ""
+            || this.driveType == ""
+            || this.driveId == "")
+        {
+          return "";
         }
 
-        return this.ids.id;
+        const repr = {
+          s: this.selectedType,
+          p: this.parentId,
+          t: this.driveType,
+          i: this.driveId
+        };
+
+        return JSON.stringify(repr);
       },
 
-      storageValue() {
-        if (this.driveType != "" && this.driveType != "id") {
-          if (!this.id) {
-            return "";
-          }
-
-          return driveType2PropName(this.driveType) + ":" + this.id;
+      selectedValue: {
+        get() {
+          return {
+            parentId: this.parentId,
+            driveType: this.driveType,
+            driveId: this.driveId
+          };
+        },
+        set({ parentId, driveType, driveId }) {
+          this.parentId = parentId || "";
+          this.driveType = driveType;
+          this.driveId = driveId;
         }
-
-        return this.ids.id;
       }
     },
 
     created() {
-
+      this.applyValue();
     },
 
     methods: {
+      applyValue() {
+        if (typeof this.value === "string" && this.value.length > 0) {
+          try {
+            const repr = JSON.parse(this.value);
+            this.selectedType = repr.s;
+            this.parentId = repr.p;
+            this.driveType = repr.t;
+            this.driveId = repr.i;
+            return;
+
+          } catch (err) {
+            // break
+          }
+        }
+
+        this.selectedType = "";
+        this.parentId = "";
+        this.driveType = "";
+        this.driveId = "";
+      },
+
+      updateValue() {
+        this.$emit("input",this.storageValue);
+      },
+
       selectPicker(type) {
-        if (this.driveType == type) {
-          this.driveType = "";
+        if (this.selectedType == type) {
+          this.selectedType = "";
         }
         else {
-          this.driveType = type;
+          this.selectedType = type;
         }
+      }
+    },
+
+    watch: {
+      selectedType(newType,oldType) {
+        if (oldType) {
+          this.parentId = "";
+          this.driveType = "";
+          this.driveId = "";
+        }
+      },
+
+      storageValue() {
+        this.updateValue();
       }
     }
   };
 </script>
 
 <style scoped>
-  .title-bar {
-    font-weight: bold;
-    font-size: 1.5em;
-  }
-
   .drive-tree-picker {
     flex: 0 0;
   }

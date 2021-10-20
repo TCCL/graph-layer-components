@@ -6,4 +6,9 @@
       <div data-graph-layer="drivePicker" data-graph-layer--form-element="driveId"></div>
     </div>
   </div>
+  <div class="region-wrapper">
+    <div class="region graph-layer">
+      <div data-graph-layer="drivePicker" data-graph-layer--value="{&quot;s&quot;:&quot;user&quot;,&quot;t&quot;:&quot;me&quot;,&quot;i&quot;:&quot;1&quot;}"></div>
+    </div>
+  </div>
 </div>

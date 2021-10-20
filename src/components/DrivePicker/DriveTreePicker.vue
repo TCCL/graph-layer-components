@@ -3,8 +3,7 @@
     <div class="header" @click="select">
       <icon :i="active ? 'arrow-down' : 'arrow-right'" />
 
-      <span v-if="isMe">My Drives</span>
-      <span v-else-if="isUser">User Drives</span>
+      <span v-if="isUser">User Drives</span>
       <span v-else-if="isGroup">Group Drives</span>
       <span v-else-if="isSite">Site Drives</span>
     </div>
@@ -13,15 +12,23 @@
       v-if="active"
       :loading-state="$loadingState"
       :error-state="$errorState"
-      class="graph-layer-drive-tree-picker-inner"
+      class="drive-tree-picker-inner"
       >
+      <div
+        v-for="entry in staticEntries"
+        class="drive-tree-static-option"
+        :class="{ active:(selectedEntry === entry) }"
+        @click="selectStaticEntry(entry)"
+        >
+        <span>{{ entry.name }}</span>
+      </div>
       <drive-tree-options
         v-for="entry in entries"
         v-bind:key="entry.id"
         :type="type"
         :info="entry"
         :active="selectedEntry === entry"
-        :id.sync="forwardId"
+        :value.sync="forwardValue"
         @select="selectEntry(entry)"
         />
     </graph-layer-wrapper>
@@ -39,6 +46,30 @@
     return na < nb ? -1 : (na > nb ? 1 : 0);
   }
 
+  function valueMatchesEntry(value,entry) {
+    // Handle static entry.
+    if (entry.value) {
+      return entry.value.driveType == value.driveType
+        && entry.value.driveId == value.driveId;
+    }
+
+    // Handle (non-static) entry.
+    if (entry.id && entry.type) {
+      return (value.driveType == "drive"
+              && value.parentId == entry.id)
+        || (entry.type == value.driveType
+            && entry.id == value.driveId);
+    }
+
+    return false;
+  }
+
+  const EMPTY_VALUE = {
+    parentId: "",
+    driveId: "",
+    driveType: ""
+  };
+
   export default {
     name: "DriveTreePicker",
 
@@ -54,30 +85,27 @@
     data: () => ({
       loaded: false,
       entries: [],
+      staticEntries: [],
       selectedEntry: null
     }),
 
     props: {
       type: String,
-      id: String,
+      value: Object,
       active: Boolean
     },
 
     computed: {
-      isMe() {
-        return this.type == 'me';
-      },
-
       isUser() {
-        return this.type == 'user';
+        return this.type == "user";
       },
 
       isGroup() {
-        return this.type == 'group';
+        return this.type == "group";
       },
 
       isSite() {
-        return this.type == 'site';
+        return this.type == "site";
       },
 
       classes() {
@@ -91,38 +119,84 @@
         return cls;
       },
 
-      forwardId: {
+      forwardValue: {
         get() {
-          return this.id;
+          return this.value;
         },
         set(value) {
-          this.$emit('id:update',value);
+          const cpy = Object.assign({},value);
+          if (this.selectedEntry && cpy.driveType == "drive") {
+            cpy.parentId = this.selectedEntry.id;
+          }
+          this.$emit("update:value",cpy);
         }
       }
     },
 
     created() {
-
+      // NOTE: this call handles initial loading if the instance is not loaded.
+      this.applyValue();
     },
 
     methods: {
+      applyValue() {
+        // Attempt to select the value if the instance is active. This loads
+        // entries if the instance is not loaded.
+        if (this.active) {
+          if (this.loaded) {
+            this.selectValue();
+          }
+          else {
+            this.load().then(() => {
+              this.selectValue();
+            });
+          }
+        }
+        else {
+          this.selectedEntry = null;
+        }
+      },
+
       load() {
+        let promise;
+
         this.entries.splice(0);
 
-        if (this.isMe) {
-
-        }
-        else if (this.isUser) {
-          this.loadUsers();
+        if (this.isUser) {
+          promise = this.loadUsers();
         }
         else if (this.isGroup) {
-          this.loadGroups();
+          promise = this.loadGroups();
         }
         else if (this.isSite) {
-          this.loadSites();
+          promise = this.loadSites();
         }
 
         this.loaded = true;
+
+        if (!promise) {
+          return Promise.resolve();
+        }
+
+        return promise;
+      },
+
+      loadUsers() {
+        // Add static entries.
+        this.staticEntries.push({
+          name: 'Current User',
+          value: {
+            driveType: "me",
+            driveId: "1"
+          }
+        });
+
+        // Load users from Graph.
+
+      },
+
+      loadGroups() {
+
       },
 
       loadSites() {
@@ -130,14 +204,15 @@
         const url = new URL(endpoint,window.location.origin);
         url.searchParams.set("search","*");
 
-        this.$fetchJson(url).then((result) => {
+        return this.$fetchJson(url).then((result) => {
           for (let i = 0;i < result.value.length;++i) {
             const siteInfo = result.value[i];
 
             const entry = {
+              id: siteInfo.id,
+              type: "site",
               name: siteInfo.displayName || siteInfo.name,
               title: siteInfo.description,
-              id: siteInfo.id,
               externalLink: siteInfo.webUrl
             };
 
@@ -149,11 +224,7 @@
       },
 
       select() {
-        if (!this.loaded) {
-          this.load();
-        }
-
-        this.$emit('select',this.type);
+        this.$emit("select",this.type);
       },
 
       selectEntry(entry) {
@@ -163,13 +234,45 @@
         else {
           this.selectedEntry = entry;
         }
+      },
+
+      selectStaticEntry(entry) {
+        if (this.selectedEntry === entry) {
+          this.selectedEntry = null;
+          this.forwardValue = EMPTY_VALUE;
+        }
+        else {
+          this.selectedEntry = entry;
+          this.forwardValue = entry.value;
+        }
+      },
+
+      selectValue() {
+        this.selectedEntry = null;
+        if (!this.active) {
+          return;
+        }
+
+        // Search through entries for a match.
+        const searchfn = valueMatchesEntry.bind(this,this.value);
+        const result = this.staticEntries.concat(this.entries).find(searchfn);
+        if (result) {
+          this.selectEntry(result);
+        }
       }
     },
 
     watch: {
+      active() {
+        // NOTE: this call handles initial loading if the instance is not
+        // loaded.
+        this.applyValue();
+      },
+
       type() {
         this.entries.splice(0);
         this.loaded = false;
+        this.applyValue();
       }
     }
   };
@@ -187,18 +290,30 @@
     align-items: center;
   }
   .drive-tree-picker > .header:hover {
-    background-color: var(--graph-layer-drive-selected-background-color);
+    background-color: var(--graph-layer-drive-selected-color);
   }
 
   .drive-tree-picker.active > .header {
-    border-bottom: 2px solid var(--graph-layer-color-primary);
+    border-bottom: 2px solid var(--graph-layer-drive-active-color);
   }
 
-  .drive-tree-picker .drive-tree-options {
+  .drive-tree-picker .drive-tree-options,
+  .drive-tree-picker .drive-tree-static-option {
+    flex: 0 0;
     margin-left: 2em;
   }
 
-  .drive-tree-picker .drive-tree-options {
-    flex: 0 0;
+  .drive-tree-picker .drive-tree-static-option {
+    cursor: pointer;
+  }
+  .drive-tree-picker .drive-tree-static-option:hover {
+    background-color: var(--graph-layer-drive-selected-color);
+  }
+  .drive-tree-picker .drive-tree-static-option.active {
+    background-color: var(--graph-layer-drive-selected-color);
+  }
+
+  .drive-tree-picker .drive-tree-static-option > span {
+    font-style: italic;
   }
 </style>

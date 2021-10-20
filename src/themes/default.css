@@ -26,5 +26,6 @@
   --graph-layer-drive-item-selected-background-color: var(--graph-layer-color-light-gray);
 
   /* Drive Picker */
-  --graph-layer-drive-selected-background-color: var(--graph-layer-color-light-gray);
+  --graph-layer-drive-selected-color: var(--graph-layer-color-light-gray);
+  --graph-layer-drive-active-color: var(--graph-layer-color-primary);
 }

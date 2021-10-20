@@ -5,37 +5,46 @@
       <span>{{ info.name }}</span>
     </div>
 
-    <div v-if="active" class="entry-wrapper">
+    <graph-layer-wrapper
+      v-if="active"
+      :loading-state="$loadingState"
+      :error-state="$errorState"
+      class="drive-tree-options-inner"
+      >
       <div
         v-for="entry in entries"
         class="entry"
+        :class="{ active:(entry === selectedEntry) }"
         @click="selectEntry"
         >
         <span>{{ entry.name }}</span>
       </div>
-    </div>
+    </graph-layer-wrapper>
   </div>
 </template>
 
 <script>
   import GraphLayerMixin from "../../core/mixins/GraphLayerMixin.js";
+  import LoadErrorMixin from "../../core/mixins/LoadErrorMixin.js";
 
   export default {
     name: "DriveTreeOptions",
 
     mixins: [
-      GraphLayerMixin
+      GraphLayerMixin,
+      LoadErrorMixin
     ],
 
     data: () => ({
       loaded: false,
-      entries: [{ name:"test" }],
+      entries: [],
       selectedEntry: null
     }),
 
     props: {
       type: String,
       info: Object,
+      value: Object,
       active: Boolean
     },
 
@@ -53,13 +62,63 @@
     },
 
     created() {
-
+      // NOTE: this call handles initial loading if the instance is not loaded.
+      this.applyValue();
     },
 
     methods: {
+      applyValue() {
+        // Attempt to select the value if the instance is active. This loads
+        // entries if the instance is not loaded.
+        if (this.active) {
+          if (this.loaded) {
+            this.selectValue();
+          }
+          else {
+            this.load().then(() => {
+              this.selectValue();
+            });
+          }
+        }
+        else {
+          this.selectedEntry = null;
+        }
+      },
+
       load() {
+        let promise;
+
+        this.entries.splice(0);
+
+        if (this.type == "user") {
+          promise = this.loadUser();
+        }
+        else if (this.type == "group") {
+          promise = this.loadGroup();
+        }
+        else if (this.type == "site") {
+          promise = this.loadSite();
+        }
 
         this.loaded = true;
+
+        if (!promise) {
+          return Promise.resolve();
+        }
+
+        return promise;
+      },
+
+      loadUser() {
+
+      },
+
+      loadGroup() {
+
+      },
+
+      loadSite() {
+
       },
 
       select() {
@@ -77,25 +136,44 @@
         else {
           this.selectedEntry = entry;
         }
+      },
+
+      selectValue() {
+        const result = this.entries.find((entry) => {
+          return entry.value.driveType == this.value.driveType
+            && entry.value.driveId == this.value.driveId;
+        });
+
+        this.selectedEntry = result || null;
       }
     },
 
     watch: {
+      active() {
+        // NOTE: this call handles initial loading if the instance is not
+        // loaded.
+        this.applyValue();
+      },
+
       type() {
         this.entries.splice(0);
         this.loaded = false;
+        this.applyValue();
       },
 
       selectedEntry() {
-        let id;
+        let value;
         if (!this.selectedEntry) {
-          id = null;
+          value = {
+            driveType: "",
+            driveId: ""
+          };
         }
         else {
-          id = this.selectedEntry.id;
+          value = this.selectedEntry.value;
         }
 
-        this.$emit('id:update',id);
+        this.$emit("update:value",value);
       }
     }
   };
@@ -109,7 +187,11 @@
     align-items: center;
   }
   .drive-tree-options > .header:hover {
-    background-color: var(--graph-layer-drive-selected-background-color);
+    background-color: var(--graph-layer-drive-selected-color);
+  }
+
+  .drive-tree-options.active > .header {
+    border-bottom: 2px solid var(--graph-layer-drive-active-color);
   }
 
   .entry {
@@ -117,6 +199,9 @@
     margin-left: 2em;
   }
   .entry:hover {
-    background-color: var(--graph-layer-drive-selected-background-color);
+    background-color: var(--graph-layer-drive-selected-color);
+  }
+  .entry.active {
+    background-color: var(--graph-layer-drive-active-color);
   }
 </style>

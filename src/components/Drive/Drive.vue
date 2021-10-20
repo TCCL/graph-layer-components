@@ -64,6 +64,11 @@
     }),
 
     props: {
+      value: {
+        type: String,
+        default: null
+      },
+
       id: {
         type: String,
         default: null
@@ -96,25 +101,105 @@
     },
 
     computed: {
-      endpoint() {
+      parsedValue() {
+        if (this.value) {
+          try {
+            const repr = JSON.parse(this.value);
+            return {
+              driveType: repr.t,
+              driveId: repr.i
+            };
+
+          } catch (err) {
+            // break
+          }
+        }
+
+        return {
+          driveType: null,
+          driveValue: null
+        };
+      },
+
+      meValue() {
         if (this.me) {
+            return true;
+        }
+
+        if (this.parsedValue.driveType == "me") {
+          return !!this.parsedValue.driveId;
+        }
+
+        return null;
+      },
+
+      userValue() {
+        if (this.userIdOrPrincipleName) {
+          return this.userIdOrPrincipleName;
+        }
+
+        if (this.parsedValue.driveType == "user") {
+          return this.parsedValue.driveId;
+        }
+
+        return null;
+      },
+
+      groupValue() {
+        if (this.groupId) {
+          return this.groupId;
+        }
+
+        if (this.parsedValue.driveType == "group") {
+          return this.parsedValue.driveId;
+        }
+
+        return null;
+      },
+
+      siteValue() {
+        if (this.siteId) {
+          return this.siteId;
+        }
+
+        if (this.parsedValue.driveType == "site") {
+          return this.parsedValue.driveId;
+        }
+
+        return null;
+      },
+
+      driveValue() {
+        if (this.id) {
+          return this.id;
+        }
+
+        if (this.parsedValue.driveType == "drive") {
+          return this.parsedValue.driveId;
+        }
+
+        return null;
+      },
+
+      endpoint() {
+        if (this.meValue) {
           return "/me/drive";
         }
 
-        if (this.userIdOrPrincipleName) {
-          return "/users/" + this.userIdOrPrincipleName + "/drive";
+        if (this.userValue) {
+          return "/users/" + this.userValue + "/drive";
         }
 
-        if (this.siteId) {
-          return "/sites/" + this.siteId + "/drive";
+        if (this.siteValue) {
+          return "/sites/" + this.siteValue + "/drive";
         }
 
-        if (this.groupId) {
-          return "/groups/" + this.groupId + "/drive";
+        if (this.groupValue) {
+          return "/groups/" + this.groupValue + "/drive";
         }
 
-        if (this.id) {
-          return "/drives/" + this.id;
+        if (this.driveValue) {
+          return "/drives/" + this.driveValue;
         }
 
         return null;
@@ -175,8 +260,8 @@
 
           // Fetch group info if we do not have group display name via 'owner'
           // property.
-          if (this.groupId && (!this.driveInfo.owner || !this.driveInfo.owner.group)) {
-            const uri = "/groups/" + this.groupId;
+          if (this.groupValue && (!this.driveInfo.owner || !this.driveInfo.owner.group)) {
+            const uri = "/groups/" + this.groupValue;
             this.$fetchJson(uri,null,true).then((groupInfo) => {
               this.groupInfo = groupInfo;
             });
@@ -184,8 +269,8 @@
         });
 
         // Fetch site info to use site display name.
-        if (this.siteId) {
-          const uri = "/sites/" + this.siteId;
+        if (this.siteValue) {
+          const uri = "/sites/" + this.siteValue;
           this.$fetchJson(uri,null,true).then((siteInfo) => {
             this.siteInfo = siteInfo;
           });
