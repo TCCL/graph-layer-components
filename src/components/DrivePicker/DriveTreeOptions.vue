@@ -12,10 +12,16 @@
       class="drive-tree-options-inner"
       >
       <div
+        v-if="entries.length == 0"
+        class="no-entry"
+        >
+        <span>No drives available</span>
+      </div>
+      <div
         v-for="entry in entries"
         class="entry"
         :class="{ active:(entry === selectedEntry) }"
-        @click="selectEntry"
+        @click="selectEntry(entry)"
         >
         <span>{{ entry.name }}</span>
       </div>
@@ -110,15 +116,112 @@
       },
 
       loadUser() {
+        const endpoint = "/users/" + this.info.id + "/drives";
+        const url = new URL(endpoint,window.location.origin);
 
+        this.$loadingState = true;
+        return this.$fetchJson(url,null,true).then((result) => {
+          const defaultEndpoint = "/users/" + this.info.id + "/drive";
+          const defaultUrl = new URL(defaultEndpoint,window.location.origin);
+
+          const { value: drives } = result;
+
+          // Query the default drive so we can mark it as default.
+          this.$fetchJson(defaultUrl,null,true).then((defaultDrive) => {
+            this.processDrives(drives,defaultDrive);
+            this.$loadingState = false;
+          }, (err) => {
+            this.processDrives(drives);
+            this.$loadingState = false;
+          });
+
+        }, (err) => {
+          this.$loadingState = false;
+          if (err.code != 404 || err.error.code != "itemNotFound") {
+            this.$errorState = err;
+          }
+        });
       },
 
       loadGroup() {
+        const endpoint = "/groups/" + this.info.id + "/drives";
+        const url = new URL(endpoint,window.location.origin);
 
+        this.$loadingState = true;
+        return this.$fetchJson(url,null,true).then((result) => {
+          const defaultEndpoint = "/groups/" + this.info.id + "/drive";
+          const defaultUrl = new URL(defaultEndpoint,window.location.origin);
+
+          const { value: drives } = result;
+
+          // Query the default drive so we can mark it as default.
+          this.$fetchJson(defaultUrl,null,true).then((defaultDrive) => {
+            this.processDrives(drives,defaultDrive);
+            this.$loadingState = false;
+          }, (err) => {
+            this.processDrives(drives);
+            this.$loadingState = false;
+          });
+
+        }, (err) => {
+          this.$loadingState = false;
+          if (err.code != 404 || err.error.code != "itemNotFound") {
+            this.$errorState = err;
+          }
+        });
       },
 
       loadSite() {
+        const endpoint = "/sites/" + this.info.id + "/drives";
+        const url = new URL(endpoint,window.location.origin);
 
+        this.$loadingState = true;
+        return this.$fetchJson(url,null,true).then((result) => {
+          const defaultEndpoint = "/sites/" + this.info.id + "/drive";
+          const defaultUrl = new URL(defaultEndpoint,window.location.origin);
+
+          const { value: drives } = result;
+
+          // Query the default drive so we can mark it as default.
+          this.$fetchJson(defaultUrl,null,true).then((defaultDrive) => {
+            this.processDrives(drives,defaultDrive);
+            this.$loadingState = false;
+          }, (err) => {
+            this.processDrives(drives);
+            this.$loadingState = false;
+          });
+
+        }, (err) => {
+          this.$loadingState = false;
+          if (err.code != 404 || err.error.code != "itemNotFound") {
+            this.$errorState = err;
+          }
+        });
+      },
+
+      processDrives(drives,defaultDrive) {
+        for (let i = 0;i < drives.length;++i) {
+          const drive = drives[i];
+          const value = {
+            driveId: drive.id
+          };
+
+          if (defaultDrive && defaultDrive.id == drive.id) {
+            value.driveType = this.type;
+            value.driveId = this.info.id;
+          }
+          else {
+            value.driveType = "drive";
+            value.driveId = drive.id;
+          }
+
+          this.entries.push({
+            id: drive.id,
+            name: drive.name,
+            externalLink: drive.webUrl,
+            value
+          });
+        }
       },
 
       select() {
@@ -187,21 +290,28 @@
     align-items: center;
   }
   .drive-tree-options > .header:hover {
-    background-color: var(--graph-layer-drive-selected-color);
+    background-color: var(--graph-layer-drive-picker-hover-color);
   }
 
   .drive-tree-options.active > .header {
-    border-bottom: 2px solid var(--graph-layer-drive-active-color);
+    border-bottom: 2px solid var(--graph-layer-drive-picker-active-color);
   }
 
+  .entry, .no-entry {
+    padding: 4px;
+  }
   .entry {
     cursor: pointer;
     margin-left: 2em;
   }
   .entry:hover {
-    background-color: var(--graph-layer-drive-selected-color);
+    background-color: var(--graph-layer-drive-picker-hover-color);
   }
   .entry.active {
-    background-color: var(--graph-layer-drive-active-color);
+    background-color: var(--graph-layer-drive-picker-selected-color);
+  }
+  .no-entry {
+    margin-left: 2em;
+    font-style: italic;
   }
 </style>

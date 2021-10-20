@@ -192,11 +192,53 @@
         });
 
         // Load users from Graph.
+        const endpoint = "/users";
+        const url = new URL(endpoint,window.location.origin);
 
+        return this.$fetchJson(url).then((result) => {
+          const { value: users } = result;
+
+          for (let i = 0;i < users.length;++i) {
+            const user = users[i];
+
+            const entry = {
+              id: user.id,
+              type: "user",
+              name: user.displayName || user.userPrincipleName,
+              title: user.displayName || user.userPrincipleName,
+              externalLink: null
+            };
+
+            this.entries.push(entry);
+          }
+
+          this.entries.sort(sortByName);
+        });
       },
 
       loadGroups() {
+        const endpoint = "/groups";
+        const url = new URL(endpoint,window.location.origin);
 
+        return this.$fetchJson(url).then((result) => {
+          const { value: groups } = result;
+
+          for (let i = 0;i < groups.length;++i) {
+            const group = groups[i];
+
+            const entry = {
+              id: group.id,
+              type: "group",
+              name: group.displayName || group.id,
+              title: group.description || group.displayName,
+              externalLink: null
+            };
+
+            this.entries.push(entry);
+          }
+
+          this.entries.sort(sortByName);
+        });
       },
 
       loadSites() {
@@ -290,11 +332,11 @@
     align-items: center;
   }
   .drive-tree-picker > .header:hover {
-    background-color: var(--graph-layer-drive-selected-color);
+    background-color: var(--graph-layer-drive-picker-hover-color);
   }
 
   .drive-tree-picker.active > .header {
-    border-bottom: 2px solid var(--graph-layer-drive-active-color);
+    border-bottom: 2px solid var(--graph-layer-drive-picker-active-color);
   }
 
   .drive-tree-picker .drive-tree-options,
@@ -305,12 +347,13 @@
 
   .drive-tree-picker .drive-tree-static-option {
     cursor: pointer;
+    padding: 4px;
   }
   .drive-tree-picker .drive-tree-static-option:hover {
-    background-color: var(--graph-layer-drive-selected-color);
+    background-color: var(--graph-layer-drive-picker-hover-color);
   }
   .drive-tree-picker .drive-tree-static-option.active {
-    background-color: var(--graph-layer-drive-selected-color);
+    background-color: var(--graph-layer-drive-picker-selected-color);
   }
 
   .drive-tree-picker .drive-tree-static-option > span {
