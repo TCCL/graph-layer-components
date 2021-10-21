@@ -137,9 +137,7 @@
 
         }, (err) => {
           this.$loadingState = false;
-          if (err.code != 404 || err.error.code != "itemNotFound") {
-            this.$errorState = err;
-          }
+          this.processError(err);
         });
       },
 
@@ -165,9 +163,7 @@
 
         }, (err) => {
           this.$loadingState = false;
-          if (err.code != 404 || err.error.code != "itemNotFound") {
-            this.$errorState = err;
-          }
+          this.processError(err);
         });
       },
 
@@ -186,6 +182,7 @@
           this.$fetchJson(defaultUrl,null,true).then((defaultDrive) => {
             this.processDrives(drives,defaultDrive);
             this.$loadingState = false;
+
           }, (err) => {
             this.processDrives(drives);
             this.$loadingState = false;
@@ -193,9 +190,7 @@
 
         }, (err) => {
           this.$loadingState = false;
-          if (err.code != 404 || err.error.code != "itemNotFound") {
-            this.$errorState = err;
-          }
+          this.processError(err);
         });
       },
 
@@ -222,6 +217,18 @@
             value
           });
         }
+      },
+
+      processError(err) {
+        if (err.code == 404 && err.payload.error) {
+          switch (err.payload.error.code) {
+          case "itemNotFound":
+          case "ResourceNotFound":
+            return;
+          }
+        }
+
+        this.$errorState = err;
       },
 
       select() {

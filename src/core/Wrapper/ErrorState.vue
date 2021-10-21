@@ -8,6 +8,17 @@
 </template>
 
 <script>
+  function isGraphLayerError(err) {
+    return err.status && err.error && err.message;
+  }
+
+  function isMicrosoftError(err) {
+    return typeof err.error === "object"
+      && err.error.code
+      && err.error.message
+      && err.error.innerError;
+  }
+
   export default {
     name: "ErrorState",
 
@@ -25,12 +36,24 @@
     computed: {
       message() {
         if (typeof this.error === "object"
-            && this.error.error)
+            && this.error.error
+            && this.error.message)
         {
           return this.error.error;
         }
 
-        if (typeof this.error === "string") {
+        if (typeof this.error === "object"
+            && this.error.code
+            && this.error.payload)
+        {
+          if (isGraphLayerError(this.error.payload)) {
+            return this.error.payload.error;
+          }
+          if (isMicrosoftError(this.error.payload)) {
+             return this.error.payload.error.message;
+          }
+        }
+        else if (typeof this.error === "string") {
           return this.error;
         }
 
@@ -43,6 +66,18 @@
             && this.error.message)
         {
           return this.error.message;
+        }
+
+        if (typeof this.error === "object"
+            && this.error.code
+            && this.error.payload)
+        {
+          if (isGraphLayerError(this.error.payload)) {
+            return this.error.payload.message;
+          }
+          // if (isMicrosoftError(this.error.payload)) {
+          //    return this.error.payload.error.code;
+          // }
         }
 
         return "";
@@ -61,6 +96,7 @@
 
 <style scoped>
   .graph-layer-error-state {
+    flex: 1 0;
     display: flex;
     justify-content: center;
     align-items: center;

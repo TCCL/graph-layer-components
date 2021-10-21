@@ -35,6 +35,7 @@
 
 <style scoped>
   .graph-layer-loading-state {
+    flex: 1 0;
     display: flex;
     justify-content: center;
     align-items: center;

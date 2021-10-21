@@ -117,9 +117,9 @@ export default {
       else {
         promise = this.$graphLayer.fetch(resource,init).then((response) => {
           if (!response.ok) {
-            return response.json().then((json) => Promise.reject({
+            return response.json().then((payload) => Promise.reject({
               code: response.status,
-              error: json.error || json
+              payload
             }));
           }
 
