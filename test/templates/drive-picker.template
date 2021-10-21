@@ -8,7 +8,11 @@
   </div>
   <div class="region-wrapper">
     <div class="region graph-layer">
-      <div data-graph-layer="drivePicker" data-graph-layer--value="{&quot;s&quot;:&quot;user&quot;,&quot;t&quot;:&quot;me&quot;,&quot;i&quot;:&quot;1&quot;}"></div>
+      <div
+        data-graph-layer="drivePicker"
+        data-graph-layer--value="{&quot;s&quot;:&quot;user&quot;,&quot;t&quot;:&quot;me&quot;,&quot;i&quot;:&quot;1&quot;}"
+        data-graph-layer--groups-off="1"
+        data-graph-layer--sites-off="1"></div>
     </div>
   </div>
 </div>

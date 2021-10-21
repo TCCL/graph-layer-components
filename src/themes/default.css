@@ -27,6 +27,7 @@
 
   /* Drive Picker */
   --graph-layer-drive-picker-active-color: var(--graph-layer-color-primary);
+  --graph-layer-drive-picker-heading-border-color: var(--graph-layer-color-light-gray);
   --graph-layer-drive-picker-hover-color: var(--graph-layer-color-light-gray);
-  --graph-layer-drive-picker-selected-color: rgb(49 133 252 / 28%);
+  --graph-layer-drive-picker-selected-color: var(--graph-layer-color-secondary);
 }

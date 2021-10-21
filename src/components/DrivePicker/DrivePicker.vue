@@ -1,39 +1,41 @@
 <template>
   <graph-layer-wrapper
-    :loading-state="$loadingState"
-    :error-state="$errorState"
     class="graph-layer-drive-picker"
     :class="[$themeClass]"
-    scroll
     >
-    <drive-tree-picker
-      v-if="!usersOff"
-      class="user"
-      type="user"
-      :value.sync="selectedValue"
-      :active="selectedType == 'user'"
-      @select="selectPicker"
-      />
-
-    <drive-tree-picker
-      v-if="!groupsOff"
-      class="group"
-      type="group"
-      :value.sync="selectedValue"
-      :active="selectedType == 'group'"
-      @select="selectPicker"
-      />
-
-    <drive-tree-picker
-      v-if="!sitesOff"
-      class="site"
-      type="site"
-      :value.sync="selectedValue"
-      :active="selectedType == 'site'"
-      @select="selectPicker"
-      />
-
+    <div class="header">
+      <div class="title">{{ title }}</div>
+    </div>
     <input v-if="formElement" type="hidden" :name="formElement" :value="storageValue" />
+
+    <graph-layer-wrapper class="graph-layer-drive-picker-inner" scroll>
+      <drive-tree-picker
+        v-if="!usersOff"
+        class="user"
+        type="user"
+        :value.sync="selectedValue"
+        :active="selectedType == 'user'"
+        @select="selectPicker"
+        />
+
+      <drive-tree-picker
+        v-if="!groupsOff"
+        class="group"
+        type="group"
+        :value.sync="selectedValue"
+        :active="selectedType == 'group'"
+        @select="selectPicker"
+        />
+
+      <drive-tree-picker
+        v-if="!sitesOff"
+        class="site"
+        type="site"
+        :value.sync="selectedValue"
+        :active="selectedType == 'site'"
+        @select="selectPicker"
+        />
+    </graph-layer-wrapper>
   </graph-layer-wrapper>
 </template>
 
@@ -60,23 +62,28 @@
     }),
 
     props: {
+      title: {
+        type: String,
+        default: "Choose a drive"
+      },
+
       value: {
         type: String,
         default: ""
       },
 
       usersOff: {
-        type: Boolean,
+        type: [Boolean,String],
         default: false
       },
 
       groupsOff: {
-        type: Boolean,
+        type: [Boolean,String],
         default: false
       },
 
       sitesOff: {
-        type: Boolean,
+        type: [Boolean,String],
         default: false
       },
 
@@ -178,7 +185,13 @@
 </script>
 
 <style scoped>
-  .drive-tree-picker {
-    flex: 0 0;
+  .header {
+    border-bottom: 2px solid var(--graph-layer-drive-picker-heading-border-color);
+    padding-bottom: 0.5em;
+  }
+
+  .header > .title {
+    font-size: 1.5em;
+    font-weight: bold;
   }
 </style>
