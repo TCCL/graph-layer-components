@@ -194,12 +194,18 @@
         // Load users from Graph.
         const endpoint = "/users";
         const url = new URL(endpoint,window.location.origin);
+        url.searchParams.set("$orderby","displayName");
+        url.searchParams.set("$select","id,displayName,userPrincipleName,userType");
+        url.searchParams.set("$top","512");
 
         return this.$fetchJson(url).then((result) => {
           const { value: users } = result;
 
           for (let i = 0;i < users.length;++i) {
             const user = users[i];
+            if (user.userType != "Member") {
+              continue;
+            }
 
             const entry = {
               id: user.id,
@@ -211,14 +217,13 @@
 
             this.entries.push(entry);
           }
-
-          this.entries.sort(sortByName);
         });
       },
 
       loadGroups() {
         const endpoint = "/groups";
         const url = new URL(endpoint,window.location.origin);
+        url.searchParams.set("$orderby","displayName");
 
         return this.$fetchJson(url).then((result) => {
           const { value: groups } = result;
@@ -236,8 +241,6 @@
 
             this.entries.push(entry);
           }
-
-          this.entries.sort(sortByName);
         });
       },
 
