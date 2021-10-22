@@ -25,6 +25,13 @@
         >
         <span>{{ entry.name }}</span>
       </div>
+
+      <div v-if="hasNextPage" class="pagination">
+        <click-text
+          @click="loadNextPage"
+          title="Click to load additional drive entries in this list"
+          >Load additional drives</click-text>
+      </div>
     </graph-layer-wrapper>
   </div>
 </template>
@@ -32,6 +39,7 @@
 <script>
   import GraphLayerMixin from "../../core/mixins/GraphLayerMixin.js";
   import LoadErrorMixin from "../../core/mixins/LoadErrorMixin.js";
+  import { extractQueryParam } from "../../core/helpers.js";
 
   export default {
     name: "DriveTreeOptions",
@@ -44,7 +52,8 @@
     data: () => ({
       loaded: false,
       entries: [],
-      selectedEntry: null
+      selectedEntry: null,
+      nextLink: null
     }),
 
     props: {
@@ -64,6 +73,10 @@
         }
 
         return cls;
+      },
+
+      hasNextPage() {
+        return !!this.nextLink;
       }
     },
 
@@ -124,10 +137,13 @@
           const defaultEndpoint = "/users/" + this.info.id + "/drive";
           const defaultUrl = new URL(defaultEndpoint,window.location.origin);
 
-          const { value: drives } = result;
+          const drives = this.processLoadResult(result,url);
 
           // Query the default drive so we can mark it as default.
           this.$fetchJson(defaultUrl,null,true).then((defaultDrive) => {
+            if (this.nextLink) {
+              this.nextLink.defaultDrive = defaultDrive;
+            }
             this.processDrives(drives,defaultDrive);
             this.$loadingState = false;
           }, (err) => {
@@ -150,10 +166,13 @@
           const defaultEndpoint = "/groups/" + this.info.id + "/drive";
           const defaultUrl = new URL(defaultEndpoint,window.location.origin);
 
-          const { value: drives } = result;
+          const drives = this.processLoadResult(result,url);
 
           // Query the default drive so we can mark it as default.
           this.$fetchJson(defaultUrl,null,true).then((defaultDrive) => {
+            if (this.nextLink) {
+              this.nextLink.defaultDrive = defaultDrive;
+            }
             this.processDrives(drives,defaultDrive);
             this.$loadingState = false;
           }, (err) => {
@@ -176,10 +195,13 @@
           const defaultEndpoint = "/sites/" + this.info.id + "/drive";
           const defaultUrl = new URL(defaultEndpoint,window.location.origin);
 
-          const { value: drives } = result;
+          const drives = this.processLoadResult(result,url);
 
           // Query the default drive so we can mark it as default.
           this.$fetchJson(defaultUrl,null,true).then((defaultDrive) => {
+            if (this.nextLink) {
+              this.nextLink.defaultDrive = defaultDrive;
+            }
             this.processDrives(drives,defaultDrive);
             this.$loadingState = false;
 
@@ -191,6 +213,39 @@
         }, (err) => {
           this.$loadingState = false;
           this.processError(err);
+        });
+      },
+
+      processLoadResult(result,url,defaultDrive) {
+        if (result["@odata.nextLink"]) {
+          const skipToken = extractQueryParam(
+            result["@odata.nextLink"],
+            "$skiptoken"
+          );
+          url.searchParams.set("$skiptoken",skipToken);
+
+          this.nextLink = {
+            url,
+            defaultDrive: defaultDrive || null
+          };
+        }
+        else {
+          this.nextLink = null;
+        }
+
+        return result.value;
+      },
+
+      loadNextPage() {
+        if (!this.hasNextPage) {
+          return;
+        }
+
+        const { url, defaultDrive } = this.nextLink;
+
+        this.$fetchJson(url).then((result) => {
+          const drives = this.processLoadResult(result,url,defaultDrive);
+          this.processDrives(drives);
         });
       },
 
@@ -320,5 +375,10 @@
   .no-entry {
     margin-left: 2em;
     font-style: italic;
+  }
+
+  .pagination {
+    margin-left: 2em;
+    padding: 4px 0 4px 0;
   }
 </style>
