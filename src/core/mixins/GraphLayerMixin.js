@@ -4,6 +4,7 @@ import Cookies from "js-cookie";
 
 import globals from "../../globals.js";
 import * as WrapperComponents from "../Wrapper";
+import * as coreComponents from "../components";
 import Icon from "../icons";
 import { nop } from "../helpers.js";
 
@@ -29,6 +30,7 @@ function modifyPromise(promise) {
 export default {
   components: {
     ...WrapperComponents,
+    ...coreComponents,
     Icon
   },
 

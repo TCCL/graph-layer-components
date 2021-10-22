@@ -108,6 +108,7 @@ class GraphLayer {
       resource = url + resource;
     }
     else if (resource instanceof URL) {
+      resource = new URL(resource);
       resource.pathname = url + resource.pathname;
     }
 

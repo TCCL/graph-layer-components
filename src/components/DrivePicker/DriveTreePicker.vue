@@ -22,6 +22,7 @@
         >
         <span>{{ entry.name }}</span>
       </div>
+
       <drive-tree-options
         v-for="entry in entries"
         v-bind:key="entry.id"
@@ -31,6 +32,13 @@
         :value.sync="forwardValue"
         @select="selectEntry(entry)"
         />
+
+      <div v-if="hasNextPage" class="drive-tree-pagination">
+        <click-text
+          @click="loadNextPage"
+          title="Click to load additional entries in this list"
+          >Load additional items</click-text>
+      </div>
     </graph-layer-wrapper>
   </div>
 </template>
@@ -39,6 +47,7 @@
   import GraphLayerMixin from "../../core/mixins/GraphLayerMixin.js";
   import LoadErrorMixin from "../../core/mixins/LoadErrorMixin.js";
   import DriveTreeOptions from "./DriveTreeOptions.vue";
+  import { extractQueryParam } from "../../core/helpers.js";
 
   function sortByName(a,b) {
     const na = a.name;
@@ -64,6 +73,40 @@
     return false;
   }
 
+  function makeUserEntry(user) {
+    if (user.userType != "Member") {
+      return null;
+    }
+
+    return {
+      id: user.id,
+      type: "user",
+      name: user.displayName || user.userPrincipleName,
+      title: user.displayName || user.userPrincipleName,
+      externalLink: null
+    };
+  }
+
+  function makeGroupEntry(group) {
+    return {
+      id: group.id,
+      type: "group",
+      name: group.displayName || group.id,
+      title: group.description || group.displayName,
+      externalLink: null
+    };
+  }
+
+  function makeSiteEntry(site) {
+    return {
+      id: site.id,
+      type: "site",
+      name: site.displayName || site.name,
+      title: site.description,
+      externalLink: site.webUrl
+    };
+  }
+
   const EMPTY_VALUE = {
     parentId: "",
     driveId: "",
@@ -86,7 +129,8 @@
       loaded: false,
       entries: [],
       staticEntries: [],
-      selectedEntry: null
+      selectedEntry: null,
+      nextLink: null
     }),
 
     props: {
@@ -130,6 +174,10 @@
           }
           this.$emit("update:value",cpy);
         }
+      },
+
+      hasNextPage() {
+        return !!this.nextLink;
       }
     },
 
@@ -199,48 +247,40 @@
         url.searchParams.set("$top","512");
 
         return this.$fetchJson(url).then((result) => {
-          const { value: users } = result;
+          const users = this.processLoadResult(result,url,makeUserEntry);
 
           for (let i = 0;i < users.length;++i) {
             const user = users[i];
-            if (user.userType != "Member") {
+            const entry = makeUserEntry(user);
+            if (!entry) {
               continue;
             }
 
-            const entry = {
-              id: user.id,
-              type: "user",
-              name: user.displayName || user.userPrincipleName,
-              title: user.displayName || user.userPrincipleName,
-              externalLink: null
-            };
-
             this.entries.push(entry);
           }
+
+          this.entries.sort(sortByName);
         });
       },
 
       loadGroups() {
         const endpoint = "/groups";
         const url = new URL(endpoint,window.location.origin);
-        url.searchParams.set("$orderby","displayName");
 
         return this.$fetchJson(url).then((result) => {
-          const { value: groups } = result;
+          const groups = this.processLoadResult(result,url,makeGroupEntry);
 
           for (let i = 0;i < groups.length;++i) {
             const group = groups[i];
-
-            const entry = {
-              id: group.id,
-              type: "group",
-              name: group.displayName || group.id,
-              title: group.description || group.displayName,
-              externalLink: null
-            };
+            const entry = makeGroupEntry(group);
+            if (!entry) {
+              continue;
+            }
 
             this.entries.push(entry);
           }
+
+          this.entries.sort(sortByName);
         });
       },
 
@@ -250,16 +290,56 @@
         url.searchParams.set("search","*");
 
         return this.$fetchJson(url).then((result) => {
-          for (let i = 0;i < result.value.length;++i) {
-            const siteInfo = result.value[i];
+          const value = this.processLoadResult(result,url,makeSiteEntry);
 
-            const entry = {
-              id: siteInfo.id,
-              type: "site",
-              name: siteInfo.displayName || siteInfo.name,
-              title: siteInfo.description,
-              externalLink: siteInfo.webUrl
-            };
+          for (let i = 0;i < value.length;++i) {
+            const site = value[i];
+            const entry = makeSiteEntry(site);
+            if (!entry) {
+              continue;
+            }
+
+            this.entries.push(entry);
+          }
+
+          this.entries.sort(sortByName);
+        });
+      },
+
+      processLoadResult(result,url,entryfn) {
+        if (result["@odata.nextLink"]) {
+          const skipToken = extractQueryParam(
+            result["@odata.nextLink"],
+            "$skiptoken"
+          );
+          url.searchParams.set("$skiptoken",skipToken);
+
+          this.nextLink = {
+            url,
+            entryfn
+          };
+        }
+        else {
+          this.nextLink = null;
+        }
+
+        return result.value;
+      },
+
+      loadNextPage() {
+        if (!this.hasNextPage) {
+          return;
+        }
+
+        const { url, entryfn } = this.nextLink;
+
+        this.$fetchJson(url).then((result) => {
+          const value = this.processLoadResult(result,url,entryfn);
+          for (let i = 0;i < value.length;++i) {
+            const entry = entryfn(value[i]);
+            if (!entry) {
+              continue;
+            }
 
             this.entries.push(entry);
           }
@@ -343,7 +423,8 @@
   }
 
   .drive-tree-picker .drive-tree-options,
-  .drive-tree-picker .drive-tree-static-option {
+  .drive-tree-picker .drive-tree-static-option,
+  .drive-tree-picker .drive-tree-pagination {
     flex: 0 0;
     margin-left: 2em;
   }
@@ -361,5 +442,9 @@
 
   .drive-tree-picker .drive-tree-static-option > span {
     font-style: italic;
+  }
+
+  .drive-tree-pagination {
+    padding: 4px 0 4px 1.5em;
   }
 </style>
