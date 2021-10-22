@@ -5,6 +5,14 @@
     >
     <div class="header">
       <div class="title">{{ title }}</div>
+      <div class="filter-region">
+        <input
+          v-model="filterText"
+          v-show="selectedType"
+          type="text"
+          placeholder="Filter items..."
+          >
+      </div>
     </div>
     <input v-if="formElement" type="hidden" :name="formElement" :value="storageValue" />
 
@@ -15,6 +23,7 @@
         type="user"
         :value.sync="selectedValue"
         :active="selectedType == 'user'"
+        :filter-text="filterTextDelayed"
         @select="selectPicker"
         />
 
@@ -24,6 +33,7 @@
         type="group"
         :value.sync="selectedValue"
         :active="selectedType == 'group'"
+        :filter-text="filterTextDelayed"
         @select="selectPicker"
         />
 
@@ -33,6 +43,7 @@
         type="site"
         :value.sync="selectedValue"
         :active="selectedType == 'site'"
+        :filter-text="filterTextDelayed"
         @select="selectPicker"
         />
     </graph-layer-wrapper>
@@ -58,7 +69,10 @@
       selectedType: "",
       parentId: "",
       driveType: "",
-      driveId: ""
+      driveId: "",
+
+      filterText: "",
+      filterTextDelayed: ""
     }),
 
     props: {
@@ -129,6 +143,7 @@
     },
 
     created() {
+      this.$options.filterTextCounter = 0;
       this.applyValue();
     },
 
@@ -179,6 +194,19 @@
 
       storageValue() {
         this.updateValue();
+      },
+
+      filterText(value) {
+        const id = ++this.$options.filterTextCounter;
+
+        window.setTimeout(
+          () => {
+            if (id === this.$options.filterTextCounter) {
+              this.filterTextDelayed = value;
+            }
+          },
+          1500
+        );
       }
     }
   };
@@ -186,6 +214,7 @@
 
 <style scoped>
   .header {
+    display: flex;
     border-bottom: 2px solid var(--graph-layer-drive-picker-heading-border-color);
     padding-bottom: 0.5em;
   }
@@ -193,5 +222,21 @@
   .header > .title {
     font-size: 1.5em;
     font-weight: bold;
+  }
+
+  .header > .filter-region {
+    flex: 1;
+    text-align: right;
+  }
+  .header > .filter-region > input {
+    width: 90%;
+    font-size: 18px;
+    outline: none;
+    padding: 4px;
+    border: none;
+    border-bottom: 2px solid var(--graph-layer-drive-picker-heading-border-color);
+  }
+  .header > .filter-region > input:focus {
+    border-bottom: 2px solid var(--graph-layer-drive-picker-active-color);
   }
 </style>

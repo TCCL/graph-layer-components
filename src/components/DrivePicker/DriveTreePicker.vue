@@ -24,7 +24,7 @@
       </div>
 
       <drive-tree-options
-        v-for="entry in entries"
+        v-for="entry in currentEntries"
         v-bind:key="entry.id"
         :type="type"
         :info="entry"
@@ -48,6 +48,8 @@
   import LoadErrorMixin from "../../core/mixins/LoadErrorMixin.js";
   import DriveTreeOptions from "./DriveTreeOptions.vue";
   import { extractQueryParam } from "../../core/helpers.js";
+
+  import Fuse from 'fuse.js';
 
   function sortByName(a,b) {
     const na = a.name;
@@ -136,7 +138,8 @@
     props: {
       type: String,
       value: Object,
-      active: Boolean
+      active: Boolean,
+      filterText: String
     },
 
     computed: {
@@ -177,7 +180,19 @@
       },
 
       hasNextPage() {
-        return !!this.nextLink;
+        return !!this.nextLink && !this.filterText;
+      },
+
+      currentEntries() {
+        if (!this.filterText) {
+          return this.entries;
+        }
+
+        if (this.$options.fuse) {
+          return this.$options.fuse.search(this.filterText).map(x => x.item);
+        }
+
+        return [];
       }
     },
 
@@ -398,6 +413,15 @@
         this.entries.splice(0);
         this.loaded = false;
         this.applyValue();
+      },
+
+      entries() {
+        const options = {
+          keys: ['name'],
+          threshold: 0.25
+        };
+
+        this.$options.fuse = new Fuse(this.entries,options);
       }
     }
   };
