@@ -6,7 +6,7 @@
     :class="[$themeClass]"
     >
     <div class="title-region">
-      <div v-if="canGoBack" class="back" @click="goBack">
+      <div v-if="canGoBack" class="back" @click="goBack" title="Go back">
         <icon i="arrow-back" />
       </div>
       <div class="title-bar">
