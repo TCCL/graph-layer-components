@@ -2,7 +2,7 @@
   "name": "@tccl/graph-layer-components",
   "version": "1.0.0-dev",
   "description": "Frontend library of components for graph-layer integration",
-  "module": "src/index.js",
+  "module": "dist/graph-layer-components.esm.js",
   "main": "dist/graph-layer-components.js",
   "scripts": {
     "build": "rollup --config",
