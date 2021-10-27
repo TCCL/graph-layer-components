@@ -7,9 +7,8 @@ import GraphLayer from "../../src";
 
 // Create GraphLayer instance and scan for elements.
 const graphLayer = new GraphLayer();
+Vue.use(graphLayer);
 for (const key in testComponents) {
   graphLayer.registerScanComponent(key,testComponents[key]);
 }
 graphLayer.scanAll();
-
-Vue.use(graphLayer);
