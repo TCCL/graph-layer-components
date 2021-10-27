@@ -1,0 +1,25 @@
+/* test/src/base.css */
+
+.testbed-wrapper {
+  display: flex;
+  flex-flow: row wrap;
+}
+
+.testbed-wrapper > .region-wrapper {
+  flex: 0 0 50%;
+  overflow: hidden;
+}
+
+.testbed-wrapper > .region-wrapper > .region {
+  padding: 3%;
+  min-height: 360px;
+  max-height: 360px;
+}
+
+.testbed-wrapper .input-test {
+  flex: 1 0;
+}
+
+.testbed-wrapper > .region-wrapper > .region.drive-picker-form-test .drive-picker-widget {
+  min-height: 200px;
+}

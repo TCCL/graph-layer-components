@@ -1,0 +1,39 @@
+{
+  "name": "@tccl/graph-layer-components",
+  "version": "1.0.0-dev",
+  "description": "Frontend library of components for graph-layer integration",
+  "module": "dist/graph-layer-components.esm.js",
+  "main": "dist/graph-layer-components.js",
+  "scripts": {
+    "build": "rollup --config",
+    "build-test": "rollup --config ./test/rollup.config.js"
+  },
+  "files": [
+    "src/**",
+    "dist/**"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://git.developer.tulsalibrary.org/intranet/graph-layer-components.git"
+  },
+  "author": "Tulsa City-County Library",
+  "contributors": [
+    {
+      "name": "Roger Gee",
+      "email": "roger.gee@tulsalibrary.org"
+    }
+  ],
+  "license": "MIT",
+  "devDependencies": {
+    "@rollup/plugin-node-resolve": "^13.0.4",
+    "@rollup/plugin-replace": "^3.0.0",
+    "date-fns": "^2.25.0",
+    "fuse.js": "^6.4.6",
+    "js-cookie": "^3.0.1",
+    "rollup": "^2.56.3",
+    "rollup-plugin-css-only": "^3.1.0",
+    "rollup-plugin-svg": "^2.0.0",
+    "rollup-plugin-vue": "^5.1.9",
+    "vue": "^2.6.14"
+  }
+}
