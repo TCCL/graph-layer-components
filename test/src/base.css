@@ -19,3 +19,7 @@
 .testbed-wrapper .input-test {
   flex: 1 0;
 }
+
+.testbed-wrapper > .region-wrapper > .region.drive-picker-form-test .drive-picker-widget {
+  min-height: 200px;
+}
