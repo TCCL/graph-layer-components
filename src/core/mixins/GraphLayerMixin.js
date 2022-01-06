@@ -8,16 +8,18 @@ import * as coreComponents from "../components";
 import Icon from "../icons";
 import { nop } from "../helpers.js";
 
-function findParentItem($parent,key,subkey) {
+function findParentItem($parent,key,subkey,undef) {
   if (!$parent) {
     return null;
   }
 
-  if (key in $parent) {
-    return $parent[key][subkey];
+  if (key in $parent && subkey in $parent[key]) {
+    if ($parent[key][subkey] !== undef) {
+      return $parent[key][subkey];
+    }
   }
 
-  return findParentProp($parent.$parent,key,subkey);
+  return findParentItem($parent.$parent,key,subkey);
 }
 
 function modifyPromise(promise) {
@@ -49,7 +51,7 @@ export default {
   computed: {
     $graphLayer() {
       const inst = this.graphLayer
-            || findParentItem(this.$parent,"$props","graphLayer")
+            || findParentItem(this.$parent,"$props","graphLayer",null)
             || globals.graphLayer;
 
       if (!inst) {
