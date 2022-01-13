@@ -140,7 +140,7 @@
           const drives = this.processLoadResult(result,url);
 
           // Query the default drive so we can mark it as default.
-          this.$fetchJson(defaultUrl,null,true).then((defaultDrive) => {
+          return this.$fetchJson(defaultUrl,null,true).then((defaultDrive) => {
             if (this.nextLink) {
               this.nextLink.defaultDrive = defaultDrive;
             }
@@ -169,7 +169,7 @@
           const drives = this.processLoadResult(result,url);
 
           // Query the default drive so we can mark it as default.
-          this.$fetchJson(defaultUrl,null,true).then((defaultDrive) => {
+          return this.$fetchJson(defaultUrl,null,true).then((defaultDrive) => {
             if (this.nextLink) {
               this.nextLink.defaultDrive = defaultDrive;
             }
@@ -198,7 +198,7 @@
           const drives = this.processLoadResult(result,url);
 
           // Query the default drive so we can mark it as default.
-          this.$fetchJson(defaultUrl,null,true).then((defaultDrive) => {
+          return this.$fetchJson(defaultUrl,null,true).then((defaultDrive) => {
             if (this.nextLink) {
               this.nextLink.defaultDrive = defaultDrive;
             }
