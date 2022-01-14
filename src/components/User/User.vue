@@ -1,16 +1,16 @@
 <template>
   <graph-layer-wrapper
+    justify-around
     :loading-state="$loadingState"
     :error-state="$errorState"
-    class="graph-layer-user-wrapper justify-around"
-    :class="[$themeClass]"
+    :class="[$style['graph-layer-user-wrapper'],$themeClass]"
     >
-    <div class="graph-layer-user">
+    <div :class="$style['graph-layer-user']">
       <avatar ref="avatar" :endpoint="endpoint" :display-name="userInfo.displayName" />
-      <div class="user-info">
-        <div class="name">{{ userInfo.displayName }}</div>
-        <div class="job-title caption">{{ userInfo.jobTitle }}</div>
-        <div class="emailAddress"><a :href="emailLink">{{ userInfo.mail }}</a></div>
+      <div :class="$style['user-info']">
+        <div>{{ userInfo.displayName }}</div>
+        <caption-text block>{{ userInfo.jobTitle }}</caption-text>
+        <div><a :href="emailLink">{{ userInfo.mail }}</a></div>
       </div>
     </div>
   </graph-layer-wrapper>
@@ -116,7 +116,7 @@
   };
 </script>
 
-<style scoped>
+<style module>
   .graph-layer-user {
     display: flex;
     flex-flow: row nowrap;

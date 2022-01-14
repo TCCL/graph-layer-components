@@ -1,11 +1,10 @@
 <template>
   <graph-layer-wrapper
-    class="graph-layer-drive-picker"
-    :class="[$themeClass]"
+    :class="[$themeClass,$style['graph-layer-drive-picker']]"
     >
-    <div class="header">
-      <div class="title">{{ title }}</div>
-      <div class="filter-region">
+    <div :class="$style['header']">
+      <div :class="$style['title']">{{ title }}</div>
+      <div :class="$style['filter-region']">
         <input
           v-model="filterText"
           v-show="selectedType"
@@ -16,10 +15,9 @@
     </div>
     <input v-if="formElement" type="hidden" :name="formElement" :value="storageValue" />
 
-    <graph-layer-wrapper class="graph-layer-drive-picker-inner" scroll>
+    <graph-layer-wrapper scroll>
       <drive-tree-picker
         v-if="!usersOff"
-        class="user"
         type="user"
         :value.sync="selectedValue"
         :active="selectedType == 'user'"
@@ -29,7 +27,6 @@
 
       <drive-tree-picker
         v-if="!groupsOff"
-        class="group"
         type="group"
         :value.sync="selectedValue"
         :active="selectedType == 'group'"
@@ -39,7 +36,6 @@
 
       <drive-tree-picker
         v-if="!sitesOff"
-        class="site"
         type="site"
         :value.sync="selectedValue"
         :active="selectedType == 'site'"
@@ -212,7 +208,11 @@
   };
 </script>
 
-<style scoped>
+<style module>
+  .graph-layer-drive-picker {
+
+  }
+
   .header {
     display: flex;
     border-bottom: 2px solid var(--graph-layer-drive-picker-heading-border-color);

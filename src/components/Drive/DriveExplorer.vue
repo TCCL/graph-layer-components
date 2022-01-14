@@ -2,14 +2,14 @@
   <graph-layer-wrapper
     :loading-state="$loadingState"
     :error-state="$errorState"
-    class="graph-layer-drive-explorer"
+    :class="$style['graph-layer-drive-explorer']"
     scroll
     >
-    <div v-if="currentListing.length == 0" class="empty">
-      <span class="caption">This folder is empty.</span>
+    <div v-if="currentListing.length == 0" :class="$style['empty']">
+      <span :class="$style['caption']">This folder is empty.</span>
     </div>
 
-    <div class="entry-wrapper" v-for="item in currentListing">
+    <div :class="$style['entry-wrapper']" v-for="item in currentListing">
       <folder-entry
         v-if="item.folder"
         :item="item"
@@ -22,22 +22,22 @@
         />
     </div>
 
-    <div v-if="hasNext || page > 0" class="page-buttons-wrapper">
-      <div class="page-buttons">
-        <div class="page-back-button-wrapper button-wrapper">
+    <div v-if="hasNext || page > 0" :class="$style['page-buttons-wrapper']">
+      <div :class="$style['page-buttons']">
+        <div :class="[$style['page-back-button-wrapper'],$style['button-wrapper']]">
           <icon
+            medium button
             i="arrow-left"
-            class="button primary"
-            :class="{ disabled:page<=0 }"
+            :class="{ disabled: (page <= 0) }"
             @click="pageBack"
             />
         </div>
 
-        <div class="page-forward-button-wrapper button-wrapper">
+        <div :class="[$style['page-forward-button-wrapper'],$style['button-wrapper']]">
           <icon
+            medium button
             i="arrow-right"
-            class="button primary"
-            :class="{ disabled:!hasNext }"
+            :class="{ disabled: (!hasNext) }"
             @click="pageForward"
             />
         </div>
@@ -263,7 +263,7 @@
   };
 </script>
 
-<style scoped>
+<style module>
   .entry-wrapper {
     border-bottom: 1px solid var(--graph-layer-drive-row-border-color);
   }

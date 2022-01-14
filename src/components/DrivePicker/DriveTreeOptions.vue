@@ -1,6 +1,6 @@
 <template>
-  <div class="drive-tree-options" :class="classes">
-    <div class="header" @click="select" :title="info.title">
+  <div :class="classes">
+    <div :class="$style['header']" @click="select" :title="info.title">
       <icon :i="active ? 'arrow-down' : 'arrow-right'" />
       <span>{{ info.name }}</span>
     </div>
@@ -9,24 +9,26 @@
       v-if="active"
       :loading-state="$loadingState"
       :error-state="$errorState"
-      class="drive-tree-options-inner"
       >
       <div
         v-if="entries.length == 0"
-        class="no-entry"
+        :class="$style['no-entry']"
         >
         <span>No drives available</span>
       </div>
       <div
         v-for="entry in entries"
         class="entry"
-        :class="{ active:(entry === selectedEntry) }"
+        :class="[
+          (entry === selectedEntry ? $style.active : ''),
+          $style.entry
+         ]"
         @click="selectEntry(entry)"
         >
         <span>{{ entry.name }}</span>
       </div>
 
-      <div v-if="hasNextPage" class="pagination">
+      <div v-if="hasNextPage" :class="$style['pagination']">
         <click-text
           @click="loadNextPage"
           title="Click to load additional drive entries in this list"
@@ -65,11 +67,13 @@
 
     computed: {
       classes() {
-        const cls = [];
+        const cls = [
+          this.$themeClass,
+          this.$style["drive-tree-options"]
+        ];
 
-        cls.push(this.$themeClass);
         if (this.active) {
-          cls.push("active");
+          cls.push(this.$style.active);
         }
 
         return cls;
@@ -344,7 +348,7 @@
   };
 </script>
 
-<style scoped>
+<style module>
   .drive-tree-options > .header {
     flex: 0 0;
     cursor: pointer;

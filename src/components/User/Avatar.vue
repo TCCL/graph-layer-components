@@ -1,7 +1,7 @@
 <template>
-  <div class="graph-layer-user-avatar">
+  <div :class="$style['graph-layer-user-avatar']">
     <img v-if="hasImage" :src="blobUrl">
-    <div v-else class="initials">{{ initials }}</div>
+    <div v-else :class="$style['initials']">{{ initials }}</div>
   </div>
 </template>
 
@@ -87,7 +87,7 @@
   };
 </script>
 
-<style scoped>
+<style module>
   .graph-layer-user-avatar {
     display: inline-flex;
     justify-content: center;
