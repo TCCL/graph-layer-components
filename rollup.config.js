@@ -9,7 +9,12 @@ import replace from "@rollup/plugin-replace";
 const plugins = [
   nodeResolve(),
   vue({
-    css: false
+    css: false,
+    style: {
+      postcssModulesOptions: {
+        generateScopedName: 'tccl-graph-layer-components-[local]-[hash:base64:4]'
+      }
+    }
   }),
   css({
     output: "graph-layer-components.css"
