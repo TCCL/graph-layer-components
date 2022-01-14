@@ -1,8 +1,9 @@
 <template functional>
   <div
-    class="graph-layer-wrapper"
-    :class="(props.scroll ? ' scroll' : '')"
-    >
+    :class="[
+      (props.scroll ? $style.scroll : ''),
+      $style['graph-layer-wrapper']
+     ]">
     <loading-state
       v-if="props.loadingState && !props.hideLoading"
       :class="[data.staticClass,data.class]"
@@ -18,8 +19,12 @@
 
     <div
       v-show="!props.loadingState && !props.errorState"
-      class="graph-layer-content"
-      :class="[data.staticClass,data.class]"
+      :class="[
+        $style['graph-layer-content'],
+        (props.justifyAround ? $style['justify-around'] : ''),
+        data.staticClass,
+        data.class
+       ]"
       v-bind="data.attrs"
       >
       <slot />
@@ -50,17 +55,26 @@
       scroll: {
         type: Boolean,
         default: false
+      },
+
+      justifyAround: {
+        type: Boolean,
+        default: false
       }
     }
   };
 </script>
 
-<style scoped>
+<style module>
   .graph-layer-wrapper {
     overflow: hidden;
     flex: 1 0;
     display: flex;
     flex-flow: column nowrap;
+  }
+
+  .graph-layer-wrapper a {
+    color: var(--graph-layer-anchor-color);
   }
 
   .graph-layer-wrapper > .graph-layer-content {

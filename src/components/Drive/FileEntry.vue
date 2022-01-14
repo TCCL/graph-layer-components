@@ -1,17 +1,17 @@
 <template>
-  <div class="graph-layer-drive-file-entry">
-    <div class="navigate" @click="navigate" :title="item.name">
-      <icon i="file" class="secondary" /><a class="text">{{ item.name }}</a>
+  <div :class="$style['graph-layer-drive-file-entry']">
+    <div :class="$style['navigate']" @click="navigate" :title="item.name">
+      <icon i="file" secondary /><a :class="$style['text']">{{ item.name }}</a>
     </div>
-    <div class="size">
-      <span class="caption">{{ sizeFormatted }}</span>
+    <div :class="$style['size']">
+      <caption-text>{{ sizeFormatted }}</caption-text>
     </div>
-    <div class="modified-by">
+    <div :class="$style['modified-by']">
       <a v-if="modifiedByLink" :href="modifiedByLink">{{ modifiedBy }}</a>
       <span v-else>{{ modifiedBy }}</span>
     </div>
-    <div class="modified-on">
-      <span class="caption">{{ modifiedDistance }}</span>
+    <div :class="$style['modified-on']">
+      <caption-text>{{ modifiedDistance }}</caption-text>
     </div>
   </div>
 </template>
@@ -50,7 +50,7 @@
   };
 </script>
 
-<style scoped>
+<style module>
   .graph-layer-drive-file-entry {
     display: flex;
     flex-flow: row nowrap;
@@ -68,8 +68,8 @@
     display: flex;
     align-items: center;
   }
-  .graph-layer-drive-file-entry > .navigate >>> .icon {
-    margin-right: 5px;
+  .graph-layer-drive-file-entry > .navigate > .text {
+    margin-left: 5px;
   }
   .graph-layer-drive-file-entry > .navigate:hover > .text {
     text-decoration: underline;

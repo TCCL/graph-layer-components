@@ -1,6 +1,6 @@
 <template>
-  <div class="drive-tree-picker" :class="classes">
-    <div class="header" @click="select">
+  <div :class="classes">
+    <div :class="$style['header']" @click="select">
       <icon :i="active ? 'arrow-down' : 'arrow-right'" />
 
       <span v-if="isUser">User Drives</span>
@@ -12,12 +12,13 @@
       v-if="active"
       :loading-state="$loadingState"
       :error-state="$errorState"
-      class="drive-tree-picker-inner"
       >
       <div
         v-for="entry in staticEntries"
-        class="drive-tree-static-option"
-        :class="{ active:(selectedEntry === entry) }"
+        :class="[
+          (selectedEntry === entry ? $style.active : ''),
+          $style['drive-tree-static-option']
+         ]"
         @click="selectStaticEntry(entry)"
         >
         <span>{{ entry.name }}</span>
@@ -26,6 +27,7 @@
       <drive-tree-options
         v-for="entry in currentEntries"
         v-bind:key="entry.id"
+        :class="$style['drive-tree-options']"
         :type="type"
         :info="entry"
         :active="selectedEntry === entry"
@@ -33,7 +35,7 @@
         @select="selectEntry(entry)"
         />
 
-      <div v-if="hasNextPage" class="drive-tree-pagination">
+      <div v-if="hasNextPage" :class="$style['drive-tree-pagination']">
         <click-text
           @click="loadNextPage"
           title="Click to load additional entries in this list"
@@ -156,11 +158,13 @@
       },
 
       classes() {
-        const cls = [];
+        const cls = [
+          this.$themeClass,
+          this.$style["drive-tree-picker"]
+        ];
 
-        cls.push(this.$themeClass);
         if (this.active) {
-          cls.push("active");
+          cls.push(this.$style.active);
         }
 
         return cls;
@@ -427,7 +431,7 @@
   };
 </script>
 
-<style scoped>
+<style module>
   .drive-tree-picker {
 
   }

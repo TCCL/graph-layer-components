@@ -99,6 +99,7 @@ The following code executed at page load will create Graph Layer components from
 ~~~javascript
 import GraphLayer from "@tccl/graph-layer-components";
 
+const graphLayer = new GraphLayer();
 graphLayer.scanAll();
 ~~~
 

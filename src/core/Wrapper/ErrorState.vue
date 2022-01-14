@@ -1,8 +1,8 @@
 <template>
-  <div class="graph-layer-error-state">
-    <span class="excl-icon">!</span>
-    <span class="message">{{ message }}</span>
-    <span class="blurb">{{ blurb }}</span>
+  <div :class="$style['graph-layer-error-state']">
+    <span :class="$style['excl-icon']">!</span>
+    <span :class="$style['message']">{{ message }}</span>
+    <span :class="$style['blurb']">{{ blurb }}</span>
     <slot />
   </div>
 </template>
@@ -94,7 +94,7 @@
   };
 </script>
 
-<style scoped>
+<style module>
   .graph-layer-error-state {
     flex: 1 0;
     display: flex;
@@ -102,8 +102,8 @@
     align-items: center;
     flex-flow: column nowrap;
     background-color: var(--graph-layer-color-error);
-    border-radius: 10px;
     padding: 2em;
+    margin: 1em;
     text-align: center;
   }
 

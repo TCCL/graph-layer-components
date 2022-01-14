@@ -1,6 +1,6 @@
 <template>
-  <div class="graph-layer-loading-state">
-    <span class="message">{{ message }}</span>
+  <div :class="$style['graph-layer-loading-state']">
+    <span :class="$style.message">{{ message }}</span>
   </div>
 </template>
 
@@ -33,7 +33,7 @@
   };
 </script>
 
-<style scoped>
+<style module>
   .graph-layer-loading-state {
     flex: 1 0;
     display: flex;

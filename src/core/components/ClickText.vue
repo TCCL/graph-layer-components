@@ -1,10 +1,10 @@
 <template>
-  <a class="click-text" :class="classes" :title="title" v-on:click="onClick"><slot></slot></a>
+  <a :class="classes" :title="title" v-on:click="onClick"><slot></slot></a>
 </template>
 
 <script>
   export default {
-    name: 'ClickText',
+    name: "ClickText",
 
     data: () => ({
 
@@ -17,16 +17,18 @@
       },
       title: {
         type: String,
-        default: ''
+        default: ""
       }
     },
 
     computed: {
       classes() {
-        var cls = [];
+        const cls = [
+          this.$style["click-text"]
+        ];
 
         if (this.disabled) {
-          cls.push('disabled');
+          cls.push(this.$style["disabled"]);
         }
 
         return cls;
@@ -43,13 +45,13 @@
           return;
         }
 
-        this.$emit('click',event);
+        this.$emit("click",event);
       }
     }
   };
 </script>
 
-<style scoped>
+<style module>
   .click-text {
     font-size: 15px;
     cursor: pointer;

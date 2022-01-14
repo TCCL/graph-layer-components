@@ -2,32 +2,31 @@
   <graph-layer-wrapper
     :loading-state="$loadingState"
     :error-state="$errorState"
-    class="graph-layer-drive"
-    :class="[$themeClass]"
+    :class="[$themeClass,$style['graph-layer-drive']]"
     >
-    <div class="title-region">
-      <div v-if="canGoBack" class="back" @click="goBack" title="Go back">
+    <div :class="$style['title-region']">
+      <div v-if="canGoBack" :class="$style['back']" @click="goBack" title="Go back">
         <icon i="arrow-back" />
       </div>
-      <div class="title-bar">
-        <span class="name">{{ driveName }}</span>
+      <h2 :class="$style['title-bar']">
+        <span :class="$style['name']">{{ driveName }}</span>
         <span v-for="part in pathParts">/ {{ part }}</span>
-      </div>
-      <div class="toolbar">
+      </h2>
+      <div :class="$style['toolbar']">
         <icon
+          button
           i="external-link"
-          class="button"
           @click="openDrive"
           title="Open in Microsoft file viewer"
           />
       </div>
     </div>
 
-    <div class="header">
-      <div class="column name">Name</div>
-      <div class="column">Size</div>
-      <div class="column">Last Modified By</div>
-      <div class="column last-modified">Last Modified</div>
+    <div :class="$style['header']">
+      <div :class="[$style['column'],$style['name']]">Name</div>
+      <div :class="$style['column']">Size</div>
+      <div :class="$style['column']">Last Modified By</div>
+      <div :class="[$style['column'],$style['last-modified']]">Last Modified</div>
     </div>
 
     <drive-explorer
@@ -298,7 +297,7 @@
   };
 </script>
 
-<style scoped>
+<style module>
   .title-region {
     display: flex;
     align-items: center;
@@ -309,12 +308,15 @@
     flex: 1 0;
     cursor: pointer;
     display: flex;
+    justify-content: center;
   }
   .title-region > .back:hover {
     background-color: var(--graph-layer-drive-item-selected-background-color);
   }
   .title-region > .title-bar {
+    margin: 0;
     flex: 10 0;
+    font-weight: bold;
   }
   .title-region > .toolbar {
     flex: 1 0;

@@ -6,17 +6,34 @@
     functional: true,
 
     render(h,context) {
+      const classes = [
+          context.$style.icon,
+          context.data.staticClass,
+          context.data.class
+      ];
+
+      if (context.props.medium) {
+        classes.push(context.$style.medium);
+      }
+      if (context.props.large) {
+        classes.push(context.$style.large);
+      }
+      if (context.props.button) {
+        classes.push(context.$style.button);
+      }
+      if (context.props.secondary) {
+        classes.push(context.$style.secondary);
+      }
+      if (context.props.accent) {
+        classes.push(context.$style.accent);
+      }
+
       const e = h("i",{
         domProps: {
           innerHTML: getIconSvg(context.props.i)
         },
 
-        "class": [
-          "icon",
-          context.data.staticClass,
-          context.data.class
-        ],
-
+        "class": classes,
         attrs: context.data.attrs,
         style: context.data.style,
         on: context.listeners
@@ -26,38 +43,66 @@
     },
 
     props: {
-      i: String
+      i: String,
+      medium: {
+        type: Boolean,
+        value: false
+      },
+      large: {
+        type: Boolean,
+        value: false
+      },
+      button: {
+        type: Boolean,
+        value: false
+      },
+      secondary: {
+        type: Boolean,
+        value: false
+      },
+      accent: {
+        type: Boolean,
+        value: false
+      }
     }
   };
 </script>
 
-<style scoped>
+<style module>
   .icon {
     display: inline-block;
     width: 24px;
     height: 24px;
   }
+  .icon.medium {
+    width: 32px;
+    height: 32px;
+  }
+  .icon.large {
+    width: 48px;
+    height: 48px;
+  }
 
   .icon.button {
     cursor: pointer;
-    opacity: 0.9;
+    opacity: 0.75;
   }
   .icon.button:hover {
     opacity: 1;
   }
-  .icon.button.disabled {
+  .icon.button:global(.disabled) {
     cursor: initial;
     opacity: 0.2;
     fill: var(--graph-layer-color-light-gray);
   }
 
-  .icon >>> svg {
+  .icon > svg {
     fill: var(--graph-layer-color-primary);
   }
-  .icon.secondary >>> svg {
+  .icon.secondary > svg {
     fill: var(--graph-layer-color-secondary);
   }
-  .icon.accent >>> svg {
+  .icon.accent > svg {
     fill: var(--graph-layer-color-accent);
   }
 </style>
