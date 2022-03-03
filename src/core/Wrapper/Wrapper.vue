@@ -73,12 +73,13 @@
 <style>
   .graph-layer-wrapper-fade-enter-active, .graph-layer-wrapper-fade-leave-active {
     transition-property: opacity;
-    transition-duration: .25s;
+    transition-duration: .35s;
   }
   .graph-layer-wrapper-fade-enter, .graph-layer-wrapper-fade-leave-to {
     opacity: 0;
   }
   .graph-layer-wrapper-fade-enter-active {
+    transition-delay: .40s;
     position: absolute;
     width: 100%;
     height: 100%;
