@@ -1,6 +1,7 @@
 // components/index.js
 
 import Drive from "./Drive";
+import DriveBrowser from "./DriveBrowser";
 import DrivePicker from "./DrivePicker";
 import User from "./User";
 
@@ -9,6 +10,7 @@ import User from "./User";
 
 export {
   Drive as drive,
+  DriveBrowser as driveBrowser,
   DrivePicker as drivePicker,
   User as user
 }

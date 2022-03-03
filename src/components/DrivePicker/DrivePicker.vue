@@ -74,7 +74,7 @@
     props: {
       title: {
         type: String,
-        default: "Choose a drive"
+        default: "Choose a document library"
       },
 
       value: {

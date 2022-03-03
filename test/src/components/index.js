@@ -1,11 +1,13 @@
 // test/src/components
 
 import DriveInputTest from "./DriveInputTest.vue";
+import DriveBrowserInputTest from "./DriveBrowserInputTest.vue";
 import DrivePickerInputTest from "./DrivePickerInputTest.vue";
 import UserInputTest from "./UserInputTest.vue";
 
 export {
   DriveInputTest as driveInputTest,
+  DriveBrowserInputTest as driveBrowserInputTest,
   DrivePickerInputTest as drivePickerInputTest,
   UserInputTest as userInputTest
 };
