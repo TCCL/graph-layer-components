@@ -8,7 +8,10 @@
     <div v-if="isUnselected" :class="$style.explorer">
       <div
         v-for="item in items"
-        :class="$style['explorer__item']"
+        :class="[
+          $style['explorer__item'],
+          item.id == propValue.driveId ? $style['explorer__item--selected'] : ''
+        ]"
         @click="select(item)"
         >
         <icon i="folder" large />
@@ -19,6 +22,7 @@
     <drive-browser-explorer
       ref="child"
       v-else-if="children.length > 0"
+      v-model="propValue"
       :items="children"
       @nav="propNav"
       />
@@ -86,6 +90,15 @@
     },
 
     computed: {
+      propValue: {
+        get() {
+          return this.value;
+        },
+        set(value) {
+          this.$emit("input",value);
+        }
+      },
+
       isUnselected() {
         return !this.selectedItem;
       },
@@ -184,6 +197,24 @@
 
       select(item) {
         if (this.$loadingState) {
+          return;
+        }
+
+        // Base case: selecting a drive changes the value.
+        if (item.schema == "drive") {
+          if (this.propValue.driveId == item.id) {
+            // Clear existing value.
+            this.propValue = {};
+          }
+          else {
+            // Set new value.
+            this.propValue = {
+              item,
+              driveType: "drive",
+              driveId: item.id
+            };
+          }
+
           return;
         }
 
@@ -298,7 +329,8 @@
             label: drive.name,
             caption: drive.name,
             endpoint: "/drives/" + drive.id,
-            schema: "drive"
+            schema: "drive",
+            webUrl: drive.webUrl
           });
         }
 
@@ -327,6 +359,11 @@
     align-items: center;
     cursor: pointer;
     padding: 0.5em;
+  }
+
+  .explorer__item--selected {
+    background-color: var(--graph-layer-drive-browser-hover-color);
+    border: 2px solid var(--graph-layer-drive-browser-selected-color);
   }
 
   .explorer__item:hover {

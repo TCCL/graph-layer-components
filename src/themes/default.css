@@ -27,6 +27,7 @@
 
   /* Drive Browser */
   --graph-layer-drive-browser-divider-color: var(--graph-layer-color-secondary);
+  --graph-layer-drive-browser-selected-color: var(--graph-layer-color-primary);
   --graph-layer-drive-browser-hover-color: var(--graph-layer-color-secondary);
 
   /* Drive Picker */

@@ -8,30 +8,42 @@
       </div>
 
       <div :class="$style.header__nav">
-        <click-text
-          v-if="nav.length > 0"
-          :class="$style['header__nav-item']"
-          @click="navigate({ id:'domain' })"
-          >{{ domainLabel }}</click-text>
-
-        <span
-          v-else
-          :class="[$style['header__nav-item'],$style['header__nav-item--active']]"
-          >{{ domainLabel }}</span>
-
-        <template v-for="item,index in nav">
+        <div>
           <click-text
-            v-if="index < nav.length-1"
-            :key="item.id"
+            v-if="nav.length > 0"
             :class="$style['header__nav-item']"
-            @click="navigate(item)"
-            >{{ item.label }}</click-text>
+            @click="navigate({ id:'domain' })"
+            >{{ domainLabel }}</click-text>
+
           <span
             v-else
-            :key="item.id"
             :class="[$style['header__nav-item'],$style['header__nav-item--active']]"
-            >{{ item.label }}</span>
-        </template>
+            >{{ domainLabel }}</span>
+
+          <template v-for="item,index in nav">
+            <click-text
+              v-if="index < nav.length-1"
+              :key="item.id"
+              :class="$style['header__nav-item']"
+              @click="navigate(item)"
+              >{{ item.label }}</click-text>
+            <span
+              v-else
+              :key="item.id"
+              :class="[$style['header__nav-item'],$style['header__nav-item--active']]"
+              >{{ item.label }}</span>
+          </template>
+        </div>
+
+        <div>
+          <icon
+            v-if="hasSelection"
+            button
+            i="external-link"
+            @click="openDrive"
+            title="Open in Microsoft file viewer"
+            />
+        </div>
       </div>
     </div>
 
@@ -65,10 +77,10 @@
     },
 
     data: () => ({
-      selectedType: "",
-      parentId: "",
       driveType: "",
       driveId: "",
+      selectedItem: null,
+      selectedNav: null,
 
       nav: []
     }),
@@ -139,36 +151,39 @@
       selection: {
         get() {
           return {
-            type: this.selectedType,
-            parentId: this.parentId,
             driveType: this.driveType,
-            driveId: this.driveId
+            driveId: this.driveId,
+            item: this.selectedItem
           };
         },
-        set({ type, parentId, driveType, driveId }) {
-          this.selectedType = type || "";
-          this.parentId = parentId || "";
+        set({ driveType, driveId, item }) {
           this.driveType = driveType || "";
           this.driveId = driveId || "";
+          this.selectedItem = item || null;
+          if (item) {
+            this.selectedNav = this.nav.slice();
+          }
+          else {
+            this.selectedNav.splice(0);
+          }
         }
       },
 
       storageValue() {
-        if (this.selectedType == ""
-            || this.driveType == ""
-            || this.driveId == "")
-        {
+        if (this.driveType == "" || this.driveId == "") {
           return "";
         }
 
         const repr = {
-          s: this.selectedType,
-          p: this.parentId,
           t: this.driveType,
           i: this.driveId
         };
 
         return JSON.stringify(repr);
+      },
+
+      hasSelection() {
+        return this.selectedItem !== null;
       }
     },
 
@@ -179,6 +194,14 @@
     methods: {
       navigate(item) {
         this.$refs.explorer.navigate(item.id);
+      },
+
+      openDrive() {
+        if (!this.selectedItem) {
+          return;
+        }
+
+        window.open(this.selectedItem.webUrl,"_blank");
       }
     }
   };
@@ -200,6 +223,8 @@
 
   .header__nav {
     padding: 0.25em;
+    display: flex;
+    justify-content: space-between;
   }
 
   .header__nav-item {
