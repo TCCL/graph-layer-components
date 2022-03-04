@@ -76,7 +76,7 @@
     props: {
       domainLabel: {
         type: String,
-        default: "<My Organization>"
+        default: "My Organization"
       },
 
       title: {
@@ -127,8 +127,7 @@
             endpoint: "/users",
             params: {
               "$orderby": "displayName",
-              "$select": "id,displayName,jobTitle,userType",
-              "$top": "512"
+              "$select": "id,displayName,jobTitle,userType"
             },
             schema: "userList"
           });

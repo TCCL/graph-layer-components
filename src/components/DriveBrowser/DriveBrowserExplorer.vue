@@ -2,33 +2,53 @@
   <graph-layer-wrapper
     :loading-state="$loadingState"
     :error-state="$errorState"
-    class="$style['graph-layer-drive-browser-explorer']"
+    :class="$style['graph-layer-drive-browser-explorer']"
     scroll
    >
-
-  <div v-if="isUnselected" :class="$style.explorer">
-    <div
-      v-for="item in items"
-      :class="$style['explorer__item']"
-      @click="select(item)"
-      >
-      <icon i="folder" large />
-      <span :class="$style['explorer__item-label']">{{ item.label }}</span>
+    <div v-if="isUnselected" :class="$style.explorer">
+      <div
+        v-for="item in items"
+        :class="$style['explorer__item']"
+        @click="select(item)"
+        >
+        <icon i="folder" large />
+        <span :class="$style['explorer__item-label']">{{ item.label }}</span>
+      </div>
     </div>
-  </div>
 
-  <drive-browser-explorer
-    ref="child"
-    v-else-if="children.length > 0"
-    :items="children"
-    @nav="propNav"
-    />
+    <drive-browser-explorer
+      ref="child"
+      v-else-if="children.length > 0"
+      :items="children"
+      @nav="propNav"
+      />
+
+    <div v-if="hasPagination" :class="$style.pagination">
+      <div :class="$style.pagination__button">
+        <icon
+          medium button
+          i="arrow-left"
+          :class="{ disabled: !hasPrevPage }"
+          @click="previousPage"
+          />
+      </div>
+
+      <div :class="$style.pagination__button">
+        <icon
+          medium button
+          i="arrow-right"
+          :class="{ disabled: !hasNextPage }"
+          @click="nextPage"
+          />
+      </div>
+    </div>
   </graph-layer-wrapper>
 </template>
 
 <script>
   import GraphLayerMixin from "../../core/mixins/GraphLayerMixin.js";
   import LoadErrorMixin from "../../core/mixins/LoadErrorMixin.js";
+  import { extractQueryParam } from "../../core/helpers.js";
 
   function makeURL(item) {
     const url = new URL(item.endpoint,window.location.origin);
@@ -51,7 +71,13 @@
 
     data: () => ({
       selectedItem: null,
-      children: []
+      children: [],
+      pageIndex: 0,
+      pages: [],
+
+      // Is the component active in the navigation (i.e. parent with no
+      // grandchildren)?
+      active: false
     }),
 
     props: {
@@ -62,6 +88,52 @@
     computed: {
       isUnselected() {
         return !this.selectedItem;
+      },
+
+      hasPagination() {
+        // Only render if we are a parent with no grandchildren.
+        if (!this.active) {
+          return false;
+        }
+
+        // More than one page.
+        if (this.pages.length > 1) {
+          return true;
+        }
+
+        // One page, but could load more with skip token.
+        if (this.pages.length == 1 && this.pages[0][1]) {
+          return true;
+        }
+
+        return false;
+      },
+
+      hasNextPage() {
+        if (this.pageIndex < this.pages.length) {
+          // Another forward page is already loaded.
+          if (this.pageIndex < this.pages.length - 1) {
+            return true;
+          }
+
+          // Most recent page has skip token.
+          if (this.pages[this.pageIndex][1]) {
+            return true;
+          }
+        }
+
+        return false;
+      },
+
+      hasPrevPage() {
+        if (this.pageIndex < this.pages.length) {
+          // Another backward page is already loaded.
+          if (this.pageIndex >= 1) {
+            return true;
+          }
+        }
+
+        return false;
       }
     },
 
@@ -93,13 +165,21 @@
 
       propNav(items) {
         let nav = [];
+
         if (this.selectedItem) {
           nav.push(this.selectedItem);
         }
+
         if (items) {
           nav = nav.concat(items);
         }
+
         this.$emit("nav",nav);
+
+        // The component is active if it is the most recent entry in the
+        // navigation.
+        this.active = this.selectedItem
+          && nav.indexOf(this.selectedItem) == nav.length-1;
       },
 
       select(item) {
@@ -107,16 +187,70 @@
           return;
         }
 
+        // Set up state to display new item in child component.
         this.children.splice(0);
+        this.pageIndex = 0;
+        this.pages.splice(0);
 
+        // Perform first fetch.
+        this.fetchItems(item).finally(() => {
+          this.selectedItem = item;
+          this.propNav();
+        });
+      },
+
+      nextPage() {
+        if (!this.selectedItem) {
+          return;
+        }
+
+        const index = this.pageIndex + 1;
+
+        if (index >= this.pages.length) {
+          // Fetch new list of items for next page.
+          const lastIndex = this.pages.length-1;
+          const [ _, skipToken ] = this.pages[lastIndex];
+          if (skipToken) {
+            this.fetchItems(this.selectedItem,skipToken);
+            this.pages[lastIndex][1] = null;
+          }
+        }
+        else {
+          // Apply existing page entry.
+          this.pageIndex = index;
+          this.children = this.pages[index][0];
+        }
+      },
+
+      previousPage() {
+        if (!this.selectedItem) {
+          return;
+        }
+
+        const index = this.pageIndex - 1;
+        if (index < 0) {
+          return;
+        }
+
+        // Apply existing page entry.
+        this.pageIndex = index;
+        this.children = this.pages[index][0];
+      },
+
+      fetchItems(item,skipToken) {
         const url = makeURL(item);
-        this.$fetchJson(url).then((result) => {
+        if (skipToken) {
+          url.searchParams.set("$skiptoken",skipToken);
+        }
+
+        return this.$fetchJson(url).then((result) => {
+          // Set items as current children.
           this.children = this.processResult(item.schema,result);
-          this.selectedItem = item;
-          this.propNav();
-        }, (err) => {
-          this.selectedItem = item;
-          this.propNav();
+
+          // Save page entry and skip token and update index.
+          const skipToken = extractQueryParam(result["@odata.nextLink"],"$skiptoken");
+          this.pageIndex = this.pages.length;
+          this.pages.push([this.children,skipToken]);
         });
       },
 
@@ -204,5 +338,17 @@
     text-align: center;
     max-width: 12ch;
     word-break: break-word;
+  }
+
+  .pagination {
+    border-top: 2px solid var(--graph-layer-drive-browser-divider-color);
+    margin-top: 0.25em;
+    display: flex;
+    justify-content: center;
+  }
+
+  .pagination__button {
+    flex: 0 0 20%;
+    text-align: center;
   }
 </style>

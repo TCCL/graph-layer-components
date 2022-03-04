@@ -24,7 +24,7 @@
 
     <div v-if="hasNext || page > 0" :class="$style['page-buttons-wrapper']">
       <div :class="$style['page-buttons']">
-        <div :class="[$style['page-back-button-wrapper'],$style['button-wrapper']]">
+        <div :class="$style['button-wrapper']">
           <icon
             medium button
             i="arrow-left"
@@ -33,7 +33,7 @@
             />
         </div>
 
-        <div :class="[$style['page-forward-button-wrapper'],$style['button-wrapper']]">
+        <div :class="$style['button-wrapper']">
           <icon
             medium button
             i="arrow-right"
