@@ -1,6 +1,6 @@
 <template>
   <div :class="$style['graph-layer-error-state']">
-    <span :class="$style['excl-icon']">!</span>
+    <icon i="error" error xlarge />
     <span :class="$style['message']">{{ message }}</span>
     <span :class="$style['blurb']">{{ blurb }}</span>
     <slot />
@@ -8,6 +8,8 @@
 </template>
 
 <script>
+  import Icon from "../icons";
+
   function isGraphLayerError(err) {
     return err.status && err.error && err.message;
   }
@@ -21,6 +23,10 @@
 
   export default {
     name: "ErrorState",
+
+    components: {
+      Icon
+    },
 
     data: () => ({
 
@@ -101,17 +107,7 @@
     justify-content: center;
     align-items: center;
     flex-flow: column nowrap;
-    background-color: var(--graph-layer-color-error);
-    padding: 2em;
-    margin: 1em;
     text-align: center;
-  }
-
-  .excl-icon {
-    font-size: 3.5em;
-    font-weight: bold;
-    user-select: none;
-    margin: 0.25em;
   }
 
   .message {
