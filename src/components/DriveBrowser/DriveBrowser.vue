@@ -7,8 +7,8 @@
         <h2>{{ title }}</h2>
       </div>
 
-      <div :class="$style.header__nav">
-        <div>
+      <div :class="$style.header__info">
+        <div :class="$style.header__nav">
           <click-text
             v-if="nav.length > 0"
             :class="$style['header__nav-item']"
@@ -35,9 +35,9 @@
           </template>
         </div>
 
-        <div>
+        <div v-if="hasSelection" :class="$style['header__selected']">
+          <span :class="$style['header__selected-label']">{{ selectedItem.label }}</span>
           <icon
-            v-if="hasSelection"
             button
             i="external-link"
             @click="openDrive"
@@ -114,6 +114,16 @@
       browseUsers: {
         type: [Boolean,String],
         default: false
+      },
+
+      browseGroups: {
+        type: [Boolean,String],
+        default: false
+      },
+
+      browseSites: {
+        type: [Boolean,String],
+        default: false
       }
     },
 
@@ -142,6 +152,34 @@
               "$select": "id,displayName,jobTitle,userType"
             },
             schema: "userList"
+          });
+        }
+
+        if (this.browseGroups) {
+          items.push({
+            id: "toplv-groups",
+            type: "toplv",
+            label: "Groups",
+            endpoint: "/groups",
+            params: {
+              "$orderby": "displayName",
+              "$select": "id,displayName,description"
+            },
+            schema: "groupList"
+          });
+        }
+
+        if (this.browseSites) {
+          items.push({
+            id: "toplv-groups",
+            type: "toplv",
+            label: "Sites",
+            endpoint: "/sites",
+            params: {
+              "search": "*",
+              "$select": "id,displayName,description"
+            },
+            schema: "siteList"
           });
         }
 
@@ -221,10 +259,14 @@
     display: flex;
   }
 
-  .header__nav {
-    padding: 0.25em;
+  .header__info {
     display: flex;
     justify-content: space-between;
+    align-items: baseline;
+  }
+
+  .header__nav {
+    padding: 0.25em 0;
   }
 
   .header__nav-item {
@@ -237,6 +279,17 @@
   }
 
   .header__nav-item--active {
+    font-weight: bold;
+  }
+
+  .header__selected {
+    display: flex;
+    align-items: center;
+    gap: 0.25em;
+  }
+
+  .header__selected-label {
+    font-size: 0.9em;
     font-weight: bold;
   }
 </style>

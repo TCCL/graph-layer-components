@@ -6,16 +6,18 @@
     scroll
    >
     <div v-if="isUnselected" :class="$style.explorer">
-      <div
-        v-for="item in items"
-        :class="[
-          $style['explorer__item'],
-          item.id == propValue.driveId ? $style['explorer__item--selected'] : ''
-        ]"
-        @click="select(item)"
-        >
-        <icon i="folder" large />
-        <span :class="$style['explorer__item-label']">{{ item.label }}</span>
+      <div v-for="item in items">
+        <div
+          :class="[
+            $style['explorer__item'],
+            item.id == propValue.driveId ? $style['explorer__item--selected'] : ''
+          ]"
+          @click="select(item)"
+          :title="item.caption"
+          >
+          <icon i="folder" large />
+          <span :class="$style['explorer__item-label']">{{ item.label }}</span>
+        </div>
       </div>
     </div>
 
@@ -291,6 +293,12 @@
         if (schema == "userList") {
           results = this.processResult_userList(result);
         }
+        else if (schema == "groupList") {
+          results = this.processResult_groupList(result);
+        }
+        else if (schema == "siteList") {
+          results = this.processResult_siteList(result);
+        }
         else if (schema == "driveList") {
           results = this.processResult_driveList(result);
         }
@@ -317,6 +325,44 @@
         return items;
       },
 
+      processResult_groupList(result) {
+        const { value: groupList } = result;
+
+        const items = [];
+        for (let i = 0;i < groupList.length;++i) {
+          const group = groupList[i];
+          items.push({
+            id: group.id,
+            type: "group",
+            label: group.displayName,
+            caption: group.description || group.displayName,
+            endpoint: "/groups/" + group.id + "/drives",
+            schema: "driveList"
+          });
+        }
+
+        return items;
+      },
+
+      processResult_siteList(result) {
+        const { value: siteList } = result;
+
+        const items = [];
+        for (let i = 0;i < siteList.length;++i) {
+          const site = siteList[i];
+          items.push({
+            id: site.id,
+            type: "site",
+            label: site.displayName,
+            caption: site.description || site.displayName,
+            endpoint: "/sites/" + site.id + "/drives",
+            schema: "driveList"
+          });
+        }
+
+        return items;
+      },
+
       processResult_driveList(result) {
         const { value: driveList } = result;
 
@@ -327,7 +373,7 @@
             id: drive.id,
             type: "drive",
             label: drive.name,
-            caption: drive.name,
+            caption: drive.description || drive.name,
             endpoint: "/drives/" + drive.id,
             schema: "drive",
             webUrl: drive.webUrl
@@ -346,11 +392,10 @@
   }
 
   .explorer {
-    padding: 1em;
-    display: flex;
-    gap: 1.5em;
-    flex-flow: row wrap;
-    align-items: baseline;
+    padding: 0.5em;
+    display: grid;
+    grid-template-columns: repeat(5,1fr);
+    gap: 1em;
   }
 
   .explorer__item {
