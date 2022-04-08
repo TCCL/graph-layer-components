@@ -49,8 +49,48 @@ function formatByteSize(nbytes) {
   return nbytes.toString();
 }
 
+function isGraphLayerError(err) {
+  return err.status && err.error && err.message;
+}
+
+function isMicrosoftError(err) {
+  return typeof err.error === "object"
+    && err.error.code
+    && err.error.message
+    && err.error.innerError;
+}
+
+function extractErrorMessage(err) {
+  if (typeof err === "object"
+      && err.error
+      && err.message)
+  {
+    return err.error;
+  }
+
+  if (typeof err === "object"
+      && err.code
+      && err.payload)
+  {
+    if (isGraphLayerError(err.payload)) {
+      return err.payload.error;
+    }
+    if (isMicrosoftError(err.payload)) {
+      return err.payload.error.message;
+    }
+  }
+  else if (typeof err === "string") {
+    return err;
+  }
+
+  return "An error occurred";
+}
+
 export {
   nop,
   extractQueryParam,
-  formatByteSize
+  formatByteSize,
+  isGraphLayerError,
+  isMicrosoftError,
+  extractErrorMessage
 };

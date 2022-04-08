@@ -52,9 +52,25 @@
     <drive-browser-explorer
       ref="explorer"
       v-model="selection"
-      :items="topLevelItems"
+      :items="allItems"
       @nav="nav = $event"
       />
+
+    <div v-if="hasFooter" v-show="nav.length == 0" :class="$style.footer">
+      <div :class="[$style.footer__menu,toggleOptions ? $style['footer__menu--toggled'] : '']">
+        <click-text
+          @click="toggleOptions = !toggleOptions"
+          >Manual Options<icon
+                          :class="$style['footer-icon']"
+                          :i="toggleOptions ? 'arrow-right' : 'arrow-down'" /></click-text>
+      </div>
+
+      <drive-browser-options-form
+        v-if="toggleOptions"
+        :enable-sites="!!browseSites"
+        @submit="addManualItem"
+        />
+    </div>
   </graph-layer-wrapper>
 </template>
 
@@ -63,6 +79,7 @@
   import LoadErrorMixin from "../../core/mixins/LoadErrorMixin.js";
 
   import DriveBrowserExplorer from "./DriveBrowserExplorer.vue";
+  import DriveBrowserOptionsForm from "./DriveBrowserOptionsForm.vue";
 
   export default {
     name: "GraphLayerDriveBrowser",
@@ -73,7 +90,8 @@
     ],
 
     components: {
-      DriveBrowserExplorer
+      DriveBrowserExplorer,
+      DriveBrowserOptionsForm
     },
 
     data: () => ({
@@ -82,7 +100,10 @@
       selectedItem: null,
       selectedNav: null,
 
-      nav: []
+      nav: [],
+      manualItems: [],
+
+      toggleOptions: false
     }),
 
     props: {
@@ -124,10 +145,19 @@
       browseSites: {
         type: [Boolean,String],
         default: false
+      },
+
+      browseFollowedSites: {
+        type: [Boolean,String],
+        default: false
       }
     },
 
     computed: {
+      allItems() {
+        return this.topLevelItems.concat(this.manualItems);
+      },
+
       topLevelItems() {
         const items = [];
 
@@ -171,12 +201,26 @@
 
         if (this.browseSites) {
           items.push({
-            id: "toplv-groups",
+            id: "toplv-sites",
             type: "toplv",
             label: "Sites",
             endpoint: "/sites",
             params: {
               "search": "*",
+              "$select": "id,displayName,description"
+            },
+            schema: "siteList"
+          });
+        }
+
+        if (this.browseFollowedSites) {
+          items.push({
+            id: "toplv-followed-sites",
+            type: "toplv",
+            label: "My Followed Sites",
+            caption: "Browse sites that you follow",
+            endpoint: "/me/followedSites",
+            params: {
               "$select": "id,displayName,description"
             },
             schema: "siteList"
@@ -222,11 +266,15 @@
 
       hasSelection() {
         return this.selectedItem !== null;
+      },
+
+      hasFooter() {
+        return !!this.browseSites;
       }
     },
 
     created() {
-
+      this.$options.manualIdTop = 1;
     },
 
     methods: {
@@ -240,6 +288,22 @@
         }
 
         window.open(this.selectedItem.webUrl,"_blank");
+      },
+
+      addManualItem(item) {
+        // Prevent duplicates.
+        const found = this.manualItems.find((x) => x.endpoint == item.endpoint);
+        if (found) {
+          return;
+        }
+
+        if (!item.id) {
+          const id = this.$options.manualIdTop++;
+          item.id = "toplv-manual-" + id.toString();
+          item.type = "toplv";
+        }
+
+        this.manualItems.push(item);
       }
     }
   };
@@ -291,5 +355,19 @@
   .header__selected-label {
     font-size: 0.9em;
     font-weight: bold;
+  }
+
+  .footer {
+    display: flex;
+    flex-flow: column nowrap;
+  }
+
+  .footer__menu--toggled {
+    border-bottom: 2px solid var(--graph-layer-drive-browser-divider-color);
+    padding-bottom: 0.5em;
+  }
+
+  .footer-icon {
+    vertical-align: text-bottom;
   }
 </style>
