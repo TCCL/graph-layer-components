@@ -29,6 +29,10 @@
       @nav="propNav"
       />
 
+    <div v-else :class="$style['empty-state']">
+      <span>No items</span>
+    </div>
+
     <div v-if="hasPagination" :class="$style.pagination">
       <div :class="$style.pagination__button">
         <icon
@@ -389,6 +393,13 @@
 <style module>
   .graph-layer-drive-browser-explorer {
 
+  }
+
+  .empty-state {
+    display: flex;
+    justify-content: center;
+    font-size: 1.25em;
+    margin: 2em;
   }
 
   .explorer {
