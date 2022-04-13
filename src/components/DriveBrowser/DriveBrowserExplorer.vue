@@ -15,8 +15,9 @@
           @click="select(item)"
           :title="item.caption"
           >
-          <icon i="folder" large />
+          <icon i="folder" :accent="item.current" large />
           <span :class="$style['explorer__item-label']">{{ item.label }}</span>
+          <caption-text v-if="item.current">Current</caption-text>
         </div>
       </div>
     </div>

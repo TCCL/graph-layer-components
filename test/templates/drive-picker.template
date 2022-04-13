@@ -16,8 +16,8 @@
     </div>
   </div>
   <div class="region-wrapper">
-    <div class="region drive-picker-form-test">
-      <form action="./drive-picker/submit-test" method="post">
+    <div class="region">
+      <form class="form-test" action="./drive-picker/submit-test" method="post">
         <div>
           <input type="text" name="firstName" placeholder="Enter First Name">
         </div>
@@ -25,7 +25,7 @@
           <input type="text" name="lastName" placeholder="Enter Last Name">
         </div>
 
-        <div class="graph-layer drive-picker-widget">
+        <div class="graph-layer">
           <div
             data-graph-layer="drivePicker"
             data-graph-layer--title="You need to select a drive"

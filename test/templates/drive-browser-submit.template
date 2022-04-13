@@ -1,0 +1,17 @@
+<div class="drive-browser-submit-test">
+  <h3>Parameters submitted via form:</h3>
+  <table>
+    <thead>
+      <th>Name</th>
+      <th>Value</th>
+    </thead>
+    <tbody>
+      <% for (const key in params) { %>
+      <tr>
+        <td><%= key %></td>
+        <td><code><%= params[key] %></code></td>
+      </tr>
+      <% } %>
+    </tbody>
+  </table>
+</div>

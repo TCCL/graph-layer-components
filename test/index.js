@@ -18,6 +18,19 @@ function get_drive_picker(service,req,res) {
   service.render(req,res,"DrivePicker","drive-picker",{});
 }
 
+function post_drive_browser_submit_test(service,req,res) {
+  console.log(req.body);
+  service.render(
+    req,
+    res,
+    "DriveBrowser Submit Test",
+    "drive-browser-submit",
+    {
+      params: req.body
+    }
+  );
+}
+
 function post_drive_picker_submit_test(service,req,res) {
   console.log(req.body);
   service.render(
@@ -48,6 +61,7 @@ module.exports = {
   ],
 
   postRoutes: [
+    ["/graph-layer-components/drive-browser/submit-test",post_drive_browser_submit_test],
     ["/graph-layer-components/drive-picker/submit-test",post_drive_picker_submit_test]
   ],
 

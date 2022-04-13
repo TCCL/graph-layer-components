@@ -81,6 +81,21 @@
   import DriveBrowserExplorer from "./DriveBrowserExplorer.vue";
   import DriveBrowserOptionsForm from "./DriveBrowserOptionsForm.vue";
 
+  function makeEndpoint(driveType,id) {
+    switch (driveType) {
+    case "drive":
+      return "/drives/" + id;
+    case "user":
+      return "/users/" + id + "/drive";
+    case "group":
+      return "/groups/" + id + "/drive";
+    case "site":
+      return "/sites/" + id + "/drive";
+    }
+
+    throw new Error("Cannot make endpoint: invalid drive value");
+  }
+
   export default {
     name: "GraphLayerDriveBrowser",
 
@@ -275,9 +290,53 @@
 
     created() {
       this.$options.manualIdTop = 1;
+      this.applyValue();
     },
 
     methods: {
+      applyValue() {
+        if (typeof this.value === "string" && this.value.length > 0) {
+          try {
+            // Look up the selected drive.
+            const repr = JSON.parse(this.value);
+            const endpoint = makeEndpoint(repr.t,repr.i);
+            if (!repr.t || !repr.i) {
+              return;
+            }
+
+            this.$fetchJson(endpoint).then((drive) => {
+              const item = {
+                id: drive.id,
+                type: "drive",
+                label: drive.name,
+                caption: drive.description || drive.name,
+                endpoint: "/drives/" + drive.id,
+                schema: "drive",
+                webUrl: drive.webUrl,
+                current: true
+              };
+
+              this.selection = {
+                driveType: "drive",
+                driveId: drive.id,
+                item
+              };
+
+              this.addManualItem(item);
+            });
+
+            return;
+
+          } catch (err) {
+            // break
+          }
+        }
+
+        this.driveType = "";
+        this.driveId = "";
+        this.selectedItem = null;
+      },
+
       navigate(item) {
         this.$refs.explorer.navigate(item.id);
       },
@@ -304,6 +363,16 @@
         }
 
         this.manualItems.push(item);
+      },
+
+      updateValue() {
+        this.$emit("input",this.storageValue);
+      }
+    },
+
+    watch: {
+      storageValue() {
+        this.updateValue();
       }
     }
   };
