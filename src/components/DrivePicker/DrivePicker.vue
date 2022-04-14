@@ -42,6 +42,15 @@
         :filter-text="filterTextDelayed"
         @select="selectPicker"
         />
+
+      <drive-tree-picker
+        v-if="!followedSitesOff"
+        type="followedSite"
+        :value.sync="selectedValue"
+        :active="selectedType =='followedSite'"
+        :filter-text="filterTextDelayed"
+        @select="selectPicker"
+        />
     </graph-layer-wrapper>
   </graph-layer-wrapper>
 </template>
@@ -93,6 +102,11 @@
       },
 
       sitesOff: {
+        type: [Boolean,String],
+        default: false
+      },
+
+      followedSitesOff: {
         type: [Boolean,String],
         default: false
       },

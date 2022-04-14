@@ -59,13 +59,16 @@
     }),
 
     props: {
-      type: String,
       info: Object,
       value: Object,
       active: Boolean
     },
 
     computed: {
+      type() {
+        return this.info.type;
+      },
+
       classes() {
         const cls = [
           this.$themeClass,
