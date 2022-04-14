@@ -41,7 +41,7 @@
 <script>
   import GraphLayerMixin from "../../core/mixins/GraphLayerMixin.js";
   import LoadErrorMixin from "../../core/mixins/LoadErrorMixin.js";
-  import { extractQueryParam } from "../../core/helpers.js";
+  import { extractQueryParam, sortByName } from "../../core/helpers.js";
 
   export default {
     name: "DriveTreeOptions",
@@ -279,6 +279,8 @@
             value
           });
         }
+
+        this.entries.sort(sortByName);
       },
 
       processError(err) {

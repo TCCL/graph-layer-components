@@ -59,7 +59,7 @@
 <script>
   import GraphLayerMixin from "../../core/mixins/GraphLayerMixin.js";
   import LoadErrorMixin from "../../core/mixins/LoadErrorMixin.js";
-  import { extractQueryParam } from "../../core/helpers.js";
+  import { extractQueryParam, sortByLabel } from "../../core/helpers.js";
 
   function makeURL(item) {
     const url = new URL(item.endpoint,window.location.origin);
@@ -307,6 +307,8 @@
         else if (schema == "driveList") {
           results = this.processResult_driveList(result);
         }
+
+        results.sort(sortByLabel);
 
         return results;
       },

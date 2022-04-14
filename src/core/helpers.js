@@ -86,11 +86,27 @@ function extractErrorMessage(err) {
   return "An error occurred";
 }
 
+function sortBy(a,b,prop) {
+  const aa = a[prop];
+  const bb = b[prop];
+  return aa < bb ? -1 : (aa > bb ? 1 : 0);
+}
+
+function sortByName(a,b) {
+  return sortBy(a,b,"name");
+}
+
+function sortByLabel(a,b) {
+  return sortBy(a,b,"label");
+}
+
 export {
   nop,
   extractQueryParam,
   formatByteSize,
   isGraphLayerError,
   isMicrosoftError,
-  extractErrorMessage
+  extractErrorMessage,
+  sortByName,
+  sortByLabel
 };

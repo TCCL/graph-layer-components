@@ -49,15 +49,9 @@
   import GraphLayerMixin from "../../core/mixins/GraphLayerMixin.js";
   import LoadErrorMixin from "../../core/mixins/LoadErrorMixin.js";
   import DriveTreeOptions from "./DriveTreeOptions.vue";
-  import { extractQueryParam } from "../../core/helpers.js";
+  import { extractQueryParam, sortByName } from "../../core/helpers.js";
 
   import Fuse from 'fuse.js';
-
-  function sortByName(a,b) {
-    const na = a.name;
-    const nb = b.name;
-    return na < nb ? -1 : (na > nb ? 1 : 0);
-  }
 
   function valueMatchesEntry(value,entry) {
     // Handle static entry.
