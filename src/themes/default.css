@@ -20,15 +20,15 @@
   --graph-layer-user-avatar-shadow-color: var(--graph-layer-color-soft-black);
   --graph-layer-user-avatar-color: var(--graph-layer-color-soft-black);
 
+  /* Generic Browser */
+  --graph-layer-generic-browser-divider-color: var(--graph-layer-color-secondary);
+  --graph-layer-generic-browser-selected-color: var(--graph-layer-color-primary);
+  --graph-layer-generic-browser-hover-color: var(--graph-layer-color-secondary);
+
   /* Drive */
   --graph-layer-drive-divider-color: var(--graph-layer-color-secondary);
   --graph-layer-drive-row-border-color: var(--graph-layer-color-light-gray);
   --graph-layer-drive-item-selected-background-color: var(--graph-layer-color-light-gray);
-
-  /* Drive Browser */
-  --graph-layer-drive-browser-divider-color: var(--graph-layer-color-secondary);
-  --graph-layer-drive-browser-selected-color: var(--graph-layer-color-primary);
-  --graph-layer-drive-browser-hover-color: var(--graph-layer-color-secondary);
 
   /* Drive Picker */
   --graph-layer-drive-picker-active-color: var(--graph-layer-color-primary);

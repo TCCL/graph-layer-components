@@ -2,7 +2,7 @@
   <graph-layer-wrapper
     :loading-state="$loadingState"
     :error-state="$errorState"
-    :class="$style['graph-layer-drive-browser-explorer']"
+    :class="$style['graph-layer-generic-browser-explorer']"
     scroll
    >
     <div v-if="isUnselected" :class="$style.explorer">
@@ -10,23 +10,27 @@
         <div
           :class="[
             $style['explorer__item'],
-            item.id == propValue.driveId ? $style['explorer__item--selected'] : ''
+            item.id == propValue.id ? $style['explorer__item--selected'] : ''
           ]"
           @click="select(item)"
           :title="item.caption"
           >
-          <icon i="folder" :accent="item.current" large />
+          <icon :i="item.icon || 'folder'" :accent="item.current" large />
           <span :class="$style['explorer__item-label']">{{ item.label }}</span>
           <caption-text v-if="item.current">Current</caption-text>
         </div>
       </div>
     </div>
 
-    <drive-browser-explorer
-      ref="child"
+    <template v-else-if="children === false"></template>
+
+    <generic-browser-explorer
       v-else-if="children.length > 0"
+      ref="child"
       v-model="propValue"
       :items="children"
+      :target-schema="targetSchema"
+      :schema-processing="schemaProcessing"
       @nav="propNav"
       />
 
@@ -73,7 +77,7 @@
   }
 
   export default {
-    name: "DriveBrowserExplorer",
+    name: "GenericBrowserExplorer",
 
     mixins: [
       GraphLayerMixin,
@@ -82,7 +86,7 @@
 
     data: () => ({
       selectedItem: null,
-      children: [],
+      children: false,
       pageIndex: 0,
       pages: [],
 
@@ -93,7 +97,9 @@
 
     props: {
       value: Object,
-      items: Array
+      items: Array,
+      targetSchema: String,
+      schemaProcessing: Object
     },
 
     computed: {
@@ -173,7 +179,7 @@
           }
 
           this.selectedItem = null;
-          this.children.splice(0);
+          this.children = false;
           this.$errorState = null;
           this.propNav();
 
@@ -207,9 +213,10 @@
           return;
         }
 
-        // Base case: selecting a drive changes the value.
-        if (item.schema == "drive") {
-          if (this.propValue.driveId == item.id) {
+        // Base case: selecting an item having the target schema changes the
+        // value.
+        if (item.schema == this.targetSchema) {
+          if (this.propValue.id == item.id) {
             // Clear existing value.
             this.propValue = {};
           }
@@ -217,8 +224,8 @@
             // Set new value.
             this.propValue = {
               item,
-              driveType: "drive",
-              driveId: item.id
+              type: item.type,
+              id: item.id
             };
           }
 
@@ -226,7 +233,7 @@
         }
 
         // Set up state to display new item in child component.
-        this.children.splice(0);
+        this.children = false;
         this.pageIndex = 0;
         this.pages.splice(0);
 
@@ -295,106 +302,20 @@
       processResult(schema,result) {
         let results = [];
 
-        if (schema == "userList") {
-          results = this.processResult_userList(result);
-        }
-        else if (schema == "groupList") {
-          results = this.processResult_groupList(result);
-        }
-        else if (schema == "siteList") {
-          results = this.processResult_siteList(result);
-        }
-        else if (schema == "driveList") {
-          results = this.processResult_driveList(result);
+        if (schema in this.schemaProcessing) {
+          results = this.schemaProcessing[schema](result);
         }
 
         results.sort(sortByLabel);
 
         return results;
-      },
-
-      processResult_userList(result) {
-        const { value: userList } = result;
-
-        const items = [];
-        for (let i = 0;i < userList.length;++i) {
-          const user = userList[i];
-          items.push({
-            id: user.id,
-            type: "user",
-            label: user.displayName,
-            caption: user.jobTitle || user.displayName,
-            endpoint: "/users/" + user.id + "/drives",
-            schema: "driveList"
-          });
-        }
-
-        return items;
-      },
-
-      processResult_groupList(result) {
-        const { value: groupList } = result;
-
-        const items = [];
-        for (let i = 0;i < groupList.length;++i) {
-          const group = groupList[i];
-          items.push({
-            id: group.id,
-            type: "group",
-            label: group.displayName,
-            caption: group.description || group.displayName,
-            endpoint: "/groups/" + group.id + "/drives",
-            schema: "driveList"
-          });
-        }
-
-        return items;
-      },
-
-      processResult_siteList(result) {
-        const { value: siteList } = result;
-
-        const items = [];
-        for (let i = 0;i < siteList.length;++i) {
-          const site = siteList[i];
-          items.push({
-            id: site.id,
-            type: "site",
-            label: site.displayName,
-            caption: site.description || site.displayName,
-            endpoint: "/sites/" + site.id + "/drives",
-            schema: "driveList"
-          });
-        }
-
-        return items;
-      },
-
-      processResult_driveList(result) {
-        const { value: driveList } = result;
-
-        const items = [];
-        for (let i = 0;i < driveList.length;++i) {
-          const drive = driveList[i];
-          items.push({
-            id: drive.id,
-            type: "drive",
-            label: drive.name,
-            caption: drive.description || drive.name,
-            endpoint: "/drives/" + drive.id,
-            schema: "drive",
-            webUrl: drive.webUrl
-          });
-        }
-
-        return items;
       }
     }
   };
 </script>
 
 <style module>
-  .graph-layer-drive-browser-explorer {
+  .graph-layer-generic-browser-explorer {
 
   }
 
@@ -421,12 +342,12 @@
   }
 
   .explorer__item--selected {
-    background-color: var(--graph-layer-drive-browser-hover-color);
-    border: 2px solid var(--graph-layer-drive-browser-selected-color);
+    background-color: var(--graph-layer-generic-browser-hover-color);
+    border: 2px solid var(--graph-layer-generic-browser-selected-color);
   }
 
   .explorer__item:hover {
-    background-color: var(--graph-layer-drive-browser-hover-color);
+    background-color: var(--graph-layer-generic-browser-hover-color);
   }
 
   .explorer__item-label {
@@ -437,7 +358,7 @@
   }
 
   .pagination {
-    border-top: 2px solid var(--graph-layer-drive-browser-divider-color);
+    border-top: 2px solid var(--graph-layer-generic-browser-divider-color);
     margin-top: 0.25em;
     display: flex;
     justify-content: center;

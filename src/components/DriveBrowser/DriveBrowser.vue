@@ -1,85 +1,32 @@
 <template>
-  <graph-layer-wrapper
-    :class="[$themeClass,$style['graph-layer-drive-browser']]"
-   >
-    <div :class="$style.header">
-      <div :class="$style.header__title">
-        <h2>{{ title }}</h2>
-      </div>
-
-      <div :class="$style.header__info">
-        <div :class="$style.header__nav">
-          <click-text
-            v-if="nav.length > 0"
-            :class="$style['header__nav-item']"
-            @click="navigate({ id:'domain' })"
-            >{{ domainLabel }}</click-text>
-
-          <span
-            v-else
-            :class="[$style['header__nav-item'],$style['header__nav-item--active']]"
-            >{{ domainLabel }}</span>
-
-          <template v-for="item,index in nav">
-            <click-text
-              v-if="index < nav.length-1"
-              :key="item.id"
-              :class="$style['header__nav-item']"
-              @click="navigate(item)"
-              >{{ item.label }}</click-text>
-            <span
-              v-else
-              :key="item.id"
-              :class="[$style['header__nav-item'],$style['header__nav-item--active']]"
-              >{{ item.label }}</span>
-          </template>
-        </div>
-
-        <div v-if="hasSelection" :class="$style['header__selected']">
-          <span :class="$style['header__selected-label']">{{ selectedItem.label }}</span>
-          <icon
-            button
-            i="external-link"
-            @click="openDrive"
-            title="Open in Microsoft file viewer"
-            />
-        </div>
-      </div>
-    </div>
-
+  <graph-layer-generic-browser
+    target-schema="drive"
+    v-model="selection"
+    :schema-processing="schemaProcessing"
+    :title="title"
+    :domain-label="domainLabel"
+    :items="items"
+    >
     <input v-if="formElement" type="hidden" :name="formElement" :value="storageValue" />
 
-    <drive-browser-explorer
-      ref="explorer"
-      v-model="selection"
-      :items="allItems"
-      @nav="nav = $event"
-      />
-
-    <div v-if="hasFooter" v-show="nav.length == 0" :class="$style.footer">
-      <div :class="[$style.footer__menu,toggleOptions ? $style['footer__menu--toggled'] : '']">
-        <click-text
-          @click="toggleOptions = !toggleOptions"
-          >Manual Options<icon
-                          :class="$style['footer-icon']"
-                          :i="toggleOptions ? 'arrow-right' : 'arrow-down'" /></click-text>
-      </div>
-
+    <template v-if="browseSites" #footer>
       <drive-browser-options-form
-        v-if="toggleOptions"
         :enable-sites="!!browseSites"
         @submit="addManualItem"
         />
-    </div>
-  </graph-layer-wrapper>
+    </template>
+  </graph-layer-generic-browser>
 </template>
 
 <script>
   import GraphLayerMixin from "../../core/mixins/GraphLayerMixin.js";
   import LoadErrorMixin from "../../core/mixins/LoadErrorMixin.js";
+  import StorageMixin from "../../core/mixins/StorageMixin.js";
 
-  import DriveBrowserExplorer from "./DriveBrowserExplorer.vue";
+  import GraphLayerGenericBrowser from "../GenericBrowser/GenericBrowser.vue";
+
   import DriveBrowserOptionsForm from "./DriveBrowserOptionsForm.vue";
+  import DriveSchemaProcessing from "./DriveSchemaProcessing.js";
 
   function makeEndpoint(driveType,id) {
     switch (driveType) {
@@ -101,24 +48,17 @@
 
     mixins: [
       GraphLayerMixin,
-      LoadErrorMixin
+      LoadErrorMixin,
+      StorageMixin
     ],
 
     components: {
-      DriveBrowserExplorer,
+      GraphLayerGenericBrowser,
       DriveBrowserOptionsForm
     },
 
     data: () => ({
-      driveType: "",
-      driveId: "",
-      selectedItem: null,
-      selectedNav: null,
-
-      nav: [],
-      manualItems: [],
-
-      toggleOptions: false
+      manualItems: []
     }),
 
     props: {
@@ -133,11 +73,7 @@
       },
 
       formElement: {
-        type: String,
-        default: ""
-      },
-
-      value: {
+        // Name of hidden form element to create for <form> submission.
         type: String,
         default: ""
       },
@@ -169,7 +105,7 @@
     },
 
     computed: {
-      allItems() {
+      items() {
         return this.topLevelItems.concat(this.manualItems);
       },
 
@@ -245,108 +181,56 @@
         return items;
       },
 
+      schemaProcessing() {
+        return DriveSchemaProcessing;
+      },
+
       selection: {
         get() {
           return {
-            driveType: this.driveType,
-            driveId: this.driveId,
-            item: this.selectedItem
+            type: this.storage.type,
+            id: this.storage.id
           };
         },
-        set({ driveType, driveId, item }) {
-          this.driveType = driveType || "";
-          this.driveId = driveId || "";
-          this.selectedItem = item || null;
-          if (item) {
-            this.selectedNav = this.nav.slice();
-          }
-          else {
-            this.selectedNav.splice(0);
-          }
+
+        set({ type, id }) {
+          this.storage.type = type || "";
+          this.storage.id = id || "";
         }
-      },
-
-      storageValue() {
-        if (this.driveType == "" || this.driveId == "") {
-          return "";
-        }
-
-        const repr = {
-          t: this.driveType,
-          i: this.driveId
-        };
-
-        return JSON.stringify(repr);
-      },
-
-      hasSelection() {
-        return this.selectedItem !== null;
-      },
-
-      hasFooter() {
-        return !!this.browseSites;
       }
     },
 
     created() {
       this.$options.manualIdTop = 1;
-      this.applyValue();
     },
 
     methods: {
-      applyValue() {
-        if (typeof this.value === "string" && this.value.length > 0) {
-          try {
-            // Look up the selected drive.
-            const repr = JSON.parse(this.value);
-            const endpoint = makeEndpoint(repr.t,repr.i);
-            if (!repr.t || !repr.i) {
-              return;
-            }
+      applyValue(repr) {
+        // Called from StorageMixin.created()
 
-            this.$fetchJson(endpoint).then((drive) => {
-              const item = {
-                id: drive.id,
-                type: "drive",
-                label: drive.name,
-                caption: drive.description || drive.name,
-                endpoint: "/drives/" + drive.id,
-                schema: "drive",
-                webUrl: drive.webUrl,
-                current: true
-              };
-
-              this.selection = {
-                driveType: "drive",
-                driveId: drive.id,
-                item
-              };
-
-              this.addManualItem(item);
+        if (repr.t && repr.i) {
+          const endpoint = makeEndpoint(repr.t,repr.i);
+          this.$fetchJson(endpoint).then((drive) => {
+            const [ item ] = DriveSchemaProcessing.driveList({
+              value: [drive]
             });
 
-            return;
+            item.current = true;
 
-          } catch (err) {
-            // break
-          }
+            this.storage.type = item.type;
+            this.storage.id = drive.id;
+
+            this.addManualItem(item);
+          });
         }
-
-        this.driveType = "";
-        this.driveId = "";
-        this.selectedItem = null;
+        else {
+          this.storage.type = "";
+          this.storage.id = "";
+        }
       },
 
       navigate(item) {
         this.$refs.explorer.navigate(item.id);
-      },
-
-      openDrive() {
-        if (!this.selectedItem) {
-          return;
-        }
-
-        window.open(this.selectedItem.webUrl,"_blank");
       },
 
       addManualItem(item) {
@@ -363,16 +247,6 @@
         }
 
         this.manualItems.push(item);
-      },
-
-      updateValue() {
-        this.$emit("input",this.storageValue);
-      }
-    },
-
-    watch: {
-      storageValue() {
-        this.updateValue();
       }
     }
   };
