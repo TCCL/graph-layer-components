@@ -10,6 +10,7 @@ export default {
       items.push({
         id: user.id,
         type: "user",
+        icon: "person",
         label: user.displayName,
         caption: user.jobTitle || user.displayName,
         endpoint: "/users/" + user.id + "/drives",
@@ -29,6 +30,7 @@ export default {
       items.push({
         id: group.id,
         type: "group",
+        icon: "people",
         label: group.displayName,
         caption: group.description || group.displayName,
         endpoint: "/groups/" + group.id + "/drives",
@@ -48,6 +50,7 @@ export default {
       items.push({
         id: site.id,
         type: "site",
+        icon: "globe",
         label: site.displayName,
         caption: site.description || site.displayName,
         endpoint: "/sites/" + site.id + "/drives",
@@ -67,6 +70,7 @@ export default {
       items.push({
         id: drive.id,
         type: "drive",
+        icon: "hard-drive",
         label: drive.name,
         caption: drive.description || drive.name,
         endpoint: "/drives/" + drive.id,

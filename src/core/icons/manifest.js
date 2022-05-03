@@ -8,6 +8,10 @@ import arrowLeftSvg from "./arrow-left.svg";
 import arrowRightSvg from "./arrow-right.svg";
 import arrowDownSvg from "./arrow-down.svg";
 import externalLinkSvg from "./external-link.svg";
+import hardDriveSvg from "./hard-drive.svg";
+import personSvg from "./person.svg";
+import peopleSvg from "./people.svg";
+import globeSvg from "./globe.svg";
 
 export default function (iconId) {
   switch (iconId) {
@@ -25,6 +29,14 @@ export default function (iconId) {
     return arrowDownSvg;
   case "external-link":
     return externalLinkSvg;
+  case "hard-drive":
+    return hardDriveSvg;
+  case "person":
+    return personSvg;
+  case "people":
+    return peopleSvg;
+  case "globe":
+    return globeSvg;
   }
 
   return errorSvg;
