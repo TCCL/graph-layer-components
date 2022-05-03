@@ -88,6 +88,11 @@
         default: false
       },
 
+      browseGuests: {
+        type: [Boolean,String],
+        default: false
+      },
+
       browseGroups: {
         type: [Boolean,String],
         default: false
@@ -129,7 +134,21 @@
             label: "Users",
             endpoint: "/users",
             params: {
-              "$orderby": "displayName",
+              "$filter": "userType eq 'Member'",
+              "$select": "id,displayName,jobTitle,userType"
+            },
+            schema: "userList"
+          });
+        }
+
+        if (this.browseUsers) {
+          items.push({
+            id: "toplv-guests",
+            type: "toplv",
+            label: "Guests",
+            endpoint: "/users",
+            params: {
+              "$filter": "userType eq 'Guest'",
               "$select": "id,displayName,jobTitle,userType"
             },
             schema: "userList"

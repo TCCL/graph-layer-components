@@ -6,6 +6,7 @@
       <div
         data-graph-layer="driveBrowser"
         data-graph-layer--browse-users="1"
+        data-graph-layer--browse-guests="1"
         data-graph-layer--browse-me="1"
         data-graph-layer--browse-groups="1"
         data-graph-layer--browse-sites="1"
