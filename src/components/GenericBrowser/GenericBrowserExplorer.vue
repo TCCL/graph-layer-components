@@ -225,7 +225,8 @@
             this.propValue = {
               item,
               type: item.type,
-              id: item.id
+              id: item.id,
+              parentId: item.parentId
             };
           }
 
@@ -290,7 +291,7 @@
 
         return this.$fetchJson(url).then((result) => {
           // Set items as current children.
-          this.children = this.processResult(item.schema,result);
+          this.children = this.processResult(item.schema,result,item);
 
           // Save page entry and skip token and update index.
           const skipToken = extractQueryParam(result["@odata.nextLink"],"$skiptoken");
@@ -299,11 +300,11 @@
         });
       },
 
-      processResult(schema,result) {
+      processResult(schema,result,parent) {
         let results = [];
 
         if (schema in this.schemaProcessing) {
-          results = this.schemaProcessing[schema](result);
+          results = this.schemaProcessing[schema](result,parent);
         }
 
         results.sort(sortByLabel);

@@ -12,6 +12,7 @@ import hardDriveSvg from "./hard-drive.svg";
 import personSvg from "./person.svg";
 import peopleSvg from "./people.svg";
 import globeSvg from "./globe.svg";
+import listSvg from "./list.svg";
 
 export default function (iconId) {
   switch (iconId) {
@@ -37,6 +38,8 @@ export default function (iconId) {
     return peopleSvg;
   case "globe":
     return globeSvg;
+  case "list":
+    return listSvg;
   }
 
   return errorSvg;

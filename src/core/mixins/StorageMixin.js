@@ -4,7 +4,8 @@ export default {
   data: () => ({
     storage: {
       type: "",
-      id: ""
+      id: "",
+      parentId: ""
     }
   }),
 
@@ -25,6 +26,10 @@ export default {
         t: this.storage.type,
         i: this.storage.id
       };
+
+      if (this.storage.parentId) {
+        repr.p = this.storage.parentId;
+      }
 
       return JSON.stringify(repr);
     },
