@@ -1,10 +1,10 @@
 <template>
-  <div :class="$style['graph-layer-drive-browser-options-form']">
+  <div :class="$style['graph-layer-generic-browser-options-form']">
     <div v-if="$errorState" :class="$style.error">
       <icon i="error" error /><span>{{ errorMessage }}</span>
     </div>
 
-    <div v-if="enableSites" :class="$style.form">
+    <div v-if="sitesEnabled" :class="$style.form">
       <span :class="$style.label">Add Site</span>
       <div :class="$style['input-wrapper']">
         <input :class="$style.input" v-model="siteUrl" type="text" placeholder="Site URL...">
@@ -21,7 +21,7 @@
   import { extractErrorMessage } from "../../core/helpers";
 
   export default {
-    name: "DriveBrowserOptionsForm",
+    name: "GenericBrowserOptionsForm",
 
     mixins: [
       GraphLayerMixin,
@@ -34,6 +34,8 @@
     }),
 
     props: {
+      schemaProcessing: Object,
+
       enableSites: {
         type: Boolean,
         default: false
@@ -41,6 +43,10 @@
     },
 
     computed: {
+      sitesEnabled() {
+        return this.enableSites && "siteList" in this.schemaProcessing;
+      },
+
       errorMessage() {
         return extractErrorMessage(this.$errorState);
       }
@@ -52,7 +58,7 @@
 
     methods: {
       submitSite() {
-        if (!this.siteUrl || this.working) {
+        if (!this.siteUrl || this.working || !this.sitesEnabled) {
           return;
         }
 
@@ -67,14 +73,9 @@
 
         const endpoint = "/sites/" + hostName + ":/" + serverPath;
         this.$fetchJson(endpoint).then((site) => {
-          const item = {
-            id: site.id,
-            type: "site",
-            label: site.displayName,
-            caption: site.description || site.displayName,
-            endpoint: "/sites/" + site.id + "/drives",
-            schema: "driveList"
-          };
+          const [ item ] = this.schemaProcessing.siteList({
+            value: [site]
+          });
 
           this.$emit("submit",item);
           this.siteUrl = "";
@@ -85,7 +86,7 @@
 </script>
 
 <style module>
-  .graph-layer-drive-browser-options-form {
+  .graph-layer-generic-browser-options-form {
 
   }
 

@@ -10,7 +10,8 @@
     <input v-if="formElement" type="hidden" :name="formElement" :value="storageValue" />
 
     <template v-if="browseSites" #footer>
-      <drive-browser-options-form
+      <generic-browser-options-form
+        :schema-processing="schemaProcessing"
         :enable-sites="!!browseSites"
         @submit="addManualItem"
         />
@@ -24,8 +25,8 @@
   import StorageMixin from "../../core/mixins/StorageMixin.js";
 
   import GraphLayerGenericBrowser from "../GenericBrowser/GenericBrowser.vue";
+  import GenericBrowserOptionsForm from "../GenericBrowser/GenericBrowserOptionsForm.vue";
 
-  import DriveBrowserOptionsForm from "./DriveBrowserOptionsForm.vue";
   import DriveSchemaProcessing from "./DriveSchemaProcessing.js";
 
   function makeEndpoint(driveType,id) {
@@ -54,7 +55,7 @@
 
     components: {
       GraphLayerGenericBrowser,
-      DriveBrowserOptionsForm
+      GenericBrowserOptionsForm
     },
 
     data: () => ({
@@ -248,10 +249,6 @@
         }
       },
 
-      navigate(item) {
-        this.$refs.explorer.navigate(item.id);
-      },
-
       addManualItem(item) {
         // Prevent duplicates.
         const found = this.manualItems.find((x) => x.endpoint == item.endpoint);
@@ -270,66 +267,3 @@
     }
   };
 </script>
-
-<style module>
-  .graph-layer-drive-browser {
-
-  }
-
-  .header {
-    border-bottom: 3px solid var(--graph-layer-drive-browser-divider-color);
-    padding: 0.75em 0;
-  }
-
-  .header__title {
-    display: flex;
-  }
-
-  .header__info {
-    display: flex;
-    justify-content: space-between;
-    align-items: baseline;
-  }
-
-  .header__nav {
-    padding: 0.25em 0;
-  }
-
-  .header__nav-item {
-    padding: 0.5em;
-    border-right: 3px solid var(--graph-layer-drive-browser-divider-color);
-  }
-
-  .header__nav-item:last-child {
-    border-right: none;
-  }
-
-  .header__nav-item--active {
-    font-weight: bold;
-  }
-
-  .header__selected {
-    display: flex;
-    align-items: center;
-    gap: 0.25em;
-  }
-
-  .header__selected-label {
-    font-size: 0.9em;
-    font-weight: bold;
-  }
-
-  .footer {
-    display: flex;
-    flex-flow: column nowrap;
-  }
-
-  .footer__menu--toggled {
-    border-bottom: 2px solid var(--graph-layer-drive-browser-divider-color);
-    padding-bottom: 0.5em;
-  }
-
-  .footer-icon {
-    vertical-align: text-bottom;
-  }
-</style>
