@@ -44,6 +44,10 @@ function post_drive_picker_submit_test(service,req,res) {
   );
 }
 
+function get_list_browser(service,req,res) {
+  service.render(req,res,"List Browser","list-browser",{});
+}
+
 module.exports = {
   title: "Graph Layer Components",
 
@@ -57,7 +61,8 @@ module.exports = {
     ["/graph-layer-components/userinfo",get_user,"User"],
     ["/graph-layer-components/drive",get_drive,"Drive"],
     ["/graph-layer-components/drive-browser",get_drive_browser,"DriveBrowser"],
-    ["/graph-layer-components/drive-picker",get_drive_picker,"DrivePicker"]
+    ["/graph-layer-components/drive-picker",get_drive_picker,"DrivePicker"],
+    ["/graph-layer-components/list-browser",get_list_browser,"ListBrowser"]
   ],
 
   postRoutes: [
