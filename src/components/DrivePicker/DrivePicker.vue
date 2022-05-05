@@ -17,7 +17,7 @@
 
     <graph-layer-wrapper scroll>
       <drive-tree-picker
-        v-if="!usersOff"
+        v-if="enableUsers"
         type="user"
         :value.sync="selectedValue"
         :active="selectedType == 'user'"
@@ -26,7 +26,7 @@
         />
 
       <drive-tree-picker
-        v-if="!groupsOff"
+        v-if="enableGroups"
         type="group"
         :value.sync="selectedValue"
         :active="selectedType == 'group'"
@@ -35,7 +35,7 @@
         />
 
       <drive-tree-picker
-        v-if="!sitesOff"
+        v-if="enableSites"
         type="site"
         :value.sync="selectedValue"
         :active="selectedType == 'site'"
@@ -44,7 +44,7 @@
         />
 
       <drive-tree-picker
-        v-if="!followedSitesOff"
+        v-if="enableFollowedSites"
         type="followedSite"
         :value.sync="selectedValue"
         :active="selectedType =='followedSite'"
@@ -149,6 +149,22 @@
           this.driveType = driveType;
           this.driveId = driveId;
         }
+      },
+
+      enableUsers() {
+        return !this.string2boolean(this.usersOff);
+      },
+
+      enableGroups() {
+        return !this.string2boolean(this.groupsOff);
+      },
+
+      enableSites() {
+        return !this.string2boolean(this.sitesOff);
+      },
+
+      enableFollowedSites() {
+        return !this.string2boolean(this.followedSitesOff);
       }
     },
 

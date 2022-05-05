@@ -9,10 +9,10 @@
     >
     <input v-if="formElement" type="hidden" :name="formElement" :value="storageValue" />
 
-    <template v-if="browseSites" #footer>
+    <template #footer>
       <generic-browser-options-form
         :schema-processing="schemaProcessing"
-        :enable-sites="!!browseSites"
+        enable-sites
         @submit="addManualItem"
         />
     </template>
@@ -75,7 +75,7 @@
 
       browseSites: {
         type: [Boolean,String],
-        default: false
+        default: true
       },
 
       browseFollowedSites: {
@@ -92,7 +92,7 @@
       topLevelItems() {
         const items = [];
 
-        if (this.browseSites) {
+        if (this.string2boolean(this.browseSites)) {
           items.push({
             id: "toplv-sites",
             type: "toplv",
@@ -106,7 +106,7 @@
           });
         }
 
-        if (this.browseFollowedSites) {
+        if (this.string2boolean(this.browseFollowedSites)) {
           items.push({
             id: "toplv-followed-sites",
             type: "toplv",

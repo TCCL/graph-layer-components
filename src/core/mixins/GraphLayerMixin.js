@@ -6,7 +6,7 @@ import globals from "../../globals.js";
 import * as WrapperComponents from "../Wrapper";
 import * as coreComponents from "../components";
 import Icon from "../icons";
-import { nop } from "../helpers.js";
+import { nop, string2boolean } from "../helpers.js";
 
 function findParentItem($parent,key,subkey,undef) {
   if (!$parent) {
@@ -46,6 +46,10 @@ export default {
       type: [Boolean,String],
       default: false
     }
+  },
+
+  filters: {
+    string2boolean
   },
 
   computed: {
@@ -107,6 +111,8 @@ export default {
   },
 
   methods: {
+    string2boolean,
+
     $fetch(resource,init,ignoreError) {
       this.$loadingState = true;
       this.$errorState = null;

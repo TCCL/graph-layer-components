@@ -121,7 +121,7 @@
       },
 
       meValue() {
-        if (this.me) {
+        if (this.string2boolean(this.me)) {
             return true;
         }
 

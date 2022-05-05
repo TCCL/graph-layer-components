@@ -4,6 +4,17 @@ function nop() {
 
 }
 
+function string2boolean(value) {
+  if (typeof value === "boolean") {
+    return value;
+  }
+
+  const valueLower = value.toLowerCase();
+  return valueLower !== "false"
+    && valueLower !== "off"
+    && valueLower !== "0";
+}
+
 function extractQueryParam(_query,name) {
   if (typeof _query !== "string" || _query.length == 0) {
     return null;
@@ -102,6 +113,7 @@ function sortByLabel(a,b) {
 
 export {
   nop,
+  string2boolean,
   extractQueryParam,
   formatByteSize,
   isGraphLayerError,

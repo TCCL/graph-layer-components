@@ -9,10 +9,10 @@
     >
     <input v-if="formElement" type="hidden" :name="formElement" :value="storageValue" />
 
-    <template v-if="browseSites" #footer>
+    <template v-if="enableSites" #footer>
       <generic-browser-options-form
         :schema-processing="schemaProcessing"
-        :enable-sites="!!browseSites"
+        :enable-sites="enableSites"
         @submit="addManualItem"
         />
     </template>
@@ -111,6 +111,11 @@
     },
 
     computed: {
+      enableSites() {
+        return this.string2boolean(this.browseSites)
+          || this.string2boolean(this.browseFollowedSites);
+      },
+
       items() {
         return this.topLevelItems.concat(this.manualItems);
       },
@@ -118,7 +123,7 @@
       topLevelItems() {
         const items = [];
 
-        if (this.browseMe) {
+        if (this.string2boolean(this.browseMe)) {
           items.push({
             id: "toplv-me",
             type: "toplv",
@@ -128,7 +133,7 @@
           });
         }
 
-        if (this.browseUsers) {
+        if (this.string2boolean(this.browseUsers)) {
           items.push({
             id: "toplv-users",
             type: "toplv",
@@ -142,7 +147,7 @@
           });
         }
 
-        if (this.browseUsers) {
+        if (this.string2boolean(this.browseGuests)) {
           items.push({
             id: "toplv-guests",
             type: "toplv",
@@ -156,7 +161,7 @@
           });
         }
 
-        if (this.browseGroups) {
+        if (this.string2boolean(this.browseGroups)) {
           items.push({
             id: "toplv-groups",
             type: "toplv",
@@ -170,7 +175,7 @@
           });
         }
 
-        if (this.browseSites) {
+        if (this.string2boolean(this.browseSites)) {
           items.push({
             id: "toplv-sites",
             type: "toplv",
@@ -184,7 +189,7 @@
           });
         }
 
-        if (this.browseFollowedSites) {
+        if (this.string2boolean(this.browseFollowedSites)) {
           items.push({
             id: "toplv-followed-sites",
             type: "toplv",
