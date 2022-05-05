@@ -3,6 +3,7 @@
 import Drive from "./Drive";
 import DriveBrowser from "./DriveBrowser";
 import DrivePicker from "./DrivePicker";
+import List from "./List";
 import ListBrowser from "./ListBrowser";
 import User from "./User";
 
@@ -13,6 +14,7 @@ export {
   Drive as drive,
   DriveBrowser as driveBrowser,
   DrivePicker as drivePicker,
+  List as list,
   ListBrowser as listBrowser,
   User as user
 }
