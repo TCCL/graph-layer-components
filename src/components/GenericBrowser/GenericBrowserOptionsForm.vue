@@ -35,11 +35,7 @@
 
     props: {
       schemaProcessing: Object,
-
-      enableSites: {
-        type: Boolean,
-        default: false
-      }
+      enableSites: Boolean
     },
 
     computed: {
@@ -111,7 +107,7 @@
     outline: none;
     padding: 4px;
     border: none;
-    border-bottom: 2px solid var(--graph-layer-drive-picker-heading-border-color);
+    border-bottom: 2px solid var(--graph-layer-divider-color);
   }
 
   .label {

@@ -26,7 +26,7 @@
 
     computed: {
       hasValue() {
-        return this.listValue != "";
+        return this.listValue != "" && this.listValue != "{}";
       }
     },
 

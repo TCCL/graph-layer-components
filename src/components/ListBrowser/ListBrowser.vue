@@ -9,10 +9,18 @@
     >
     <input v-if="formElement" type="hidden" :name="formElement" :value="storageValue" />
 
-    <template #footer>
+    <list-browser-column-widget
+      v-if="isSelected"
+      v-model="storage.columns"
+      :class="$style['column-widget']"
+      :list-id="storage.id"
+      :site-id="storage.parentId"
+      />
+
+    <template v-else #footer>
       <generic-browser-options-form
-        :schema-processing="schemaProcessing"
         enable-sites
+        :schema-processing="schemaProcessing"
         @submit="addManualItem"
         />
     </template>
@@ -27,7 +35,8 @@
   import GraphLayerGenericBrowser from "../GenericBrowser/GenericBrowser.vue";
   import GenericBrowserOptionsForm from "../GenericBrowser/GenericBrowserOptionsForm.vue";
 
-  import ListBrowserSchemaProcessing from "./ListBrowserSchemaProcessing";
+  import ListBrowserColumnWidget from "./ListBrowserColumnWidget.vue";
+  import ListBrowserSchemaProcessing from "./ListBrowserSchemaProcessing.js";
 
   function makeEndpoint(type,id,parentId) {
     switch (type) {
@@ -49,7 +58,8 @@
 
     components: {
       GraphLayerGenericBrowser,
-      GenericBrowserOptionsForm
+      GenericBrowserOptionsForm,
+      ListBrowserColumnWidget
     },
 
     data: () => ({
@@ -140,11 +150,18 @@
           this.storage.id = id || "";
           this.storage.parentId = parentId || "";
         }
+      },
+
+      isSelected() {
+        return this.storage.type == "list"
+          && this.storage.id != ""
+          && this.storage.parentId != "";
       }
     },
 
     created() {
       this.registerStorageKey("parentId","p");
+      this.registerStorageKey("columns","cs",[]);
       this.$options.manualIdTop = 1;
     },
 
@@ -164,6 +181,12 @@
             this.storage.type = item.type;
             this.storage.id = item.id;
             this.storage.parentId = item.parentId;
+            if (repr.cs) {
+              this.storage.columns = repr.cs;
+            }
+            else {
+              this.storage.columns = [];
+            }
 
             this.addManualItem(item);
           });
@@ -172,6 +195,7 @@
           this.storage.type = "";
           this.storage.id = "";
           this.storage.parentId = "";
+          this.storage.columns = [];
         }
       },
 
@@ -194,6 +218,9 @@
   };
 </script>
 
-<style scoped>
-
+<style module>
+  .column-widget {
+    flex: 1.5;
+    border-top: 2px solid var(--graph-layer-divider-color);
+  }
 </style>

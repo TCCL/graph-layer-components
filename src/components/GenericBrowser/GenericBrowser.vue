@@ -48,8 +48,6 @@
       </div>
     </div>
 
-    <slot></slot>
-
     <generic-browser-explorer
       ref="explorer"
       v-model="selection"
@@ -58,6 +56,8 @@
       :items="items"
       @nav="nav = $event"
       />
+
+    <slot></slot>
 
     <div v-if="$slots.footer" v-show="nav.length == 0" :class="$style.footer">
       <div :class="[$style.footer__menu,toggleFooter ? $style['footer__menu--toggled'] : '']">
@@ -174,7 +174,7 @@
   }
 
   .header {
-    border-bottom: 3px solid var(--graph-layer-generic-browser-divider-color);
+    border-bottom: 3px solid var(--graph-layer-divider-color);
     padding: 0.75em 0;
   }
 
@@ -194,7 +194,7 @@
 
   .header__nav-item {
     padding: 0.5em;
-    border-right: 3px solid var(--graph-layer-generic-browser-divider-color);
+    border-right: 3px solid var(--graph-layer-divider-color);
   }
 
   .header__nav-item:last-child {
@@ -221,8 +221,12 @@
     flex-flow: column nowrap;
   }
 
+  .footer__menu {
+
+  }
+
   .footer__menu--toggled {
-    border-bottom: 2px solid var(--graph-layer-generic-browser-divider-color);
+    border-bottom: 2px solid var(--graph-layer-divider-color);
     padding-bottom: 0.5em;
   }
 

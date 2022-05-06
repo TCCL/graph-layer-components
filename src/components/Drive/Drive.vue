@@ -301,7 +301,7 @@
   .title-region {
     display: flex;
     align-items: center;
-    border-bottom: 3px solid var(--graph-layer-drive-divider-color);
+    border-bottom: 3px solid var(--graph-layer-divider-color);
     padding: 0.75em 0;
   }
   .title-region > .back {
@@ -325,7 +325,7 @@
 
   .header {
     display: flex;
-    border-bottom: 2px solid var(--graph-layer-drive-row-border-color);
+    border-bottom: 2px solid var(--graph-layer-border-color);
   }
   .header > .column {
     font-size: 12px;

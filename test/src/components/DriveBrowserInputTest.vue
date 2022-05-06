@@ -26,7 +26,7 @@
 
     computed: {
       hasValue() {
-        return this.driveValue != "";
+        return this.driveValue != "" && this.driveValue != "{}";
       }
     },
 
