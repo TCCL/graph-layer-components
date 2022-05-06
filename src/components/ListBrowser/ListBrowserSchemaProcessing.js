@@ -35,7 +35,8 @@ export default {
         label: list.name,
         caption: list.name,
         endpoint: "/sites/" + parent.id + "/lists/" + list.id,
-        schema: "list"
+        schema: "list",
+        webUrl: list.webUrl
       });
     }
 

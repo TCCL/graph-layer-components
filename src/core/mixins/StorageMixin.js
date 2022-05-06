@@ -4,8 +4,7 @@ export default {
   data: () => ({
     storage: {
       type: "",
-      id: "",
-      parentId: ""
+      id: ""
     }
   }),
 
@@ -22,20 +21,26 @@ export default {
         return "{}";
       }
 
-      const repr = {
-        t: this.storage.type,
-        i: this.storage.id
-      };
+      const ks = this.$options.storageKeys;
+      const repr = {};
 
-      if (this.storage.parentId) {
-        repr.p = this.storage.parentId;
-      }
+      Object.keys(ks).forEach((key) => {
+        if (this.storage[key]) {
+          repr[ks[key]] = this.storage[key];
+        }
+      });
 
       return JSON.stringify(repr);
     },
   },
 
   created() {
+    // Define base storage keys.
+    this.$options.storageKeys = {
+      type: "t",
+      id: "i"
+    };
+
     // Parse value and pass it to applyValue() method if it exists.
     if (typeof this.applyValue === "function"
         && typeof this.value === "string"
@@ -51,6 +56,11 @@ export default {
   },
 
   methods: {
+    registerStorageKey(key,storedPropertyName,defaultValue) {
+      this.$options.storageKeys[key] = storedPropertyName;
+      this.$set(this.storage,key,defaultValue || "");
+    },
+
     updateStorageValue() {
       this.$emit("input",this.storageValue);
     }

@@ -144,6 +144,7 @@
     },
 
     created() {
+      this.registerStorageKey("parentId","p");
       this.$options.manualIdTop = 1;
     },
 
