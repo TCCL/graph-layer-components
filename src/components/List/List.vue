@@ -17,13 +17,24 @@
       </div>
     </div>
 
+    <div v-if="ready" :class="$style['list-grid']" :style="gridStyles">
+      <list-header
+        v-for="c,i in selectedColumns"
+        :key="c.id"
+        :class="$style['list-grid-header']"
+        v-model="grid.widths[i]"
+        :column="c"
+        />
 
+    </div>
   </graph-layer-wrapper>
 </template>
 
 <script>
   import GraphLayerMixin from "../../core/mixins/GraphLayerMixin.js";
   import LoadErrorMixin from "../../core/mixins/LoadErrorMixin.js";
+
+  import ListHeader from "./ListHeader.vue";
 
   export default {
     name: "GraphLayerList",
@@ -33,9 +44,17 @@
       LoadErrorMixin
     ],
 
+    components: {
+      ListHeader
+    },
+
     data: () => ({
       listInfo: {},
-      columnInfo: {}
+      columnInfo: {},
+      rows: [],
+      grid: {
+        widths: []
+      }
     }),
 
     props: {
@@ -104,6 +123,10 @@
         return result;
       },
 
+      ready() {
+        return this.selectedColumns.length > 0;
+      },
+
       endpoint() {
         if (this.parsedValue) {
           return "/sites/" + this.parsedValue.p + "/lists/" + this.parsedValue.i;
@@ -118,6 +141,14 @@
         }
 
         return this.listInfo.displayName;
+      },
+
+      gridStyles() {
+        const styles = {};
+
+        styles['grid-template-columns'] = this.grid.widths.join(" ");
+
+        return styles;
       }
     },
 
@@ -138,19 +169,19 @@
           this.listInfo = info;
         });
 
-        const columnMap = {};
         const columnEndpoint = this.endpoint + "/columns";
         this.$fetchJson(columnEndpoint).then((result) => {
           const { value: columnDefs } = result;
 
+          const columnMap = {};
           for (let i = 0;i < columnDefs.length;++i) {
             const def = columnDefs[i];
             columnMap[def.id] = def;
             columnMap[def.name] = def;
           }
-        });
 
-        this.columnInfo = columnMap;
+          this.columnInfo = columnMap;
+        });
       },
 
       openExternal() {
@@ -163,6 +194,11 @@
     watch: {
       endpoint(hasEndpoint) {
         this.load();
+      },
+
+      selectedColumns(cs) {
+        this.grid.widths = new Array(cs.length);
+        this.grid.widths.fill("1fr",0,cs.length);
       }
     }
   };
@@ -182,5 +218,18 @@
 
   .header__toolbar {
 
+  }
+
+  .list-grid {
+    flex: 1;
+    margin: 0.25em 0.25em 0.25em;
+    overflow-x: auto;
+    display: grid;
+    grid-template-rows: max-content;
+    gap: 0.25em;
+  }
+
+  .list-grid-header {
+    border-bottom: 1px solid var(--graph-layer-border-color);
   }
 </style>
