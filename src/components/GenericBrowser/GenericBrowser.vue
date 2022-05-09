@@ -142,6 +142,7 @@
 
     methods: {
       navigate(item) {
+        this.selection = {};
         this.$refs.explorer.navigate(item.id);
       },
 

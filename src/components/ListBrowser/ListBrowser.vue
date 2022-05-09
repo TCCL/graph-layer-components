@@ -17,7 +17,7 @@
       :site-id="storage.parentId"
       />
 
-    <template v-else #footer>
+    <template v-if="true" #footer>
       <generic-browser-options-form
         enable-sites
         :schema-processing="schemaProcessing"
@@ -149,6 +149,7 @@
           this.storage.type = type || "";
           this.storage.id = id || "";
           this.storage.parentId = parentId || "";
+          this.storage.columns.splice(0);
         }
       },
 

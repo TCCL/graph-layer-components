@@ -6,7 +6,7 @@
       <button v-else @click="reset">Clear</button>
     </div>
 
-    <graph-layer-list-browser v-show="!commit" v-model="listValue" browse-sites="0" browse-followed-sites  />
+    <graph-layer-list-browser v-show="!commit" v-model="listValue" browse-sites browse-followed-sites  />
     <graph-layer-list v-if="commit" :value="listValue" />
   </div>
 </template>

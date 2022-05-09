@@ -14,4 +14,9 @@
       <div data-graph-layer="listBrowserApplyTest"></div>
     </div>
   </div>
+  <div class="region-wrapper">
+    <div class="region region--large graph-layer">
+      <div data-graph-layer="listBrowserInputTest"></div>
+    </div>
+  </div>
 </div>
