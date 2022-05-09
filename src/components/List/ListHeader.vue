@@ -1,11 +1,11 @@
 <template>
   <div :class="$style['list-header']">
-    <div :class="$style.header">
-      <h3 :class="$style.header__text">{{ title }}</h3>
+    <div :class="$style['list-header__label']">
+      <h4 :class="$style['list-header__label-text']">{{ title }}</h4>
     </div>
 
     <div
-      :class="[$style.resizer,tracking ? $style['resizer--tracking'] : '']"
+      :class="[$style['list-header__resizer'],tracking ? $style['list-header__resizer--tracking'] : '']"
       @mousedown="startTracking"></div>
   </div>
 </template>
@@ -95,11 +95,14 @@
 
 <style module>
   .list-header {
+    position: sticky;
+    top: 0;
+    background-color: var(--graph-layer-color-background);
     display: flex;
     align-items: flex-end;
   }
 
-  .header {
+  .list-header__label {
     flex: 1;
     height: 2.5em;
     display: flex;
@@ -107,24 +110,24 @@
     justify-content: center;
     overflow: hidden;
   }
-  .header:hover {
+  .list-header__label:hover {
     background-color: var(--graph-layer-color-light-gray);
   }
 
-  .header__text {
+  .list-header__label-text {
     margin: 0.25em;
     white-space: nowrap;
     text-overflow: ellipsis;
     overflow: hidden;
   }
 
-  .resizer {
+  .list-header__resizer {
     position: relative;
     cursor: col-resize;
     padding: 1.25em 6px;
   }
 
-  .resizer::after {
+  .list-header__resizer::after {
     content: "";
     position: absolute;
     top: 0;
@@ -133,8 +136,8 @@
     width: 1px;
     background-color: transparent;
   }
-  .resizer:hover::after,
-  .resizer--tracking::after {
+  .list-header__resizer:hover::after,
+  .list-header__resizer--tracking::after {
     background-color: var(--graph-layer-border-color);
   }
 </style>

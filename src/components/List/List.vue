@@ -4,10 +4,10 @@
     :error-state="$errorState"
     :class="[$themeClass,$style['graph-layer-list']]"
     >
-    <div :class="$style.header">
+    <div :class="$style['graph-layer-list__header']">
       <h2 :title="listInfo.description">{{ label }}</h2>
 
-      <div :class="$style.header__toolbar">
+      <div :class="$style['graph-layer-list__header-toolbar']">
         <icon
           button
           i="external-link"
@@ -17,16 +17,12 @@
       </div>
     </div>
 
-    <div v-if="ready" :class="$style['list-grid']" :style="gridStyles">
-      <list-header
-        v-for="c,i in selectedColumns"
-        :key="c.id"
-        :class="$style['list-grid-header']"
-        v-model="grid.widths[i]"
-        :column="c"
-        />
-
-    </div>
+    <list-content
+      v-if="ready"
+      :class="$style['graph-layer-list__content']"
+      :endpoint="endpoint"
+      :columns="selectedColumns"
+      />
   </graph-layer-wrapper>
 </template>
 
@@ -34,7 +30,7 @@
   import GraphLayerMixin from "../../core/mixins/GraphLayerMixin.js";
   import LoadErrorMixin from "../../core/mixins/LoadErrorMixin.js";
 
-  import ListHeader from "./ListHeader.vue";
+  import ListContent from "./ListContent.vue";
 
   export default {
     name: "GraphLayerList",
@@ -45,16 +41,12 @@
     ],
 
     components: {
-      ListHeader
+      ListContent
     },
 
     data: () => ({
       listInfo: {},
-      columnInfo: {},
-      rows: [],
-      grid: {
-        widths: []
-      }
+      columnInfo: {}
     }),
 
     props: {
@@ -141,14 +133,6 @@
         }
 
         return this.listInfo.displayName;
-      },
-
-      gridStyles() {
-        const styles = {};
-
-        styles['grid-template-columns'] = this.grid.widths.join(" ");
-
-        return styles;
       }
     },
 
@@ -194,11 +178,6 @@
     watch: {
       endpoint(hasEndpoint) {
         this.load();
-      },
-
-      selectedColumns(cs) {
-        this.grid.widths = new Array(cs.length);
-        this.grid.widths.fill("1fr",0,cs.length);
       }
     }
   };
@@ -209,27 +188,20 @@
 
   }
 
-  .header {
+  .graph-layer-list__header {
     display: flex;
     justify-content: space-between;
     align-items: center;
     border-bottom: 2px solid var(--graph-layer-divider-color);
   }
 
-  .header__toolbar {
+  .graph-layer-list__header-toolbar {
 
   }
 
-  .list-grid {
+  .graph-layer-list__content {
     flex: 1;
     margin: 0.25em 0.25em 0.25em;
     overflow-x: auto;
-    display: grid;
-    grid-template-rows: max-content;
-    gap: 0.25em;
-  }
-
-  .list-grid-header {
-    border-bottom: 1px solid var(--graph-layer-border-color);
   }
 </style>

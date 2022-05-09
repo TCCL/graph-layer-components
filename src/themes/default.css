@@ -2,6 +2,7 @@
 
 .graph-layer--theme-default {
   /* General properties: */
+  --graph-layer-color-background: white;
   --graph-layer-color-black: #000;
   --graph-layer-color-soft-black: #555;
   --graph-layer-color-light-gray: #eee;

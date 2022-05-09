@@ -1,6 +1,7 @@
 /* core/base.css - graph-layer-wrapper */
 
 .graph-layer {
+  background-color: var(--graph-layer-color-background);
   display: flex;
   flex-flow: column nowrap;
 }
