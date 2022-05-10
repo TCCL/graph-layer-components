@@ -21,12 +21,35 @@
         {{ item }}
       </div>
     </div>
+
+    <div v-if="hasNextPage || pageNumber > 0" :class="$style['list-content__pagination']">
+      <div :class="$style['list-content__pagination-buttons']">
+        <div :class="$style['list-content__pagination-button-wrapper']">
+          <icon
+            medium button
+            i="arrow-left"
+            :class="{ disabled: (pageNumber <= 0) }"
+            @click="pageBack"
+            />
+        </div>
+
+        <div :class="$style['list-content__pagination-button-wrapper']">
+          <icon
+            medium button
+            i="arrow-right"
+            :class="{ disabled: (!hasNextPage) }"
+            @click="pageForward"
+            />
+        </div>
+      </div>
+    </div>
   </graph-layer-wrapper>
 </template>
 
 <script>
   import GraphLayerMixin from "../../core/mixins/GraphLayerMixin.js";
   import LoadErrorMixin from "../../core/mixins/LoadErrorMixin.js";
+  import { extractQueryParam } from "../../core/helpers.js";
 
   import ListHeader from "./ListHeader.vue";
 
@@ -44,12 +67,14 @@
 
     data: () => ({
       gridWidths: [],
-      items: []
+      items: [],
+      pageNumber: -1
     }),
 
     props: {
       endpoint: String,
-      columns: Array
+      columns: Array,
+      limit: Number
     },
 
     computed: {
@@ -80,12 +105,25 @@
         }
 
         return list;
+      },
+
+      hasNextPage() {
+        const next = this.pageNumber + 1;
+        const nextPage = this.$options.pages.get(next);
+
+        if (nextPage) {
+          return !!nextPage.skipToken;
+        }
+
+        return false;
       }
     },
 
     created() {
+      this.$options.pages = new Map();
+
       this.setupGridWidths();
-      this.load();
+      this.loadPage(0);
     },
 
     methods: {
@@ -94,26 +132,84 @@
         this.gridWidths.fill("1fr",0,this.columns.length);
       },
 
-      load() {
+      loadPage(pageNumber) {
+        const page = this.$options.pages.get(pageNumber);
+        if (page && page.items) {
+          this.items = page.items;
+          this.pageNumber = pageNumber;
+        }
+        else {
+          this.load(pageNumber);
+        }
+      },
+
+      load(pageNumber) {
         const cols = this.columns.map((c) => c.name).join(",");
 
         const url = new URL(this.endpoint + "/items",window.location.origin);
         url.searchParams.set("expand","fields(select=" + cols + ")");
+        if (this.limit > 0) {
+          url.searchParams.set("$top",this.limit);
+        }
+
+        const page = this.$options.pages.get(pageNumber) || {};
+        if (page.skipToken) {
+          url.searchParams.set("$skiptoken",page.skipToken);
+        }
 
         this.$fetchJson(url).then((result) => {
+          // Store items in page dictionary.
+          page.items = result.value;
+          this.$options.pages.set(pageNumber,page);
+
+          // Create entry for next page if we have a next link skip token.
+          const skipToken = extractQueryParam(result["@odata.nextLink"],"$skiptoken");
+          if (skipToken) {
+            const nextPage = {
+              skipToken
+            };
+
+            this.$options.pages.set(pageNumber+1,nextPage);
+          }
+
+          // Update render state.
           this.items = result.value;
+          this.pageNumber = pageNumber;
         });
+      },
+
+      reset() {
+        this.$options.pages.clear();
+        this.loadPage(0);
+      },
+
+      pageForward() {
+        if (!this.hasNextPage) {
+          return;
+        }
+
+        const n = this.pageNumber + 1;
+        this.loadPage(n);
+      },
+
+      pageBack() {
+        if (this.pageNumber <= 0) {
+          return;
+        }
+
+        const n = this.pageNumber - 1;
+        this.loadPage(n);
       }
     },
 
     watch: {
       endpoint() {
-        this.load();
+        this.reset();
       },
 
       columns() {
         this.setupGridWidths();
-        this.load();
+        this.reset();
       }
     }
   };
@@ -140,5 +236,25 @@
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+  }
+
+  .list-content__pagination {
+    flex: 1 0;
+    margin-top: 1em;
+    display: flex;
+    flex-flow: column nowrap;
+    justify-content: flex-end;
+  }
+
+  .list-content__pagination-buttons {
+    display: flex;
+    justify-content: center;
+  }
+  .list-content__pagination-button-wrapper {
+    flex: 0 0 20%;
+    text-align: center;
+  }
+  .list-content__pagination-button-wrapper >>> .icon {
+    width: 36px;
   }
 </style>

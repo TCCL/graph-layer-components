@@ -22,6 +22,7 @@
       :class="$style['graph-layer-list__content']"
       :endpoint="endpoint"
       :columns="selectedColumns"
+      :limit="limit"
       />
   </graph-layer-wrapper>
 </template>
@@ -63,6 +64,11 @@
       overrideLabel: {
         type: String,
         default: ""
+      },
+
+      top: {
+        type: [Number,String],
+        default: null
       }
     },
 
@@ -133,6 +139,18 @@
         }
 
         return this.listInfo.displayName;
+      },
+
+      limit() {
+        let top = this.top;
+        if (typeof top !== "number") {
+          top = parseInt(top);
+        }
+        if (isNaN(top)) {
+          top = 0;
+        }
+
+        return top;
       }
     },
 

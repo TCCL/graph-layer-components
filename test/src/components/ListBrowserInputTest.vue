@@ -7,7 +7,7 @@
     </div>
 
     <graph-layer-list-browser v-show="!commit" v-model="listValue" browse-sites browse-followed-sites  />
-    <graph-layer-list v-if="commit" :value="listValue" />
+    <graph-layer-list v-if="commit" :value="listValue" :top="top" />
   </div>
 </template>
 
@@ -21,7 +21,10 @@
     }),
 
     props: {
-
+      top: {
+        type: [String,Number],
+        default: null
+      }
     },
 
     computed: {

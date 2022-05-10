@@ -1,8 +1,8 @@
 <template>
-  <div class="graph-layer list-browser-apply-test input-test">
+  <div class="graph-layer list-apply-test input-test">
     <div class="top-section">
       <div class="top-section__controls">
-        <label for="input-serialized">Serialized List Browser Value</label>
+        <label for="input-serialized">Serialized List Value</label>
         <div class="top-section__input">
           <textarea id="input-serialized" v-model="serialized" placeholder="Enter serialized value"></textarea>
         </div>
@@ -14,13 +14,13 @@
       </div>
     </div>
 
-    <graph-layer-list-browser v-if="hasValue" browse-followed-sites :value="serialized" />
+    <graph-layer-list v-if="hasValue" :value="serialized" :top="top" />
   </div>
 </template>
 
 <script>
   export default {
-    name: "ListBrowserApplyTest",
+    name: "ListApplyTest",
 
     data: () => ({
       serialized: "",
@@ -28,7 +28,10 @@
     }),
 
     props: {
-
+      top: {
+        type: [String,Number],
+        default: null
+      }
     },
 
     computed: {
