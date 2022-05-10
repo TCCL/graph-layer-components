@@ -15,10 +15,10 @@
         />
 
       <div
-        v-for="item in itemList"
+        v-for="item,i in itemList"
         :class="$style['list-content__item']"
         >
-        {{ item }}
+        <list-content-value :value="item" :column="columns[i % columns.length]" />
       </div>
     </div>
 
@@ -52,6 +52,7 @@
   import { extractQueryParam } from "../../core/helpers.js";
 
   import ListHeader from "./ListHeader.vue";
+  import ListContentValue from "./ListContentValue.js";
 
   export default {
     name: "ListContent",
@@ -62,7 +63,8 @@
     ],
 
     components: {
-      ListHeader
+      ListHeader,
+      ListContentValue
     },
 
     data: () => ({
@@ -236,6 +238,25 @@
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+  }
+
+  .list-content__value--boolean {
+    border-radius: 1.5em;
+    font-weight: bold;
+    padding: 0.125em 0.5em;
+    border: 2px solid var(--graph-layer-border-color);
+  }
+
+  .list-content__value--boolean-yes {
+    background-color: var(--graph-layer-color-primary);
+  }
+
+  .list-content__value--boolean-no {
+    background-color: var(--graph-layer-color-secondary);
+  }
+
+  .list-content__value--currency-US::before {
+    content: "$";
   }
 
   .list-content__pagination {

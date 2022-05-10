@@ -1,6 +1,6 @@
 <template>
   <div :class="$style['list-header']">
-    <div :class="$style['list-header__label']">
+    <div :class="$style['list-header__label']" :title="description">
       <h4 :class="$style['list-header__label-text']">{{ title }}</h4>
     </div>
 
@@ -47,6 +47,10 @@
     computed: {
       title() {
         return this.column.displayName || this.column.name;
+      },
+
+      description() {
+        return this.column.description || false;
       }
     },
 
