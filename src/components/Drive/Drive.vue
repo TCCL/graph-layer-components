@@ -9,7 +9,7 @@
         <icon i="arrow-back" />
       </div>
       <h2 :class="$style['title-bar']">
-        <span :class="$style['name']">{{ driveName }}</span>
+        <span :class="$style['name']">{{ label }}</span>
         <span v-for="part in pathParts">/ {{ part }}</span>
       </h2>
       <div :class="$style['toolbar']">
@@ -64,6 +64,11 @@
 
     props: {
       value: {
+        type: String,
+        default: null
+      },
+
+      overrideLabel: {
         type: String,
         default: null
       },
@@ -225,6 +230,14 @@
         }
 
         return parts.join(" / ");
+      },
+
+      label() {
+        if (this.overrideLabel) {
+          return this.overrideLabel;
+        }
+
+        return this.driveName;
       },
 
       canGoBack() {
