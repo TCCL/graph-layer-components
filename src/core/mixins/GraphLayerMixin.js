@@ -19,7 +19,7 @@ function findParentItem($parent,key,subkey,undef) {
     }
   }
 
-  return findParentItem($parent.$parent,key,subkey);
+  return findParentItem($parent.$parent,key,subkey,undef);
 }
 
 function modifyPromise(promise) {
