@@ -12,6 +12,8 @@
         :class="$style['list-content__header']"
         v-model="gridWidths[i]"
         :column="c"
+        :selected="sortColumn === c"
+        @select="sortColumn = c"
         />
 
       <div
@@ -49,7 +51,7 @@
 <script>
   import GraphLayerMixin from "../../core/mixins/GraphLayerMixin.js";
   import LoadErrorMixin from "../../core/mixins/LoadErrorMixin.js";
-  import { extractQueryParam } from "../../core/helpers.js";
+  import { extractQueryParam, sortBy } from "../../core/helpers.js";
 
   import ListHeader from "./ListHeader.vue";
   import ListContentValue from "./ListContentValue.js";
@@ -70,7 +72,8 @@
     data: () => ({
       gridWidths: [],
       items: [],
-      pageNumber: -1
+      pageNumber: -1,
+      sortColumn: null
     }),
 
     props: {
@@ -92,8 +95,16 @@
         const list = [];
         const cols = this.columns.map((c) => c.name);
 
-        for (let i = 0;i < this.items.length;++i) {
-          const item = this.items[i];
+        const items = this.items.slice();
+        if (this.sortColumn) {
+          const c = this.sortColumn.name;
+          items.sort(sortBy((item) => {
+            return item.fields[c];
+          }));
+        }
+
+        for (let i = 0;i < items.length;++i) {
+          const item = items[i];
           for (let j = 0;j < cols.length;++j) {
             const c = cols[j];
             if (c in item.fields) {
@@ -124,6 +135,9 @@
     created() {
       this.$options.pages = new Map();
 
+      if (this.columns.length > 0) {
+        this.sortColumn = this.columns[0];
+      }
       this.setupGridWidths();
       this.loadPage(0);
     },
@@ -210,6 +224,9 @@
       },
 
       columns() {
+        if (this.columns.length > 0) {
+          this.sortColumn = this.columns[0];
+        }
         this.setupGridWidths();
         this.reset();
       }

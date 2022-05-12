@@ -1,7 +1,11 @@
 <template>
   <div :class="$style['list-header']">
     <div :class="$style['list-header__label']" :title="description">
-      <h4 :class="$style['list-header__label-text']">{{ title }}</h4>
+      <h4
+        :class="[$style['list-header__label-text'],
+                 selected ? $style['list-header__label-text--selected'] : '']"
+        @click="doSelect"
+        >{{ title }}</h4>
     </div>
 
     <div
@@ -41,7 +45,8 @@
 
     props: {
       value: String,
-      column: Object
+      column: Object,
+      selected: Boolean
     },
 
     computed: {
@@ -92,6 +97,12 @@
 
       stopTracking(event) {
         this.tracking = false;
+      },
+
+      doSelect(event) {
+        if (!this.selected) {
+          this.$emit("select");
+        }
       }
     }
   };
@@ -123,6 +134,11 @@
     white-space: nowrap;
     text-overflow: ellipsis;
     overflow: hidden;
+    cursor: pointer;
+  }
+  .list-header__label-text--selected {
+    cursor: initial;
+    color: var(--graph-layer-color-primary);
   }
 
   .list-header__resizer {
