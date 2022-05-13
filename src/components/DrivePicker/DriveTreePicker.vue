@@ -3,9 +3,10 @@
     <div :class="$style['header']" @click="select">
       <icon :i="active ? 'arrow-down' : 'arrow-right'" />
 
-      <span v-if="isUser">User Drives</span>
-      <span v-else-if="isGroup">Group Drives</span>
-      <span v-else-if="isSite">Site Drives</span>
+      <span v-if="isUser">Users</span>
+      <span v-else-if="isGroup">Groups</span>
+      <span v-else-if="isSite">Sites</span>
+      <span v-else-if="isFollowedSite">Followed Sites</span>
     </div>
 
     <graph-layer-wrapper
@@ -28,7 +29,6 @@
         v-for="entry in currentEntries"
         v-bind:key="entry.id"
         :class="$style['drive-tree-options']"
-        :type="type"
         :info="entry"
         :active="selectedEntry === entry"
         :value.sync="forwardValue"
@@ -49,15 +49,9 @@
   import GraphLayerMixin from "../../core/mixins/GraphLayerMixin.js";
   import LoadErrorMixin from "../../core/mixins/LoadErrorMixin.js";
   import DriveTreeOptions from "./DriveTreeOptions.vue";
-  import { extractQueryParam } from "../../core/helpers.js";
+  import { extractQueryParam, sortByName } from "../../core/helpers.js";
 
   import Fuse from 'fuse.js';
-
-  function sortByName(a,b) {
-    const na = a.name;
-    const nb = b.name;
-    return na < nb ? -1 : (na > nb ? 1 : 0);
-  }
 
   function valueMatchesEntry(value,entry) {
     // Handle static entry.
@@ -157,6 +151,10 @@
         return this.type == "site";
       },
 
+      isFollowedSite() {
+        return this.type == "followedSite";
+      },
+
       classes() {
         const cls = [
           this.$themeClass,
@@ -238,6 +236,9 @@
         else if (this.isSite) {
           promise = this.loadSites();
         }
+        else if (this.isFollowedSite) {
+          promise = this.loadFollowedSites();
+        }
 
         this.loaded = true;
 
@@ -307,6 +308,27 @@
         const endpoint = "/sites";
         const url = new URL(endpoint,window.location.origin);
         url.searchParams.set("search","*");
+
+        return this.$fetchJson(url).then((result) => {
+          const value = this.processLoadResult(result,url,makeSiteEntry);
+
+          for (let i = 0;i < value.length;++i) {
+            const site = value[i];
+            const entry = makeSiteEntry(site);
+            if (!entry) {
+              continue;
+            }
+
+            this.entries.push(entry);
+          }
+
+          this.entries.sort(sortByName);
+        });
+      },
+
+      loadFollowedSites() {
+        const endpoint = "/me/followedSites";
+        const url = new URL(endpoint,window.location.origin);
 
         return this.$fetchJson(url).then((result) => {
           const value = this.processLoadResult(result,url,makeSiteEntry);

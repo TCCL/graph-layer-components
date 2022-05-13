@@ -9,7 +9,7 @@
         <icon i="arrow-back" />
       </div>
       <h2 :class="$style['title-bar']">
-        <span :class="$style['name']">{{ driveName }}</span>
+        <span :class="$style['name']">{{ label }}</span>
         <span v-for="part in pathParts">/ {{ part }}</span>
       </h2>
       <div :class="$style['toolbar']">
@@ -68,6 +68,11 @@
         default: null
       },
 
+      overrideLabel: {
+        type: String,
+        default: null
+      },
+
       id: {
         type: String,
         default: null
@@ -121,7 +126,7 @@
       },
 
       meValue() {
-        if (this.me) {
+        if (this.string2boolean(this.me)) {
             return true;
         }
 
@@ -227,6 +232,14 @@
         return parts.join(" / ");
       },
 
+      label() {
+        if (this.overrideLabel) {
+          return this.overrideLabel;
+        }
+
+        return this.driveName;
+      },
+
       canGoBack() {
         return this.items.length > 0;
       },
@@ -298,10 +311,14 @@
 </script>
 
 <style module>
+  .graph-layer-drive {
+
+  }
+
   .title-region {
     display: flex;
     align-items: center;
-    border-bottom: 3px solid var(--graph-layer-drive-divider-color);
+    border-bottom: 3px solid var(--graph-layer-divider-color);
     padding: 0.75em 0;
   }
   .title-region > .back {
@@ -325,7 +342,7 @@
 
   .header {
     display: flex;
-    border-bottom: 2px solid var(--graph-layer-drive-row-border-color);
+    border-bottom: 2px solid var(--graph-layer-border-color);
   }
   .header > .column {
     font-size: 12px;

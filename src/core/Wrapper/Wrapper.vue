@@ -1,23 +1,28 @@
 <template functional>
-  <div
+  <transition-group
+    tag="div"
+    name="graph-layer-wrapper-fade"
     :class="[
       (props.scroll ? $style.scroll : ''),
       $style['graph-layer-wrapper']
      ]">
+
     <loading-state
+      key="loading"
+      data-
       v-if="props.loadingState && !props.hideLoading"
       :class="[data.staticClass,data.class]"
       />
 
     <error-state
+      key="error"
       v-else-if="!props.loadingState && props.errorState"
       :error="props.errorState"
       :class="[data.staticClass,data.class]"
-      >
-
-    </error-state>
+      />
 
     <div
+      key="content"
       v-show="!props.loadingState && !props.errorState"
       :class="[
         $style['graph-layer-content'],
@@ -29,7 +34,7 @@
       >
       <slot />
     </div>
-  </div>
+  </transition-group>
 </template>
 
 <script>
@@ -65,12 +70,29 @@
   };
 </script>
 
+<style>
+  .graph-layer-wrapper-fade-enter-active, .graph-layer-wrapper-fade-leave-active {
+    transition-property: opacity;
+    transition-duration: .35s;
+  }
+  .graph-layer-wrapper-fade-enter, .graph-layer-wrapper-fade-leave-to {
+    opacity: 0;
+  }
+  .graph-layer-wrapper-fade-enter-active {
+    transition-delay: .40s;
+    position: absolute;
+    width: 100%;
+    height: 100%;
+  }
+</style>
+
 <style module>
   .graph-layer-wrapper {
     overflow: hidden;
     flex: 1 0;
     display: flex;
     flex-flow: column nowrap;
+    position: relative;
   }
 
   .graph-layer-wrapper a {

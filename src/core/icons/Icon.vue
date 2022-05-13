@@ -15,17 +15,25 @@
       if (context.props.medium) {
         classes.push(context.$style.medium);
       }
-      if (context.props.large) {
+      else if (context.props.large) {
         classes.push(context.$style.large);
       }
+      else if (context.props.xlarge) {
+        classes.push(context.$style.xlarge);
+      }
+
       if (context.props.button) {
         classes.push(context.$style.button);
       }
+
       if (context.props.secondary) {
         classes.push(context.$style.secondary);
       }
-      if (context.props.accent) {
+      else if (context.props.accent) {
         classes.push(context.$style.accent);
+      }
+      else if (context.props.error) {
+        classes.push(context.$style.error);
       }
 
       const e = h("i",{
@@ -52,6 +60,10 @@
         type: Boolean,
         value: false
       },
+      xlarge: {
+        type: Boolean,
+        value: false
+      },
       button: {
         type: Boolean,
         value: false
@@ -61,6 +73,10 @@
         value: false
       },
       accent: {
+        type: Boolean,
+        value: false
+      },
+      error: {
         type: Boolean,
         value: false
       }
@@ -81,6 +97,10 @@
   .icon.large {
     width: 48px;
     height: 48px;
+  }
+  .icon.xlarge {
+    width: 96px;
+    height: 96px;
   }
 
   .icon.button {
@@ -104,5 +124,8 @@
   }
   .icon.accent > svg {
     fill: var(--graph-layer-color-accent);
+  }
+  .icon.error > svg {
+    fill: var(--graph-layer-color-error);
   }
 </style>

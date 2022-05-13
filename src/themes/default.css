@@ -2,6 +2,7 @@
 
 .graph-layer--theme-default {
   /* General properties: */
+  --graph-layer-color-background: white;
   --graph-layer-color-black: #000;
   --graph-layer-color-soft-black: #555;
   --graph-layer-color-light-gray: #eee;
@@ -11,18 +12,23 @@
   --graph-layer-color-accent: #b74f6f;
   --graph-layer-color-error: #ffaaaa;
 
-  /* Base elements */
+  /* Generic elements */
   --graph-layer-caption-color: var(--graph-layer-color-dark-gray);
   --graph-layer-anchor-color: var(--graph-layer-color-primary);
+  --graph-layer-divider-color: var(--graph-layer-color-secondary);
+  --graph-layer-border-color: var(--graph-layer-color-light-gray);
 
   /* User */
   --graph-layer-user-avatar-border-color: var(--graph-layer-color-black);
   --graph-layer-user-avatar-shadow-color: var(--graph-layer-color-soft-black);
   --graph-layer-user-avatar-color: var(--graph-layer-color-soft-black);
 
+  /* Generic Browser */
+  --graph-layer-generic-browser-divider-color: var(--graph-layer-color-secondary);
+  --graph-layer-generic-browser-selected-color: var(--graph-layer-color-primary);
+  --graph-layer-generic-browser-hover-color: var(--graph-layer-color-secondary);
+
   /* Drive */
-  --graph-layer-drive-divider-color: var(--graph-layer-color-secondary);
-  --graph-layer-drive-row-border-color: var(--graph-layer-color-light-gray);
   --graph-layer-drive-item-selected-background-color: var(--graph-layer-color-light-gray);
 
   /* Drive Picker */

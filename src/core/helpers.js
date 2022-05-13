@@ -4,6 +4,17 @@ function nop() {
 
 }
 
+function string2boolean(value) {
+  if (typeof value === "boolean") {
+    return value;
+  }
+
+  const valueLower = value.toLowerCase();
+  return valueLower !== "false"
+    && valueLower !== "off"
+    && valueLower !== "0";
+}
+
 function extractQueryParam(_query,name) {
   if (typeof _query !== "string" || _query.length == 0) {
     return null;
@@ -49,8 +60,70 @@ function formatByteSize(nbytes) {
   return nbytes.toString();
 }
 
+function isGraphLayerError(err) {
+  return err.status && err.error && err.message;
+}
+
+function isMicrosoftError(err) {
+  return typeof err.error === "object"
+    && err.error.code
+    && err.error.message
+    && err.error.innerError;
+}
+
+function extractErrorMessage(err) {
+  if (typeof err === "object"
+      && err.error
+      && err.message)
+  {
+    return err.error;
+  }
+
+  if (typeof err === "object"
+      && err.code
+      && err.payload)
+  {
+    if (isGraphLayerError(err.payload)) {
+      return err.payload.error;
+    }
+    if (isMicrosoftError(err.payload)) {
+      return err.payload.error.message;
+    }
+  }
+  else if (typeof err === "string") {
+    return err;
+  }
+
+  return "An error occurred";
+}
+
+function sortBy(prop) {
+  return function(a,b) {
+    let aa, bb;
+    if (typeof prop === "function") {
+      aa = prop(a);
+      bb = prop(b);
+    }
+    else {
+      aa = a[prop];
+      bb = b[prop];
+    }
+    return aa < bb ? -1 : (aa > bb ? 1 : 0);
+  };
+}
+
+const sortByName = sortBy("name");
+const sortByLabel = sortBy("label");
+
 export {
   nop,
+  string2boolean,
   extractQueryParam,
-  formatByteSize
+  formatByteSize,
+  isGraphLayerError,
+  isMicrosoftError,
+  extractErrorMessage,
+  sortBy,
+  sortByName,
+  sortByLabel
 };

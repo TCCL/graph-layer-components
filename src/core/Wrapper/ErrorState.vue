@@ -1,6 +1,6 @@
 <template>
   <div :class="$style['graph-layer-error-state']">
-    <span :class="$style['excl-icon']">!</span>
+    <icon i="error" error xlarge />
     <span :class="$style['message']">{{ message }}</span>
     <span :class="$style['blurb']">{{ blurb }}</span>
     <slot />
@@ -8,19 +8,15 @@
 </template>
 
 <script>
-  function isGraphLayerError(err) {
-    return err.status && err.error && err.message;
-  }
-
-  function isMicrosoftError(err) {
-    return typeof err.error === "object"
-      && err.error.code
-      && err.error.message
-      && err.error.innerError;
-  }
+  import Icon from "../icons";
+  import { isGraphLayerError, isMicrosoftError, extractErrorMessage } from "../helpers";
 
   export default {
     name: "ErrorState",
+
+    components: {
+      Icon
+    },
 
     data: () => ({
 
@@ -35,29 +31,7 @@
 
     computed: {
       message() {
-        if (typeof this.error === "object"
-            && this.error.error
-            && this.error.message)
-        {
-          return this.error.error;
-        }
-
-        if (typeof this.error === "object"
-            && this.error.code
-            && this.error.payload)
-        {
-          if (isGraphLayerError(this.error.payload)) {
-            return this.error.payload.error;
-          }
-          if (isMicrosoftError(this.error.payload)) {
-             return this.error.payload.error.message;
-          }
-        }
-        else if (typeof this.error === "string") {
-          return this.error;
-        }
-
-        return "An error occurred";
+        return extractErrorMessage(this.error);
       },
 
       blurb() {
@@ -101,17 +75,7 @@
     justify-content: center;
     align-items: center;
     flex-flow: column nowrap;
-    background-color: var(--graph-layer-color-error);
-    padding: 2em;
-    margin: 1em;
     text-align: center;
-  }
-
-  .excl-icon {
-    font-size: 3.5em;
-    font-weight: bold;
-    user-select: none;
-    margin: 0.25em;
   }
 
   .message {
