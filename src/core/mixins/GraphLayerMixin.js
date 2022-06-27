@@ -172,6 +172,11 @@ export default {
       const sessionId = Cookies.get(cookieId);
 
       return !!sessionId;
+    },
+
+    $warn(message,...args) {
+      const fmt = "[graph-layer-components]: " + message;
+      console.warn(fmt,...args);
     }
   }
 };

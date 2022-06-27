@@ -96,18 +96,22 @@
         if (Array.isArray(this.columns)) {
           columns = this.columns;
         }
+        else if (this.columns) {
+          try {
+            const result = JSON.parse(this.columns);
+            if (Array.isArray(result)) {
+              columns = result;
+            }
+            else if (typeof result === "string") {
+              columns = result.split(",");
+            }
+            else {
+              this.$warn("cannot parse 'columns' property");
+            }
 
-        try {
-          const result = JSON.parse(this.columns);
-          if (Array.isArray(result)) {
-            columns = result;
+          } catch (ex) {
+            this.$warn("cannot parse 'columns' property");
           }
-          else if (typeof result === "string") {
-            columns = result.split(",");
-          }
-
-        } catch (ex) {
-          // break
         }
 
         const result = [];
