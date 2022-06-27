@@ -87,12 +87,31 @@
       },
 
       sync() {
+        const displayNames = new Map();
+
         const map = new Map();
         for (let i = 0;i < this.columns.length;++i) {
           const col = this.columns[i];
           col.selected = false;
           map.set(col.info.id,col);
           map.set(col.info.name,col);
+
+          const dn = col.info.displayName;
+          if (displayNames.has(dn)) {
+            displayNames.get(dn).push(col);
+          }
+          else {
+            displayNames.set(dn,[col]);
+          }
+        }
+
+        for (const value of displayNames.values()) {
+          if (value.length > 1) {
+            for (let i = 0;i < value.length;++i) {
+              value[i].info.displayName = value[i].info.displayName
+                + " (" + value[i].info.name + ")";
+            }
+          }
         }
 
         for (let i = 0;i < this.value.length;++i) {
