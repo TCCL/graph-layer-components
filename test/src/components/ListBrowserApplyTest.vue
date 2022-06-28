@@ -14,7 +14,7 @@
       </div>
     </div>
 
-    <graph-layer-list-browser v-if="hasValue" browse-followed-sites :value="serialized" />
+    <graph-layer-list-browser v-if="hasValue" browse-followed-sites :list-type="listType" :value="serialized" />
   </div>
 </template>
 
@@ -28,7 +28,10 @@
     }),
 
     props: {
-
+      listType: {
+        type: String,
+        default: "generic"
+      }
     },
 
     computed: {

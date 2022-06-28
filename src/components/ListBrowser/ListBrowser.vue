@@ -9,10 +9,11 @@
     >
     <input v-if="formElement" type="hidden" :name="formElement" :value="storageValue" />
 
-    <list-browser-column-widget
-      v-if="isSelected"
-      v-model="storage.columns"
-      :class="$style['column-widget']"
+    <component
+      v-if="widget && isSelected"
+      :is="widget"
+      v-model="storage.config"
+      :class="$style['widget']"
       :list-id="storage.id"
       :site-id="storage.parentId"
       />
@@ -36,15 +37,44 @@
   import GenericBrowserOptionsForm from "../GenericBrowser/GenericBrowserOptionsForm.vue";
 
   import ListBrowserColumnWidget from "./ListBrowserColumnWidget.vue";
+  import ListBrowserEventsConfigWidget from "./ListBrowserEventsConfigWidget.vue";
   import ListBrowserSchemaProcessing from "./ListBrowserSchemaProcessing.js";
 
-  function makeEndpoint(type,id,parentId) {
-    switch (type) {
+  function makeEndpoint(storageType,id,parentId) {
+    switch (storageType) {
     case "list":
       return "/sites/" + parentId + "/lists/" + id;
     }
 
-    throw new Error("Cannot make endpoint: invalid value");
+    throw new Error("Cannot make endpoint: invalid storage type");
+  }
+
+  function defaultConfigValue(listType) {
+    switch (listType) {
+      case "generic":
+        return [];
+      case "events":
+        return null;
+    }
+
+    throw new Error("Invalid list type");
+  }
+
+  function validateConfigValue(value,listType) {
+    switch (listType) {
+      case "generic":
+        if (Array.isArray(value)) {
+          return value;
+        }
+        break;
+      case "events":
+        if (typeof value === "object") {
+          return value;
+        }
+        break;
+    }
+
+    return defaultConfigValue(listType);
   }
 
   export default {
@@ -58,8 +88,7 @@
 
     components: {
       GraphLayerGenericBrowser,
-      GenericBrowserOptionsForm,
-      ListBrowserColumnWidget
+      GenericBrowserOptionsForm
     },
 
     data: () => ({
@@ -91,6 +120,11 @@
       browseFollowedSites: {
         type: [Boolean,String],
         default: false
+      },
+
+      listType: {
+        type: String,
+        default: "generic"
       }
     },
 
@@ -149,7 +183,8 @@
           this.storage.type = type || "";
           this.storage.id = id || "";
           this.storage.parentId = parentId || "";
-          this.storage.columns.splice(0);
+          this.storage.listType = this.listType;
+          this.storage.config = defaultConfigValue(this.listType);
         }
       },
 
@@ -157,12 +192,24 @@
         return this.storage.type == "list"
           && this.storage.id != ""
           && this.storage.parentId != "";
+      },
+
+      widget() {
+        if (this.storage.listType == "generic") {
+          return ListBrowserColumnWidget;
+        }
+        else if (this.storage.listType == "events") {
+          return ListBrowserEventsConfigWidget;
+        }
+
+        return false;
       }
     },
 
     created() {
       this.registerStorageKey("parentId","p");
-      this.registerStorageKey("columns","cs",[]);
+      this.registerStorageKey("listType","l",this.listType);
+      this.registerStorageKey("config","c",defaultConfigValue(this.listType));
       this.$options.manualIdTop = 1;
     },
 
@@ -182,11 +229,16 @@
             this.storage.type = item.type;
             this.storage.id = item.id;
             this.storage.parentId = item.parentId;
-            if (repr.cs) {
-              this.storage.columns = repr.cs;
+            this.storage.listType = item.listType || this.listType;
+            if (repr.c) {
+              this.storage.config = validateConfigValue(repr.c,this.storage.listType);
+            }
+            else if (repr.cs) {
+              // NOTE: this maintains compatibility with previous storage key.
+              this.storage.config = validateConfigValue(repr.cs,this.storage.listType);
             }
             else {
-              this.storage.columns = [];
+              this.storage.config = defaultConfigValue(this.storage.listType);
             }
 
             this.addManualItem(item);
@@ -196,7 +248,8 @@
           this.storage.type = "";
           this.storage.id = "";
           this.storage.parentId = "";
-          this.storage.columns = [];
+          this.storage.listType = this.listType;
+          this.storage.config = defaultConfigValue(this.listType);
         }
       },
 
@@ -220,7 +273,7 @@
 </script>
 
 <style module>
-  .column-widget {
+  .widget {
     flex: 1.5;
     border-top: 2px solid var(--graph-layer-divider-color);
   }

@@ -89,8 +89,15 @@
 
       selectedColumns() {
         let columns = [];
-        if (Array.isArray(this.parsedValue.cs)) {
-          columns = this.parsedValue.cs;
+        if (this.parsedValue) {
+          if (Array.isArray(this.parsedValue.c)) {
+            columns = this.parsedValue.c;
+          }
+          else if (Array.isArray(this.parsedValue.cs)) {
+            // NOTE: this maintains backwards compatibility with previous storage
+            // key.
+            columns = this.parsedValue.cs;
+          }
         }
 
         if (Array.isArray(this.columns)) {

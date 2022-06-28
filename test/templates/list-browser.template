@@ -11,12 +11,30 @@
   </div>
   <div class="region-wrapper">
     <div class="region region--large graph-layer">
-      <div data-graph-layer="listBrowserApplyTest"></div>
+      <div
+        data-graph-layer="listBrowser"
+        data-graph-layer--browse-sites="0"
+        data-graph-layer--browse-followed-sites="1"></div>
     </div>
   </div>
   <div class="region-wrapper">
     <div class="region region--large graph-layer">
       <div data-graph-layer="listBrowserInputTest"></div>
+    </div>
+  </div>
+  <div class="region-wrapper">
+    <div class="region region--large graph-layer">
+      <div data-graph-layer="listBrowserApplyTest"></div>
+    </div>
+  </div>
+  <div class="region-wrapper">
+    <div class="region region--large graph-layer">
+      <div data-graph-layer="listBrowserInputTest" data-graph-layer--list-type="events"></div>
+    </div>
+  </div>
+  <div class="region-wrapper">
+    <div class="region region--large graph-layer">
+      <div data-graph-layer="listBrowserApplyTest" data-graph-layer--list-type="events"></div>
     </div>
   </div>
 </div>
