@@ -125,6 +125,11 @@
       listType: {
         type: String,
         default: "generic"
+      },
+
+      filterTemplate: {
+        type: [Array,String],
+        default: []
       }
     },
 
@@ -168,7 +173,19 @@
       },
 
       schemaProcessing() {
-        return ListBrowserSchemaProcessing;
+        let filters = [];
+        if (Array.isArray(this.filterTemplate)) {
+          filters = this.filterTemplate;
+        }
+        else if (this.filterTemplate) {
+          filters = this.filterTemplate.split(":");
+        }
+
+        if (filters.length > 0) {
+          return ListBrowserSchemaProcessing.getFilteredByTemplate(filters);
+        }
+
+        return ListBrowserSchemaProcessing.getDefault();
       },
 
       selection: {

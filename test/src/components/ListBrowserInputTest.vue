@@ -6,7 +6,16 @@
       <button v-else @click="reset">Clear</button>
     </div>
 
-    <graph-layer-list-browser v-show="!commit" v-model="listValue" browse-sites browse-followed-sites :list-type="listType" />
+    <graph-layer-list-browser
+      v-show="!commit"
+      v-model="listValue"
+      :title="title"
+      browse-sites
+      browse-followed-sites
+      :list-type="listType"
+      :filter-template="filterTemplate"
+      />
+
     <graph-layer-list v-if="commit" :value="listValue" :top="top" />
   </div>
 </template>
@@ -21,6 +30,10 @@
     }),
 
     props: {
+      title: {
+        type: String,
+        default: ""
+      },
       top: {
         type: [String,Number],
         default: null
@@ -28,6 +41,10 @@
       listType: {
         type: String,
         default: "generic"
+      },
+      filterTemplate: {
+        type: [Array,String],
+        default: []
       }
     },
 

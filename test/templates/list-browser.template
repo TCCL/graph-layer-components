@@ -29,12 +29,18 @@
   </div>
   <div class="region-wrapper">
     <div class="region region--large graph-layer">
-      <div data-graph-layer="listBrowserInputTest" data-graph-layer--list-type="events"></div>
+      <div data-graph-layer="listBrowserInputTest"
+        data-graph-layer--title="Select an event list"
+        data-graph-layer--list-type="events"
+        data-graph-layer--filter-template="events"></div>
     </div>
   </div>
   <div class="region-wrapper">
     <div class="region region--large graph-layer">
-      <div data-graph-layer="listBrowserApplyTest" data-graph-layer--list-type="events"></div>
+      <div data-graph-layer="listBrowserApplyTest"
+        data-graph-layer--title="Select an event list"
+        data-graph-layer--list-type="events"
+        data-graph-layer--filter-template="events"></div>
     </div>
   </div>
 </div>
