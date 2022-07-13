@@ -129,7 +129,7 @@
 
       filterTemplate: {
         type: [Array,String],
-        default: []
+        default: () => ([])
       }
     },
 
@@ -239,7 +239,7 @@
           this.$fetchJson(endpoint).then((list) => {
             const parent = { id: repr.p };
             const result = { value: [list] };
-            const [ item ] = ListBrowserSchemaProcessing.listList(result,parent);
+            const [ item ] = this.schemaProcessing.listList(result,parent);
 
             item.current = true;
 

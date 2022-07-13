@@ -45,7 +45,7 @@
       },
       filterTemplate: {
         type: [Array,String],
-        default: []
+        default: () => ([])
       }
     },
 
