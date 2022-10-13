@@ -4,15 +4,23 @@ function nop() {
 
 }
 
-function string2boolean(value) {
+function normalizeBoolean(value) {
   if (typeof value === "boolean") {
     return value;
   }
 
-  const valueLower = value.toLowerCase();
-  return valueLower !== "false"
-    && valueLower !== "off"
-    && valueLower !== "0";
+  if (typeof value === "number") {
+    return value != 0;
+  }
+
+  if (typeof value === "number") {
+    const valueLower = value.toLowerCase();
+    return valueLower !== "false"
+      && valueLower !== "off"
+      && valueLower !== "0";
+  }
+
+  return !!value;
 }
 
 function extractQueryParam(_query,name) {
@@ -117,7 +125,7 @@ const sortByLabel = sortBy("label");
 
 export {
   nop,
-  string2boolean,
+  normalizeBoolean,
   extractQueryParam,
   formatByteSize,
   isGraphLayerError,

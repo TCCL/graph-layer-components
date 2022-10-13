@@ -6,7 +6,11 @@ import globals from "../../globals.js";
 import * as WrapperComponents from "../Wrapper";
 import * as coreComponents from "../components";
 import Icon from "../icons";
-import { nop, string2boolean } from "../helpers.js";
+import { nop, normalizeBoolean } from "../helpers.js";
+
+const ANONYMOUS_ENABLED = 1;
+const ANONYMOUS_DISABLED = 0;
+const ANONYMOUS_DECIDE = 2;
 
 function findParentItem($parent,key,subkey,undef) {
   if (!$parent) {
@@ -42,14 +46,19 @@ export default {
       default: null
     },
 
-    shared: {
-      type: [Boolean,String],
-      default: false
+    anonymous: {
+      type: [Boolean,Number,String],
+      default: undefined
+    },
+
+    preferAnonymous: {
+      type: [Boolean,Number,String],
+      default: undefined
     }
   },
 
   filters: {
-    string2boolean
+    normalizeBoolean
   },
 
   computed: {
@@ -63,6 +72,25 @@ export default {
       }
 
       return inst;
+    },
+
+    $anonymous() {
+      if (!this.$graphLayer.isAnonymousEnabled()) {
+        return false;
+      }
+      else if (typeof this.anonymous === "undefined") {
+        return this.$preferAnonymous;
+      }
+
+      return normalizeBoolean(this.anonymous);
+    },
+
+    $preferAnonymous() {
+      if (typeof this.preferAnonymous === "undefined") {
+        return this.$graphLayer.getOption("preferAnonymous");
+      }
+
+      return normalizeBoolean(this.preferAnonymous);
     },
 
     $theme() {
@@ -111,21 +139,28 @@ export default {
   },
 
   methods: {
-    string2boolean,
+    normalizeBoolean,
 
     $fetch(resource,init,ignoreError) {
       this.$loadingState = true;
       this.$errorState = null;
 
       let promise;
-      if (!this.$hasSession() && !this.shared) {
+      const hasSession = this.$hasSession();
+      if (!hasSession && !this.$anonymous) {
         promise = Promise.reject({
           error: "Content Unavailable",
           message: "You are not signed into Microsoft Graph and cannot view this content.",
         });
       }
       else {
-        promise = this.$graphLayer.fetch(resource,init).then((response) => {
+        if (this.$anonymous) {
+          promise = this.$graphLayer.fetchAnonymous(resource,init);
+        }
+        else {
+          promise = this.$graphLayer.fetch(resource,init);
+        }
+        promise = promise.then((response) => {
           if (!response.ok) {
             return response.json().then((payload) => Promise.reject({
               code: response.status,

@@ -112,8 +112,8 @@
 
     computed: {
       enableSites() {
-        return this.string2boolean(this.browseSites)
-          || this.string2boolean(this.browseFollowedSites);
+        return this.normalizeBoolean(this.browseSites)
+          || this.normalizeBoolean(this.browseFollowedSites);
       },
 
       items() {
@@ -123,7 +123,7 @@
       topLevelItems() {
         const items = [];
 
-        if (this.string2boolean(this.browseMe)) {
+        if (this.normalizeBoolean(this.browseMe)) {
           items.push({
             id: "toplv-me",
             type: "toplv",
@@ -133,7 +133,7 @@
           });
         }
 
-        if (this.string2boolean(this.browseUsers)) {
+        if (this.normalizeBoolean(this.browseUsers)) {
           items.push({
             id: "toplv-users",
             type: "toplv",
@@ -147,7 +147,7 @@
           });
         }
 
-        if (this.string2boolean(this.browseGuests)) {
+        if (this.normalizeBoolean(this.browseGuests)) {
           items.push({
             id: "toplv-guests",
             type: "toplv",
@@ -161,7 +161,7 @@
           });
         }
 
-        if (this.string2boolean(this.browseGroups)) {
+        if (this.normalizeBoolean(this.browseGroups)) {
           items.push({
             id: "toplv-groups",
             type: "toplv",
@@ -175,7 +175,7 @@
           });
         }
 
-        if (this.string2boolean(this.browseSites)) {
+        if (this.normalizeBoolean(this.browseSites)) {
           items.push({
             id: "toplv-sites",
             type: "toplv",
@@ -189,7 +189,7 @@
           });
         }
 
-        if (this.string2boolean(this.browseFollowedSites)) {
+        if (this.normalizeBoolean(this.browseFollowedSites)) {
           items.push({
             id: "toplv-followed-sites",
             type: "toplv",

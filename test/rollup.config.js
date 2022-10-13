@@ -5,6 +5,7 @@ import vue from "rollup-plugin-vue";
 import css from "rollup-plugin-css-only";
 import svg from "rollup-plugin-svg";
 import replace from "@rollup/plugin-replace";
+import commonjs from "@rollup/plugin-commonjs";
 
 const plugins = [
   nodeResolve(),
@@ -23,7 +24,8 @@ const plugins = [
   replace({
     preventAssignment: true,
     'process.env.NODE_ENV': JSON.stringify( 'development' )
-  })
+  }),
+  commonjs()
 ];
 
 export default {

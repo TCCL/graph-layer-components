@@ -25,9 +25,11 @@
   ],
   "license": "MIT",
   "devDependencies": {
+    "@rollup/plugin-commonjs": "^22.0.2",
     "@rollup/plugin-node-resolve": "^13.0.4",
     "@rollup/plugin-replace": "^3.0.0",
     "date-fns": "^2.25.0",
+    "extend": "^3.0.2",
     "fuse.js": "^6.4.6",
     "js-cookie": "^3.0.1",
     "rollup": "^2.56.3",

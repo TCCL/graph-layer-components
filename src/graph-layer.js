@@ -1,6 +1,7 @@
 // graph-layer.js
 
 import Vue from "vue";
+import extend from "extend";
 
 import * as Components from "./components";
 import globals from "./globals.js";
@@ -47,7 +48,21 @@ class GraphLayer {
       cookieId: "GRAPH_LAYER_SESSID",
 
       // The theme class to apply to themeable components.
-      theme: "default"
+      theme: "default",
+
+      // The app ID to use for anonymous requests. If this is omitted or empty,
+      // then no anonymous requests are made.
+      anonymousAppId: "",
+
+      // The name of the HTTP header to use to indicate an anonymous request.
+      // This must match the value configured in the graph-layer proxy endpoint
+      // settings.
+      anonymousHeader: "X-Graph-Layer-Anonymous",
+
+      // Determines if an anonymous request is performed instead of a session
+      // request for when both are available. This global setting is only
+      // considered when the component-level setting is undefined.
+      preferAnonymous: false
     });
 
     this.components = {};
@@ -75,6 +90,15 @@ class GraphLayer {
   }
 
   /**
+   * Determines if anonymous requests can be performed.
+   *
+   * @return {Boolean}
+   */
+  isAnonymousEnabled() {
+    return this.getOption("anonymousAppId") && this.getOption("anonymousHeader");
+  }
+
+  /**
    * Registers an additional component that can be created via scan
    * functionality.
    *
@@ -87,6 +111,14 @@ class GraphLayer {
     this.components[id] = component;
   }
 
+  /**
+  * Issues a graph-layer proxy request.
+  *
+  * @param {object} resource
+  * @param {object} _init
+  *
+  * @return {Promise}
+  */
   fetch(_resource,init) {
     let resource = _resource;
 
@@ -116,6 +148,24 @@ class GraphLayer {
   }
 
   /**
+   * Issues an anonymous graph-layer proxy request.
+   *
+   * @param {object} resource
+   * @param {object} _init
+   *
+   * @return {Promise}
+   */
+  fetchAnonymous(resource,_init) {
+    const init = extend({
+      headers: {
+        [this.getOption("anonymousHeader")]: this.getOption("anonymousAppId")
+      }
+    },_init);
+
+    return this.fetch(resource,init);
+  }
+
+  /**
    * Vue install method. This registers this GraphLayer instance as the default
    * instance.
    */
@@ -134,7 +184,7 @@ class GraphLayer {
    * the indicated component is loaded.
    *
    * @param {string} [attribute]
-   *  The attribute name in which to find the component ID. This defaults to 
+   *  The attribute name in which to find the component ID. This defaults to
    *  'data-graph-layer'.
    * @param {string} [selector]
    *  The selector to use to query the elements. This defaults to a selector
@@ -158,7 +208,7 @@ class GraphLayer {
    * the indicated component is loaded.
    *
    * @param {string} [attribute]
-   *  The attribute name in which to find the component ID. This defaults to 
+   *  The attribute name in which to find the component ID. This defaults to
    *  'data-graph-layer'.
    * @param {string} [selector]
    *  The selector to use to query the elements. This defaults to a selector
@@ -194,6 +244,8 @@ class GraphLayer {
    *  Returns the created Vue instance or null on failure.
    */
   processElement(elem,attrName) {
+    const ATTR_BLACKLIST = ["graphLayer"];
+
     if (!(attrName in elem.attributes)) {
       return null;
     }
@@ -209,6 +261,10 @@ class GraphLayer {
       const attr = elem.attributes[i];
       if (attr.name.substring(0,prefix.length) == prefix) {
         const name = hyphen2kebab(attr.name.substring(prefix.length));
+        if (ATTR_BLACKLIST.indexOf(name) >= 0) {
+          throw new Error("Property '" + attr.name + "' is not supported");
+        }
+
         args[name] = attr.value;
       }
     }

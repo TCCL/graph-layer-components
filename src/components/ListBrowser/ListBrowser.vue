@@ -141,7 +141,7 @@
       topLevelItems() {
         const items = [];
 
-        if (this.string2boolean(this.browseSites)) {
+        if (this.normalizeBoolean(this.browseSites)) {
           items.push({
             id: "toplv-sites",
             type: "toplv",
@@ -155,7 +155,7 @@
           });
         }
 
-        if (this.string2boolean(this.browseFollowedSites)) {
+        if (this.normalizeBoolean(this.browseFollowedSites)) {
           items.push({
             id: "toplv-followed-sites",
             type: "toplv",
