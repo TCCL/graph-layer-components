@@ -1,5 +1,5 @@
 <template>
-  <div class="graph-layer input-test drive-input-test"> 
+  <div class="graph-layer input-test drive-input-test">
    <label>Select the kind of object and specify and ID:</label>
    <div class="controls">
       <select v-model="driveType">
@@ -12,7 +12,7 @@
       <button @click="commit">Render</button>
       <hr>
     </div>
-    <graph-layer-drive v-if="ready" v-bind:[driveType]="driveId" />
+    <graph-layer-drive v-if="ready" v-bind:[driveType]="driveId" :anonymous="anonymous" />
   </div>
 </template>
 
@@ -27,7 +27,10 @@
     }),
 
     props: {
-
+      anonymous: {
+        type: [Boolean,String,Number],
+        default: undefined
+      }
     },
 
     computed: {

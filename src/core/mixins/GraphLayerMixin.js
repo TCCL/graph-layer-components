@@ -8,22 +8,29 @@ import * as coreComponents from "../components";
 import Icon from "../icons";
 import { nop, normalizeBoolean } from "../helpers.js";
 
-const ANONYMOUS_ENABLED = 1;
-const ANONYMOUS_DISABLED = 0;
-const ANONYMOUS_DECIDE = 2;
-
-function findParentItem($parent,key,subkey,undef) {
+function findParentItem($parent,undef,...keys) {
   if (!$parent) {
-    return null;
+    return undef;
   }
 
-  if (key in $parent && subkey in $parent[key]) {
-    if ($parent[key][subkey] !== undef) {
-      return $parent[key][subkey];
+  let i = 0;
+  let bucket = $parent;
+  while (bucket && i < keys.length) {
+    const key = keys[i];
+    if (typeof bucket === "object" && key in bucket) {
+      bucket = bucket[key];
     }
+    else {
+      bucket = undef;
+    }
+    i += 1;
   }
 
-  return findParentItem($parent.$parent,key,subkey,undef);
+  if (bucket === undef) {
+    return findParentItem($parent.$parent,undef,...keys);
+  }
+
+  return bucket;
 }
 
 function modifyPromise(promise) {
@@ -49,11 +56,6 @@ export default {
     anonymous: {
       type: [Boolean,Number,String],
       default: undefined
-    },
-
-    preferAnonymous: {
-      type: [Boolean,Number,String],
-      default: undefined
     }
   },
 
@@ -64,7 +66,7 @@ export default {
   computed: {
     $graphLayer() {
       const inst = this.graphLayer
-            || findParentItem(this.$parent,"$props","graphLayer",null)
+            || findParentItem(this.$parent,null,"$props","graphLayer")
             || globals.graphLayer;
 
       if (!inst) {
@@ -78,19 +80,16 @@ export default {
       if (!this.$graphLayer.isAnonymousEnabled()) {
         return false;
       }
-      else if (typeof this.anonymous === "undefined") {
-        return this.$preferAnonymous;
-      }
 
-      return normalizeBoolean(this.anonymous);
-    },
-
-    $preferAnonymous() {
-      if (typeof this.preferAnonymous === "undefined") {
+      if (typeof this.anonymous === "undefined") {
+        const parentValue = findParentItem(this.$parent,undefined,"$anonymous");
+        if (typeof parentValue !== "undefined") {
+          return parentValue;
+        }
         return this.$graphLayer.getOption("preferAnonymous");
       }
 
-      return normalizeBoolean(this.preferAnonymous);
+      return normalizeBoolean(this.anonymous);
     },
 
     $theme() {
@@ -106,7 +105,7 @@ export default {
         return this.$data.loadError;
       }
 
-      const result = findParentItem(this.$parent,"$data","loadError");
+      const result = findParentItem(this.$parent,undefined,"$data","loadError");
       if (result) {
         return result;
       }

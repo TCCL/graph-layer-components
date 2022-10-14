@@ -10,6 +10,10 @@
   overflow: hidden;
 }
 
+.testbed-wrapper > .region-wrapper--large {
+  flex: 0 0 100%;
+}
+
 .testbed-wrapper > .region-wrapper > .region {
   padding: 3%;
   height: 360px;

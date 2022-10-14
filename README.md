@@ -37,11 +37,23 @@ This library is designed to work in two significant ways:
 
 > Note: you are not limited to using the library in exclusively one of the aforementioned methods. You may use both at once if needed.
 
+See the sections below for in-depth discussion of various usage topics.
+
+### Sizing of components
+
 In general, each component is designed to work as a child of a column-oriented flexbox element. For convenience, the library provides the global CSS class `graph-layer` to use for parent elements. It is up to you as the library user to ensure this parent element is correctly sized (especially vertically) according to your needs. A component will always set its `flex-grow` property to `1` and its `flex-shrink` property to `0`. (This behavior makes it flow into the remaining space assuming all sibling elements have `flex-grow` set to the default of `0`.)
 
 Graph Layer components are designed to render well at any size (within reason). A component will overflow with scroll if its content extends past the parent element.
 
-### Using the library in a Vue.js application
+### Anonymous Requests
+
+The Graph Layer server allows clients to issue so-called "anonymous" requests. Such requests indicate that the server use a preconfigured user identity instead of requiring the user to authenticate with Microsoft Graph to obtain an access token. This feature allows the library to access resources on behalf on an anonymous client.
+
+> If you are to use anonymous requests, you should understand any and all implications of allowing such access to resources in your tenant. This feature was designed for web applications running on secure, private networks.
+
+Anonymous requests are not enabled by default. You must configure the Graph Layer server and the library to enable anonymous requests. See the section on _Global Configuration_ below for more on how to configure anonymous requests in the library client.
+
+### Using as a Vue.js component library
 
 To use the library in your Vue.js application, import the library and register the components. This allows you to access the components globally.
 
@@ -64,7 +76,7 @@ Now you can access components:
 <script>
   export default {
     name: "MyView",
-	
+
 	data: (() => {
 	  user: "myuser@myorg.org"
 	})
@@ -113,6 +125,21 @@ Explanation of attributes:
 | `data-graph-layer--PROP` | Passes a property value to the Vue.js component; substitute `PROP` for the name of the property |
 
 > When substituting `PROP` for a property name, make sure to convert a camel case property name to a hyphenated property name. Example: `propertyName` becomes `property-name`.
+
+### Global Configuration
+
+The library has a few configuration options that are globally configured. You set these on the `GraphLayer` instance via the `setOption` method.
+
+Explanation of available configuration properties:
+
+| Name | Description | Default |
+| -- | -- | -- |
+| `baseUrl` | The base URL for Graph Layer requests | `/graph/layer` |
+| `cookieId` | The name of the cookie that stores the Graph Layer session ID | `GRAPH_LAYER_SESSID` |
+| `theme` | The theme class to apply to themeable components | `default` |
+| `anonymousAppId` | Configures the Graph layer application ID to use in anonymous requests; these also enables anonymous requests | - |
+| `anonymousHeader` | Configures the HTTP header name used to indicate an anonymous request to the server. | `X-Graph-Layer-Anonymous` |
+| `preferAnonymous` | Determines whether components enable anonymous requests by default when no `anonymous` property is provided.  | `false` |
 
 ## Components
 
