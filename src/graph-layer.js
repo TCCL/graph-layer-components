@@ -59,10 +59,10 @@ class GraphLayer {
       // settings.
       anonymousHeader: "X-Graph-Layer-Anonymous",
 
-      // Determines if an anonymous request is performed instead of a session
-      // request for when both are available. This global setting is only
-      // considered when the component-level setting is undefined.
-      preferAnonymous: false
+      // Determines if an anonymous request is performed when the user does not
+      // have a graph-layer session. This is the global default which may be
+      // overridden at the component level.
+      anonymousFallback: false
     });
 
     this.components = {};

@@ -56,6 +56,11 @@ export default {
     anonymous: {
       type: [Boolean,Number,String],
       default: undefined
+    },
+
+    anonymousFallback: {
+      type: [Boolean,Number,String],
+      default: undefined
     }
   },
 
@@ -86,10 +91,23 @@ export default {
         if (typeof parentValue !== "undefined") {
           return parentValue;
         }
-        return this.$graphLayer.getOption("preferAnonymous");
+
+        return !this.$hasSession && this.$anonymousFallback;
       }
 
       return normalizeBoolean(this.anonymous);
+    },
+
+    $anonymousFallback() {
+      if (typeof this.anonymousFallback === "undefined") {
+        const parentValue = findParentItem(this.$parent,undefined,"$anonymousFallback");
+        if (typeof parentValue !== "undefined") {
+          return parentValue;
+        }
+        return this.$graphLayer.getOption("anonymousFallback");
+      }
+
+      return normalizeBoolean(this.anonymousFallback);
     },
 
     $theme() {
@@ -134,6 +152,13 @@ export default {
       set(value) {
         this.$loadError.error = value;
       }
+    },
+
+    $hasSession() {
+      const cookieId = this.$graphLayer.getOption("cookieId");
+      const sessionId = Cookies.get(cookieId);
+
+      return !!sessionId;
     }
   },
 
@@ -145,8 +170,7 @@ export default {
       this.$errorState = null;
 
       let promise;
-      const hasSession = this.$hasSession();
-      if (!hasSession && !this.$anonymous) {
+      if (!this.$hasSession && !this.$anonymous) {
         promise = Promise.reject({
           error: "Content Unavailable",
           message: "You are not signed into Microsoft Graph and cannot view this content.",
@@ -199,13 +223,6 @@ export default {
 
       modifyPromise(promise);
       return promise;
-    },
-
-    $hasSession() {
-      const cookieId = this.$graphLayer.getOption("cookieId");
-      const sessionId = Cookies.get(cookieId);
-
-      return !!sessionId;
     },
 
     $warn(message,...args) {

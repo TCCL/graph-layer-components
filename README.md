@@ -53,6 +53,8 @@ The Graph Layer server allows clients to issue so-called "anonymous" requests. S
 
 Anonymous requests are not enabled by default. You must configure the Graph Layer server and the library to enable anonymous requests. See the section on _Global Configuration_ below for more on how to configure anonymous requests in the library client.
 
+Each library component has an `anonymous` property that determines explicitly whether anonymous requests are used by that component; it only applies if the library is globally configured to perform anonymous requests. If this property is omitted, then the component will only use anonymous requests if `anonymousFallback` is `true` and the user does not have a valid Graph Layer session. The global `anonymousFallback` property applies when no component-level `anonymousFallback` property is provided.
+
 ### Using as a Vue.js component library
 
 To use the library in your Vue.js application, import the library and register the components. This allows you to access the components globally.
@@ -139,7 +141,7 @@ Explanation of available configuration properties:
 | `theme` | The theme class to apply to themeable components | `default` |
 | `anonymousAppId` | Configures the Graph layer application ID to use in anonymous requests; these also enables anonymous requests | - |
 | `anonymousHeader` | Configures the HTTP header name used to indicate an anonymous request to the server. | `X-Graph-Layer-Anonymous` |
-| `preferAnonymous` | Determines whether components enable anonymous requests by default when no `anonymous` property is provided.  | `false` |
+| `anonymousFallback` | Determines whether components enable anonymous requests by default when no `anonymous` property is provided and the user has no session.  | `false` |
 
 ## Components
 
