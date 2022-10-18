@@ -17,13 +17,7 @@
       </div>
     </div>
 
-    <list-content
-      v-if="ready"
-      :class="$style['graph-layer-list__content']"
-      :endpoint="endpoint"
-      :columns="selectedColumns"
-      :limit="limit"
-      />
+    <component v-if="ready" v-bind="content" />
   </graph-layer-wrapper>
 </template>
 
@@ -41,10 +35,6 @@
       LoadErrorMixin
     ],
 
-    components: {
-      ListContent
-    },
-
     data: () => ({
       listInfo: {},
       columnInfo: {}
@@ -56,12 +46,27 @@
         default: "{}"
       },
 
+      id: {
+        type: String,
+        default: ""
+      },
+
+      siteId: {
+        type: String,
+        default: ""
+      },
+
       columns: {
         type: [String,Array],
         default: ""
       },
 
       overrideLabel: {
+        type: String,
+        default: ""
+      },
+
+      listType: {
         type: String,
         default: ""
       },
@@ -89,16 +94,6 @@
 
       selectedColumns() {
         let columns = [];
-        if (this.parsedValue) {
-          if (Array.isArray(this.parsedValue.c)) {
-            columns = this.parsedValue.c;
-          }
-          else if (Array.isArray(this.parsedValue.cs)) {
-            // NOTE: this maintains backwards compatibility with previous storage
-            // key.
-            columns = this.parsedValue.cs;
-          }
-        }
 
         if (Array.isArray(this.columns)) {
           columns = this.columns;
@@ -120,6 +115,16 @@
             this.$warn("cannot parse 'columns' property");
           }
         }
+        else if (this.parsedValue) {
+          if (Array.isArray(this.parsedValue.c)) {
+            columns = this.parsedValue.c;
+          }
+          else if (Array.isArray(this.parsedValue.cs)) {
+            // NOTE: this maintains backwards compatibility with previous storage
+            // key.
+            columns = this.parsedValue.cs;
+          }
+        }
 
         const result = [];
         for (let i = 0;i < columns.length;++i) {
@@ -136,9 +141,31 @@
         return this.selectedColumns.length > 0;
       },
 
+      selectedId() {
+        if (this.id) {
+          return this.id;
+        }
+        if (this.parsedValue && this.parsedValue.i) {
+          return this.parsedValue.i;
+        }
+
+        return false;
+      },
+
+      selectedSiteId() {
+        if (this.siteId) {
+          return this.siteId;
+        }
+        if (this.parsedValue && this.parsedValue.p) {
+          return this.parsedValue.p;
+        }
+
+        return false;
+      },
+
       endpoint() {
-        if (this.parsedValue) {
-          return "/sites/" + this.parsedValue.p + "/lists/" + this.parsedValue.i;
+        if (this.selectedId && this.selectedSiteId) {
+          return "/sites/" + this.selectedSiteId + "/lists/" + this.selectedId;
         }
 
         return false;
@@ -150,6 +177,33 @@
         }
 
         return this.listInfo.displayName;
+      },
+
+      selectedListType() {
+        if (this.listType) {
+          return this.listType;
+        }
+        if (this.parsedValue && this.parsedValue.l) {
+          return this.parsedValue.l;
+        }
+
+        return "generic";
+      },
+
+      content() {
+        switch (this.selectedListType) {
+
+        default:
+          break;
+        }
+
+        return {
+          is: ListContent,
+          "class": this.$style["graph-layer-list__content"],
+          endpoint: this.endpoint,
+          columns: this.selectedColumns,
+          limit: this.limit
+        };
       },
 
       limit() {

@@ -210,10 +210,12 @@ The _DriveBrowser_ component is used to browse and select a drive (i.e. document
 | Property Name | Description |
 | -- | -- |
 | `value` | The serialized list value. (This value can be obtained via a ListBrowser.) |
+| `id` | The ID of the list to query and render. |
+| `siteId` | The ID of the list's parent site. |
 | `columns` | List of columns to load by ID or Name. (This overrides any columns specified via `value`.) |
 | `overrideLabel` | Title label to render in place of list name. |
+| `listType` | The type of list to render. (e.g. "generic" or "events") |
 | `top` | Determines the number of items shown per page |
-
 
 ### List Browser
 
