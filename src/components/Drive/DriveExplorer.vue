@@ -266,9 +266,13 @@
 <style module>
   .entry-wrapper {
     border-bottom: 1px solid var(--graph-layer-drive-row-border-color);
+    padding: 0.25em 0;
   }
   .entry-wrapper:last-child {
     border-bottom: none;
+  }
+  .entry-wrapper:hover {
+    background-color: var(--graph-layer-drive-item-selected-background-color);
   }
 
   .empty {

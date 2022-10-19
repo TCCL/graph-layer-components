@@ -53,9 +53,6 @@
     display: flex;
     flex-flow: row nowrap;
   }
-  .graph-layer-drive-folder-entry:hover {
-    background-color: var(--graph-layer-drive-item-selected-background-color);
-  }
 
   .graph-layer-drive-folder-entry > .navigate {
     flex: 6 0;
