@@ -26,6 +26,7 @@
   import LoadErrorMixin from "../../core/mixins/LoadErrorMixin.js";
 
   import ListContent from "./ListContent.vue";
+  import EventListContent from "./EventListContent.vue";
 
   export default {
     name: "GraphLayerList",
@@ -58,6 +59,11 @@
 
       columns: {
         type: [String,Array],
+        default: ""
+      },
+
+      config: {
+        type: [String,Object],
         default: ""
       },
 
@@ -137,8 +143,41 @@
         return result;
       },
 
+      selectedConfig() {
+        let config = null;
+
+        if (this.config && typeof this.config === "object") {
+          config = this.config;
+        }
+        else if (this.config) {
+          try {
+            const result = JSON.parse(this.config);
+            if (result && typeof result === "object") {
+              config = result;
+            }
+            else {
+              this.$warn("cannot parse 'config' property");
+            }
+          } catch (ex) {
+            this.$warn("cannot parse 'config' property");
+          }
+        }
+        else if (this.parsedValue) {
+          if (this.parsedValue.c && typeof this.parsedValue.c === "object") {
+            config = this.parsedValue.c;
+          }
+        }
+
+        return config;
+      },
+
       ready() {
-        return this.selectedColumns.length > 0;
+        switch (this.selectedListType) {
+        case "generic":
+          return this.selectedColumns.length > 0;
+        }
+
+        return true;
       },
 
       selectedId() {
@@ -192,7 +231,13 @@
 
       content() {
         switch (this.selectedListType) {
-
+        case "events":
+          return {
+            is: EventListContent,
+            "class": this.$style["graph-layer-list__content"],
+            endpoint: this.endpoint,
+            config: this.selectedConfig
+          };
         default:
           break;
         }
