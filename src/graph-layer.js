@@ -1,7 +1,6 @@
 // graph-layer.js
 
 import Vue from "vue";
-import extend from "extend";
 
 import * as Components from "./components";
 import globals from "./globals.js";
@@ -156,11 +155,24 @@ class GraphLayer {
    * @return {Promise}
    */
   fetchAnonymous(resource,_init) {
-    const init = extend({
-      headers: {
-        [this.getOption("anonymousHeader")]: this.getOption("anonymousAppId")
+    const init = _init || {};
+    const existingHeaders = (init || {})["headers"] || null;
+    const anonHeader = this.getOption("anonymousHeader");
+    const anonAppId = this.getOption("anonymousAppId");
+
+    if (existingHeaders) {
+      if (Headers && existingHeaders instanceof Headers) {
+        existingHeaders.set(anonHeader,anonAppId);
       }
-    },_init);
+      else {
+        existingHeaders[anonHeader] = anonAppId;
+      }
+    }
+    else {
+      init["existingHeaders"] = {
+        [anonHeader]: anonAppId
+      };
+    }
 
     return this.fetch(resource,init);
   }
