@@ -43,7 +43,7 @@
         <icon
           medium button
           i="arrow-left"
-          :class="{ disabled: !hasPrevPage }"
+          :disabled="!hasPrevPage"
           @click="previousPage"
           />
       </div>
@@ -52,7 +52,7 @@
         <icon
           medium button
           i="arrow-right"
-          :class="{ disabled: !hasNextPage }"
+          :disabled="!hasNextPage"
           @click="nextPage"
           />
       </div>

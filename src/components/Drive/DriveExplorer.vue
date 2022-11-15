@@ -28,7 +28,7 @@
           <icon
             medium button
             i="arrow-left"
-            :class="{ disabled: (page <= 0) }"
+            :disabled="page <= 0"
             @click="pageBack"
             />
         </div>
@@ -37,7 +37,7 @@
           <icon
             medium button
             i="arrow-right"
-            :class="{ disabled: (!hasNext) }"
+            :disabled="!hasNext"
             @click="pageForward"
             />
         </div>

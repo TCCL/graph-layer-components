@@ -30,7 +30,7 @@
           <icon
             medium button
             i="arrow-left"
-            :class="{ disabled: (pageNumber <= 0) }"
+            :disabled="pageNumber <= 0"
             @click="pageBack"
             />
         </div>
@@ -39,7 +39,7 @@
           <icon
             medium button
             i="arrow-right"
-            :class="{ disabled: (!hasNextPage) }"
+            :disabled="!hasNextPage"
             @click="pageForward"
             />
         </div>
