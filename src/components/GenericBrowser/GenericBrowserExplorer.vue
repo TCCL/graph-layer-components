@@ -44,7 +44,7 @@
           medium button
           i="arrow-left"
           :disabled="!hasPrevPage"
-          @click="previousPage"
+          @click.stop="previousPage"
           />
       </div>
 
@@ -53,7 +53,7 @@
           medium button
           i="arrow-right"
           :disabled="!hasNextPage"
-          @click="nextPage"
+          @click.stop="nextPage"
           />
       </div>
     </div>

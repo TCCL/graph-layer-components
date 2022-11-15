@@ -40,6 +40,19 @@
         classes.push(context.$style.disabled);
       }
 
+      let on = context.listeners;
+      if (context.props.button) {
+        on = Object.assign({},on || {});
+
+        const mousedownOriginal = on.mousedown;
+        on.mousedown = ($event) => {
+          if (typeof mousedownOriginal === "function") {
+            mousedownOriginal($event);
+          }
+          $event.preventDefault();
+        };
+      }
+
       const e = h("i",{
         domProps: {
           innerHTML: getIconSvg(context.props.i)
@@ -48,7 +61,7 @@
         "class": classes,
         attrs: context.data.attrs,
         style: context.data.style,
-        on: context.listeners
+        on
       });
 
       return e;

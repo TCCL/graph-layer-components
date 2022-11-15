@@ -31,7 +31,7 @@
             medium button
             i="arrow-left"
             :disabled="pageNumber <= 0"
-            @click="pageBack"
+            @click.stop="pageBack"
             />
         </div>
 
@@ -40,7 +40,7 @@
             medium button
             i="arrow-right"
             :disabled="!hasNextPage"
-            @click="pageForward"
+            @click.stop="pageForward"
             />
         </div>
       </div>

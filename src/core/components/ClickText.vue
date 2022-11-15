@@ -1,5 +1,5 @@
 <template>
-  <a :class="classes" :title="title" v-on:click="onClick"><slot></slot></a>
+  <a :class="classes" :title="title" v-on:click.stop="onClick" @mousedown.prevent><slot></slot></a>
 </template>
 
 <script>

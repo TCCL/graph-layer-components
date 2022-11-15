@@ -29,7 +29,7 @@
             medium button
             i="arrow-left"
             :disabled="page <= 0"
-            @click="pageBack"
+            @click.stop="pageBack"
             />
         </div>
 
@@ -38,7 +38,7 @@
             medium button
             i="arrow-right"
             :disabled="!hasNext"
-            @click="pageForward"
+            @click.stop="pageForward"
             />
         </div>
       </div>
