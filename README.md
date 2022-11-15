@@ -41,9 +41,15 @@ See the sections below for in-depth discussion of various usage topics.
 
 ### Sizing of components
 
-In general, each component is designed to work as a child of a column-oriented flexbox element. For convenience, the library provides the global CSS class `graph-layer` to use for parent elements. It is up to you as the library user to ensure this parent element is correctly sized (especially vertically) according to your needs. A component will always set its `flex-grow` property to `1` and its `flex-shrink` property to `0`. (This behavior makes it flow into the remaining space assuming all sibling elements have `flex-grow` set to the default of `0`.)
+In general, each component is designed to work within any size parent container. By default, the component will grow/shrink in height depending on how much content it renders.
 
-Graph Layer components are designed to render well at any size (within reason). A component will overflow with scroll if its content extends past the parent element.
+#### Fixed-height components
+
+Each component is designed to also work within a fixed-height parent container. In the case of a fixed-height component, subdivisions of the component content will overflow logically. For example, a Drive component will overflow the subdivision that renders the file listing entries while the header subdivision remains fixed in place. In this way, a component functions as a widget within a fixed area of the page.
+
+To implement fixed-height components, you must create a column-oriented flexbox parent element. This element will have a fixed height of your choosing. As a convenience, the library provides the global CSS class `graph-layer` for this purpose.
+
+> It is a good idea to assign the `graph-layer` class to a parent element in all cases. It works for both fixed-height and dynamic-height parent containers. If the height styling of the parent container changes from dynamic to fixed, the presence of the `graph-layer` class will automatically ensure the component works as expected in the fixed case.
 
 ### Anonymous Requests
 

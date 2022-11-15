@@ -3,8 +3,8 @@
     tag="div"
     name="graph-layer-wrapper-fade"
     :class="[
-      (props.scroll ? $style.scroll : ''),
-      $style['graph-layer-wrapper']
+      $style['graph-layer-wrapper'],
+      (props.scroll ? $style['graph-layer-wrapper--scroll'] : '')
      ]">
 
     <loading-state
@@ -25,8 +25,8 @@
       key="content"
       v-show="!props.loadingState && !props.errorState"
       :class="[
-        $style['graph-layer-content'],
-        (props.justifyAround ? $style['justify-around'] : ''),
+        $style['graph-layer-wrapper__content'],
+        (props.justifyAround ? $style['graph-layer-wrapper__content--justify-around'] : ''),
         data.staticClass,
         data.class
        ]"
@@ -91,7 +91,7 @@
     overflow: hidden;
     flex: 1 0;
     display: flex;
-    flex-flow: column nowrap;
+    flex-flow: row nowrap;
     position: relative;
   }
 
@@ -99,18 +99,18 @@
     color: var(--graph-layer-anchor-color);
   }
 
-  .graph-layer-wrapper > .graph-layer-content {
+  .graph-layer-wrapper__content {
     overflow: hidden;
     flex: 1 0;
     display: flex;
     justify-content: flex-start;
     flex-flow: column nowrap;
   }
-  .graph-layer-wrapper.scroll > .graph-layer-content {
+  .graph-layer-wrapper--scroll > .graph-layer-wrapper__content {
     overflow: auto;
     flex: 1 0 1px;
   }
-  .graph-layer-wrapper > .graph-layer-content.justify-around {
+  .graph-layer-wrapper__content--justify-around {
     justify-content: space-around;
   }
 </style>

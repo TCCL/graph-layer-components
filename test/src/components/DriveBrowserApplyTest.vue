@@ -72,6 +72,9 @@
 </script>
 
 <style scoped>
+  .drive-browser-apply-test {
+    height: 100%;
+  }
   .top-section {
     display: flex;
     margin-bottom: 2em;

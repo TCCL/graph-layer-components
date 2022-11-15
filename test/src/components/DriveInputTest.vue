@@ -63,6 +63,10 @@
 </script>
 
 <style scoped>
+  .drive-input-test {
+    height: 100%;
+  }
+
   .controls {
     display: flex;
     justify-content: space-between;

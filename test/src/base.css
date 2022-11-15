@@ -18,11 +18,18 @@
   padding: 3%;
   height: 360px;
   max-height: 360px;
+  border: 2px solid #fafafa;
 }
 
 .testbed-wrapper > .region-wrapper > .region--large {
   max-height: 600px;
   height: 600px;
+}
+
+.testbed-wrapper > .region-wrapper > .region--auto {
+  height: auto;
+  max-height: initial;
+  min-height: 10vh;
 }
 
 .testbed-wrapper .input-test {
@@ -37,4 +44,5 @@
 
 .testbed-wrapper .form-test .graph-layer {
   flex: 1;
+  overflow: hidden;
 }
