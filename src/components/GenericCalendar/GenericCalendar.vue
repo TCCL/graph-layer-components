@@ -14,7 +14,7 @@
       </div>
     </div>
 
-    <calendar-view :class="$style['generic-calendar__view']" :date="windowDate" />
+    <calendar-view :class="$style['generic-calendar__view']" :date="windowDate" :events="events" />
   </div>
 </template>
 
@@ -66,7 +66,8 @@
       window: {
         year: getYear(now),
         month: getMonth(now)
-      }
+      },
+      events: []
     }),
 
     props: {
@@ -101,10 +102,21 @@
     },
 
     created() {
-
+      this.loadWindow();
     },
 
     methods: {
+      loadWindow() {
+        const startDate = setDate(this.windowDate,{ date:1 });
+        const endDate = addDate(startDate,ADD_MONTH);
+
+        this.queryEvents(startDate,endDate).then((result) => {
+          const { hasNext, items } = result;
+
+          this.events = items;
+        });
+      },
+
       navigatePrevious() {
         if (!this.canNavigatePrevious) {
           return;
