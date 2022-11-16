@@ -15,7 +15,7 @@
   import GraphLayerMixin from "../../core/mixins/GraphLayerMixin.js";
   import LoadErrorMixin from "../../core/mixins/LoadErrorMixin.js";
 
-  const DEFAULT_MAPPING = {
+  export const DEFAULT_MAPPING = {
     "title": "Title",
     "startDate": "EventDate",
     "endDate": "EndDate",

@@ -1,5 +1,6 @@
 <script>
   import GraphLayerGenericCalendar from "../GenericCalendar/GenericCalendar.vue";
+  import { DEFAULT_MAPPING } from "../ListBrowser/ListBrowserEventsConfigWidget.vue";
 
   import { extractQueryParam } from "../../core/helpers.js";
 
@@ -10,12 +11,21 @@
 
   function makeProvider(endpoint,config,$instance) {
     const cache = new Map();
+    const mapping = Object.assign({},config || {},DEFAULT_MAPPING);
 
     function getCacheEntry(key) {
       if (!cache.has(key)) {
         cache.set(key,{});
       }
       return cache.get(key);
+    }
+
+    function extractFields(item) {
+      const extracted = { "id":item.id };
+      for (const key in mapping) {
+        extracted[key] = item.fields[mapping[key]];
+      }
+      return extracted;
     }
 
     async function queryEvents(startDate,endDate,_page) {
@@ -34,13 +44,15 @@
         return cacheEntry.Items;
       }
 
-      let filterString = "fields/EventDate ge ";
-      filterString += "'" + startDate.toISOString() + "'";
-      filterString += " and fields/EventDate lt ";
-      filterString += "'" + endDate.toISOString() + "'";
+      const dateField = mapping.startDate;
+      const expandFields = Object.values(mapping).join(",");
 
-      let url = new URL(endpoint + "/items",window.location.origin);
+      let filterString = `fields/${dateField} ge '${startDate.toISOString()}'`;
+      filterString += ` and fields/${dateField} lt '${endDate.toISOString()}'`;
+
+      let url = new URL(`${endpoint}/items`,window.location.origin);
       url.searchParams.set("$filter",filterString);
+      url.searchParams.set("expand",`fields(select=${expandFields})`);
 
       if (cacheEntry.skipToken) {
         url.searchParams.set("$skiptoken",cacheEntry.skipToken);
@@ -51,7 +63,8 @@
       };
 
       return $instance.$fetchJson(url,init).then((payload) => {
-        cacheEntry.items = payload.value;
+        const extracted = payload.value.map(extractFields);
+        cacheEntry.items = extracted;
 
         const skipToken = extractQueryParam(payload["@data.nextLink"],"$skiptoken");
         if (skipToken) {
