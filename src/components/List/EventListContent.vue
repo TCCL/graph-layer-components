@@ -71,11 +71,14 @@
         return { items:cacheEntry.items, hasNextPage:cacheEntry.hasNextPage };;
       }
 
-      const dateField = mapping.startDate;
+      const startDateField = mapping.startDate;
+      const endDateField = mapping.endDate;
       const expandFields = Object.values(mapping).join(",");
 
-      let filterString = `fields/${dateField} ge '${startDate.toISOString()}'`;
-      filterString += ` and fields/${dateField} lt '${endDate.toISOString()}'`;
+      let filterString = `(fields/${startDateField} ge '${startDate.toISOString()}'`;
+      filterString += ` and fields/${startDateField} lt '${endDate.toISOString()}')`;
+      filterString += ` or (fields/${endDateField} ge '${startDate.toISOString()}'`;
+      filterString += ` and fields/${endDateField} lt '${endDate.toISOString()}')`;
 
       let url = new URL(`${endpoint}/items`,window.location.origin);
       url.searchParams.set("$filter",filterString);
