@@ -22,6 +22,11 @@
     </div>
   </div>
   <div class="region-wrapper region-wrapper--large">
+    <div class="region region--large">
+      <div data-graph-layer="listBrowserInputTest" data-graph-layer--list-type="events"></div>
+    </div>
+  </div>
+  <div class="region-wrapper region-wrapper--large">
     <div class="region region--auto">
       <div data-graph-layer="listBrowserInputTest"></div>
     </div>

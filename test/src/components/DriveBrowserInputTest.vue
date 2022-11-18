@@ -1,7 +1,7 @@
 <template>
   <div class="graph-layer input-test drive-browser-input-test">
     <div class="top-section">
-      <input type="text" v-model="driveValue" readonly>
+      <input type="text" v-model="driveValue">
       <button v-if="!commit" @click="commit = true" :disabled="!hasValue">Render</button>
       <button v-else @click="reset">Clear</button>
     </div>

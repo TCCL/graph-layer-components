@@ -1,5 +1,5 @@
 20px<template>
-  <div :class="$style['calendar-view']">
+  <div :class="[$style['calendar-view'],classes]">
     <div :class="$style['calendar-view__dow']">
       <div v-for="dow in dowList" :class="$style['calendar-view-dow']">
         <span :class="$style['calendar-view-dow__text']">{{ dow.label }}</span>
@@ -106,22 +106,26 @@
         return backupDate(dt,this.dowList[0].index);
       },
 
+      nweeks() {
+        const ndays = getDaysInMonth(this.date);
+        const nweeks = Math.ceil((ndays + getDay(this.date))  / 7);
+        return nweeks;
+      },
+
       entries() {
         let dt;
         const entries = [];
-        const ndays = getDaysInMonth(this.date);
-        const nweeks = Math.ceil((ndays + getDay(this.date))  / 7);
 
         // Generate week entries that will render events.
         dt = toDate(this.startDate);
-        for (let i = 1;i <= nweeks;++i) {
-          entries.push({ is:CalendarWeek, week:i, events:this.events, date:dt });
+        for (let i = 1;i <= this.nweeks;++i) {
+          entries.push({ is:CalendarWeek, week:i, events:this.events, startDate:dt });
           dt = addDate(dt,{ days:7 });
         }
 
         // Generate calendar date label entries.
         dt = toDate(this.startDate);
-        for (let i = 1;i <= nweeks;++i) {
+        for (let i = 1;i <= this.nweeks;++i) {
           for (let j = 1;j <= 7;++j) {
             const label = getDate(dt).toString();
             const style = {};
@@ -134,6 +138,12 @@
         }
 
         return entries;
+      },
+
+      classes() {
+        const cls = [];
+        cls.push(this.$style[`calendar-view--${this.nweeks}-weeks`]);
+        return cls;
       }
     },
 
@@ -151,6 +161,14 @@
   .calendar-view {
     display: grid;
     grid-template-columns: repeat(7,1fr);
+  }
+  .calendar-view--4-weeks {
+    grid-template-rows: 20px 20px 1fr 20px 1fr 20px 1fr 20px 1fr;
+  }
+  .calendar-view--5-weeks {
+    grid-template-rows: 20px 20px 1fr 20px 1fr 20px 1fr 20px 1fr 20px 1fr;
+  }
+  .calendar-view--6-weeks {
     grid-template-rows: 20px 20px 1fr 20px 1fr 20px 1fr 20px 1fr 20px 1fr 20px 1fr;
   }
 

@@ -1,7 +1,7 @@
 <template>
   <div class="graph-layer input-test list-browser-input-test">
     <div class="top-section">
-      <input type="text" v-model="listValue" readonly>
+      <input type="text" v-model="listValue">
       <button v-if="!commit" @click="commit = true" :disabled="!hasValue">Render</button>
       <button v-else @click="reset">Clear</button>
     </div>
