@@ -14,7 +14,7 @@
       </div>
     </div>
 
-    <calendar-view :class="$style['generic-calendar__view']" :date="windowDate" :events="events" />
+    <calendar-view v-if="hasEvents" :class="$style['generic-calendar__view']" :date="windowDate" :events="events" />
   </div>
 </template>
 
@@ -67,7 +67,7 @@
         year: getYear(now),
         month: getMonth(now)
       },
-      events: []
+      events: null
     }),
 
     props: {
@@ -81,15 +81,14 @@
 
       canNavigatePrevious() {
         const dt = addDate(this.windowDate,SUBTRACT_MONTH);
-
         return dateIsAfter(dt,EPOCH);
       },
 
       canNavigateNext() {
-        const now = setDate(Date.now(),SET_NORMAL_WINDOW);
-        const dt = addDate(this.windowDate,ADD_MONTH);
-
-        return !dateIsAfter(dt,now);
+        //const now = setDate(Date.now(),SET_NORMAL_WINDOW);
+        //const dt = addDate(this.windowDate,ADD_MONTH);
+        //return !dateIsAfter(dt,now);
+        return true;
       },
 
       windowDate() {
@@ -98,6 +97,10 @@
 
       windowDateDisplay() {
         return formatDate(this.windowDate,"MMMM yyyy");
+      },
+
+      hasEvents() {
+        return Array.isArray(this.events);
       }
     },
 
@@ -110,8 +113,9 @@
         const startDate = setDate(this.windowDate,{ date:1 });
         const endDate = addDate(startDate,ADD_MONTH);
 
+        this.events = null;
         this.queryEvents(startDate,endDate).then((result) => {
-          const { hasNext, items } = result;
+          const { hasNextPage, items } = result;
 
           this.events = items;
         });
@@ -125,6 +129,7 @@
         const dt = addDate(this.windowDate,SUBTRACT_MONTH);
         this.window.year = getYear(dt);
         this.window.month = getMonth(dt);
+        this.loadWindow();
       },
 
       navigateNext() {
@@ -135,6 +140,7 @@
         const dt = addDate(this.windowDate,ADD_MONTH);
         this.window.year = getYear(dt);
         this.window.month = getMonth(dt);
+        this.loadWindow();
       }
     }
   };

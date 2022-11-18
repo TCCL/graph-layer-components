@@ -236,8 +236,7 @@
             is: EventListContent,
             "class": this.$style["graph-layer-list__content"],
             endpoint: this.endpoint,
-            config: this.selectedConfig,
-            $instance: this
+            config: this.selectedConfig
           };
         default:
           break;

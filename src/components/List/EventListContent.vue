@@ -1,9 +1,25 @@
+<template>
+  <graph-layer-wrapper
+    :loading-state="$loadingState"
+    :error-state="$errorState"
+    :class="$style['event-list-content-wrapper']"
+    scroll
+    >
+    <graph-layer-generic-calendar
+      :class="$style['event-list-content']"
+      :event-provider="eventProvider"
+      />
+  </graph-layer-wrapper>
+</template>
+
 <script>
   import parseISO from "date-fns/parseISO";
 
   import GraphLayerGenericCalendar from "../GenericCalendar/GenericCalendar.vue";
   import { DEFAULT_MAPPING } from "../ListBrowser/ListBrowserEventsConfigWidget.vue";
 
+  import GraphLayerMixin from "../../core/mixins/GraphLayerMixin.js";
+  import LoadErrorMixin from "../../core/mixins/LoadErrorMixin.js";
   import { extractQueryParam } from "../../core/helpers.js";
 
   function makeCacheKey(startDate,endDate,page) {
@@ -13,7 +29,7 @@
 
   function makeProvider(endpoint,config,$instance) {
     const cache = new Map();
-    const mapping = Object.assign({},config || {},DEFAULT_MAPPING);
+    const mapping = Object.assign({},DEFAULT_MAPPING,config || {});
 
     function getCacheEntry(key) {
       if (!cache.has(key)) {
@@ -52,7 +68,7 @@
       };
 
       if (cacheEntry.items) {
-        return cacheEntry.Items;
+        return { items:cacheEntry.items, hasNextPage:cacheEntry.hasNextPage };;
       }
 
       const dateField = mapping.startDate;
@@ -76,6 +92,7 @@
       return $instance.$fetchJson(url,init).then((payload) => {
         const extracted = payload.value.map(extractFields);
         cacheEntry.items = extracted;
+        cacheEntry.hasNextPage = !!cacheEntry.skipToken;
 
         const skipToken = extractQueryParam(payload["@data.nextLink"],"$skiptoken");
         if (skipToken) {
@@ -84,7 +101,7 @@
           nextCacheEntry.skipToken = skipToken;
         }
 
-        return { items: cacheEntry.items, hasNextPage: !!cacheEntry.skipToken };
+        return { items:cacheEntry.items, hasNextPage:cacheEntry.hasNextPage };
       });
     }
 
@@ -93,7 +110,19 @@
 
   export default {
     name: "EventListContent",
-    functional: true,
+
+    mixins: [
+      GraphLayerMixin,
+      LoadErrorMixin
+    ],
+
+    components: {
+      GraphLayerGenericCalendar
+    },
+
+    data: () => ({
+
+    }),
 
     props: {
       endpoint: String,
@@ -101,36 +130,28 @@
       $instance: Object
     },
 
-    render(createElem,context) {
-      const classes = [context.$style["event-list-content"]];
-      if (context.data.class) {
-        classes.push(context.data.class);
+    computed: {
+      eventProvider() {
+        return makeProvider(this.endpoint,this.config,this);
       }
+    },
 
-      const data = {
-          "class": classes,
-          props: {
-            eventProvider: makeProvider(
-              context.props.endpoint,
-              context.props.config,
-              context.props.$instance
-            )
-          },
-          style: context.data.style,
-          attrs: context.data.attrs,
-          on: context.data.on,
-          nativeOn: context.data.nativeOn
-      };
+    created() {
 
-      const el = createElem(GraphLayerGenericCalendar,data);
+    },
 
-      return el;
+    methods: {
+
     }
   };
 </script>
 
 <style module>
-  .event-list-content {
+  .event-list-content-wrapper {
 
+  }
+
+  .event-list-content {
+    flex: 1;
   }
 </style>

@@ -47,7 +47,8 @@
       },
 
       endDate() {
-        return addDate(this.startDate,{ weeks:1 });
+        // NOTE: Subtract off a second so that the end date is inclusive.
+        return addDate(this.startDate,{ weeks:1, seconds:-1 });
       },
 
       eventsForWeek() {
