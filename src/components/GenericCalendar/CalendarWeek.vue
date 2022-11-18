@@ -12,13 +12,29 @@
 
 <script>
   import addDate from "date-fns/add";
+  import setDate from "date-fns/set";
   import getDay from "date-fns/getDay";
+  import compareAsc from "date-fns/compareAsc";
   import eachDayOfInterval from "date-fns/eachDayOfInterval";
   import areIntervalsOverlapping from "date-fns/areIntervalsOverlapping";
   import getOverlappingDaysInIntervals from "date-fns/getOverlappingDaysInIntervals";
   import isWithinInterval from "date-fns/isWithinInterval";
 
   import CalendarEvent from "./CalendarEvent.vue";
+
+  const NORMAL_START_DATE = {
+    hours: 0,
+    minutes: 0,
+    seconds: 0,
+    milliseconds: 0
+  };
+
+  const NORMAL_END_DATE = {
+    hours: 23,
+    minutes: 59,
+    seconds: 59,
+    milliseconds: 999
+  };
 
   export default {
     name: "CalendarWeek",
@@ -62,8 +78,10 @@
         for (let i = 0;i < this.events.length;++i) {
           const event = this.events[i];
           const eventInterval = {
-            start: event.startDate,
-            end: event.endDate
+            // Normalize event interval date components so that overlap is
+            // detected with granularity no finer than day.
+            start: setDate(event.startDate,NORMAL_START_DATE),
+            end: setDate(event.endDate,NORMAL_END_DATE)
           };
 
           if (areIntervalsOverlapping(weekInterval,eventInterval)) {
@@ -96,7 +114,14 @@
         }
 
         // Sort events by duration in descending order.
-        events.sort((a,b) => b.duration - a.duration);
+        events.sort((a,b) => {
+          const n = b.duration - a.duration;
+          if (n != 0) {
+            return n;
+          }
+
+          return compareAsc(a.interval.start,b.interval.start);
+        });
 
         // Assign row line numbers.
         for (let i = 0;i < events.length;++i) {
