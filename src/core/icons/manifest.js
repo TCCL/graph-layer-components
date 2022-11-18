@@ -13,6 +13,7 @@ import personSvg from "./person.svg";
 import peopleSvg from "./people.svg";
 import globeSvg from "./globe.svg";
 import listSvg from "./list.svg";
+import closeOutlineSvg from "./close-outline.svg";
 
 export default function (iconId) {
   switch (iconId) {
@@ -40,6 +41,8 @@ export default function (iconId) {
     return globeSvg;
   case "list":
     return listSvg;
+  case "close-outline":
+    return closeOutlineSvg;
   }
 
   return errorSvg;
