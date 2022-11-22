@@ -162,6 +162,7 @@
     display: grid;
     grid-template-columns: repeat(7,1fr);
     grid-auto-rows: 24px;
+    padding-top: 4px;
   }
 
   .calendar-week__event {

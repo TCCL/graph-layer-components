@@ -1,4 +1,4 @@
-20px<template>
+<template>
   <div :class="[$style['calendar-view'],classes]">
     <div :class="$style['calendar-view__dow']">
       <div v-for="dow in dowList" :class="$style['calendar-view-dow']">
