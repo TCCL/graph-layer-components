@@ -123,18 +123,33 @@
           return compareAsc(a.interval.start,b.interval.start);
         });
 
-        // Assign row line numbers.
-        for (let i = 0;i < events.length;++i) {
-          const event = events[i];
+        // Assign row numbers such that no two events overlap.
+        let n = 1;
+        while (true) {
+          let overlaps = 0;
 
-          // Push down any other events whose interval overlap.
-          for (let j = i+1;j < events.length;++j) {
-            if (events[j].row == event.row
-                && areIntervalsOverlapping(events[j].interval,event.interval))
-            {
-              events[j].row += 1;
+          for (let i = 0;i < events.length;++i) {
+            const event = events[i];
+            if (event.row != n) {
+              continue;
+            }
+
+            // Push down any other events whose interval overlap.
+            for (let j = i+1;j < events.length;++j) {
+              if (events[j].row == event.row
+                  && areIntervalsOverlapping(events[j].interval,event.interval))
+              {
+                events[j].row += 1;
+                overlaps += 1;
+              }
             }
           }
+
+          if (overlaps == 0) {
+            break;
+          }
+
+          n += 1;
         }
 
         return events;
