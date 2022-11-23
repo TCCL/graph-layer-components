@@ -33,6 +33,7 @@ export default {
   input: "./test/src/main.js",
   output: {
     file: "test/public/test.js",
-    format: "umd"
+    format: "umd",
+    sourcemap: true
   }
 };
