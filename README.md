@@ -59,7 +59,7 @@ The Graph Layer server allows clients to issue so-called "anonymous" requests. S
 
 Anonymous requests are not enabled by default. You must configure the Graph Layer server and the library to enable anonymous requests. See the section on _Global Configuration_ below for more on how to configure anonymous requests in the library client.
 
-Each library component has an `anonymous` property that determines explicitly whether anonymous requests are used by that component; it only applies if the library is globally configured to perform anonymous requests. If this property is omitted, then the component will only use anonymous requests if `anonymousFallback` is `true` and the user does not have a valid Graph Layer session. The global `anonymousFallback` property applies when no component-level `anonymousFallback` property is provided.
+Each library component has an `anonymous` property that determines when anonymous requests are used. If this property is set to `fallback`, then the component will enable anonymous requests based on the `anonymousFallback` library option. (Note that `fallback` is the default value.) Otherwise the property either enables or disables anonymous requests explicitly via a truthy value (e.g. "off" or "enable").
 
 ### Using as a Vue.js component library
 
@@ -134,7 +134,7 @@ Explanation of attributes:
 
 > When substituting `PROP` for a property name, make sure to convert a camel case property name to a hyphenated property name. Example: `propertyName` becomes `property-name`.
 
-### Global Configuration
+### Library Options
 
 The library has a few configuration options that are globally configured. You set these on the `GraphLayer` instance via the `setOption` method.
 

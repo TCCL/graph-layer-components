@@ -55,12 +55,7 @@ export default {
 
     anonymous: {
       type: [Boolean,Number,String],
-      default: undefined
-    },
-
-    anonymousFallback: {
-      type: [Boolean,Number,String],
-      default: undefined
+      default: "fallback"
     }
   },
 
@@ -86,28 +81,19 @@ export default {
         return false;
       }
 
-      if (typeof this.anonymous === "undefined") {
+      // If fallback is set, fall back on a parent component value (for nested
+      // components that make up a component implementation) or fall back on
+      // the global "anonymousFallback" library option.
+      if (this.anonymous === "fallback") {
         const parentValue = findParentItem(this.$parent,undefined,"$anonymous");
         if (typeof parentValue !== "undefined") {
           return parentValue;
         }
 
-        return !this.$hasSession && this.$anonymousFallback;
+        return !this.$hasSession && this.$graphLayer.getOption("anonymousFallback");
       }
 
       return normalizeBoolean(this.anonymous);
-    },
-
-    $anonymousFallback() {
-      if (typeof this.anonymousFallback === "undefined") {
-        const parentValue = findParentItem(this.$parent,undefined,"$anonymousFallback");
-        if (typeof parentValue !== "undefined") {
-          return parentValue;
-        }
-        return this.$graphLayer.getOption("anonymousFallback");
-      }
-
-      return normalizeBoolean(this.anonymousFallback);
     },
 
     $theme() {

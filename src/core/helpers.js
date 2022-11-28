@@ -13,9 +13,11 @@ function normalizeBoolean(value) {
     return value != 0;
   }
 
-  if (typeof value === "number") {
+  if (typeof value === "string") {
     const valueLower = value.toLowerCase();
     return valueLower !== "false"
+      && valueLower !== "disable"
+      && valueLower !== "disabled"
       && valueLower !== "off"
       && valueLower !== "0";
   }
