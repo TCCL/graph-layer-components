@@ -61,7 +61,12 @@ class GraphLayer {
       // Determines if an anonymous request is performed when the user does not
       // have a graph-layer session. This is the global default which may be
       // overridden at the component level.
-      anonymousFallback: false
+      anonymousFallback: false,
+
+      // Determines if a component hides its content/error message if the user
+      // cannot access the content. Note that other kinds of errors are still
+      // displayed.
+      hideContentAccessDenied: false
     });
 
     this.components = {};

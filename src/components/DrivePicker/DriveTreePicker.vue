@@ -11,8 +11,7 @@
 
     <graph-layer-wrapper
       v-if="active"
-      :loading-state="$loadingState"
-      :error-state="$errorState"
+      v-bind="$wrapperBind"
       >
       <div
         v-for="entry in staticEntries"

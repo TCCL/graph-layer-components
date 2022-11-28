@@ -1,7 +1,6 @@
 <template>
   <graph-layer-wrapper
-    :loading-state="$loadingState"
-    :error-state="$errorState"
+    v-bind="$wrapperBind"
     :class="[$themeClass,$style['graph-layer-list']]"
     >
     <div :class="$style['graph-layer-list__header']">

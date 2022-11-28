@@ -16,7 +16,7 @@
 
     <error-state
       key="error"
-      v-else-if="!props.loadingState && props.errorState"
+      v-else-if="!props.loadingState && props.errorState && !props.hideError"
       :error="props.errorState"
       :class="[data.staticClass,data.class]"
       />
@@ -53,6 +53,11 @@
       },
 
       hideLoading: {
+        type: Boolean,
+        default: false
+      },
+
+      hideError: {
         type: Boolean,
         default: false
       },

@@ -148,6 +148,7 @@ Explanation of available configuration properties:
 | `anonymousAppId` | Configures the Graph layer application ID to use in anonymous requests; these also enables anonymous requests | - |
 | `anonymousHeader` | Configures the HTTP header name used to indicate an anonymous request to the server. | `X-Graph-Layer-Anonymous` |
 | `anonymousFallback` | Determines whether components enable anonymous requests by default when no `anonymous` property is provided and the user has no session.  | `false` |
+| `hideContentAccessDenied` | Determines whether components hide content when access to content is denied | `false` |
 
 ## Components
 

@@ -6,8 +6,7 @@
     </div>
 
     <graph-layer-wrapper
-      :loading-state="$loadingState"
-      :error-state="$errorState"
+      v-bind="$wrapperBind"
       scroll
       >
       <div :class="$style['column-wrapper']">

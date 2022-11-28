@@ -47,6 +47,10 @@ export default {
     Icon
   },
 
+  data: () => ({
+    hideContentFlag: false
+  }),
+
   props: {
     graphLayer: {
       type: Object,
@@ -56,6 +60,11 @@ export default {
     anonymous: {
       type: [Boolean,Number,String],
       default: "fallback"
+    },
+
+    hideContentAccessDenied: {
+      type: [Boolean,Number,String],
+      default: "inherit"
     }
   },
 
@@ -74,6 +83,14 @@ export default {
       }
 
       return inst;
+    },
+
+    $wrapperBind() {
+      return {
+        "loading-state": this.$loadingState,
+        "error-state": this.$errorState,
+        "hide-error": this.$hideContentAccessDenied
+      };
     },
 
     $anonymous() {
@@ -145,6 +162,23 @@ export default {
       const sessionId = Cookies.get(cookieId);
 
       return !!sessionId;
+    },
+
+    $hideContentAccessDenied() {
+      let setting = this.hideContentAccessDenied;
+      if (setting == "inherit") {
+        setting = findParentItem(this.$parent,undefined,"hideContentAccessDenied");
+      }
+      if (typeof setting === "undefined" || setting == "inherit") {
+        setting = this.$graphLayer.getOption("hideContentAccessDenied");
+      }
+
+      const response = this.hideContentFlag;
+      if (normalizeBoolean(setting)) {
+        return response;
+      }
+
+      return false;
     }
   },
 
@@ -154,9 +188,11 @@ export default {
     $fetch(resource,init,ignoreError) {
       this.$loadingState = true;
       this.$errorState = null;
+      this.hideContentFlag = false;
 
       let promise;
       if (!this.$hasSession && !this.$anonymous) {
+        this.hideContentFlag = true;
         promise = Promise.reject({
           error: "Content Unavailable",
           message: "You are not signed into Microsoft Graph and cannot view this content.",
@@ -171,10 +207,18 @@ export default {
         }
         promise = promise.then((response) => {
           if (!response.ok) {
-            return response.json().then((payload) => Promise.reject({
-              code: response.status,
-              payload
-            }));
+            return response.json().then((payload) => {
+              switch (payload.error.code) {
+              case "accessDenied":
+                this.hideContentFlag = true;
+                break;
+              }
+
+              return Promise.reject({
+                code: response.status,
+                payload
+              });
+            });
           }
 
           this.$loadingState = false;
