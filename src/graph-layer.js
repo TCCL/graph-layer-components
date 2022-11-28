@@ -169,7 +169,7 @@ class GraphLayer {
       }
     }
     else {
-      init["existingHeaders"] = {
+      init["headers"] = {
         [anonHeader]: anonAppId
       };
     }
