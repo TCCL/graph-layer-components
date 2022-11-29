@@ -44,19 +44,19 @@
 
 <style module>
   .calendar-event {
-    background-color: var(--graph-layer-color-primary);
+    background-color: var(--graph-layer-calendar-view-event-background-color);
     display: flex;
     justify-content: center;
     align-items: center;
-    border: 2px solid var(--graph-layer-border-color);
+    border: 2px solid var(--graph-layer-calendar-view-event-border-color);
     cursor: pointer;
   }
   .calendar-event:hover {
-    background-color: var(--graph-layer-color-secondary);
+    background-color: var(--graph-layer-calendar-view-event-hover-background-color);
   }
 
   .calendar-event__text {
-    color: var(--graph-layer-color-background);
+    color: var(--graph-layer-calendar-view-event-text-color);
     font-size: 15px;
     white-space: nowrap;
     overflow: hidden;
