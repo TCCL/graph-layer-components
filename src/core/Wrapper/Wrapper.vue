@@ -9,7 +9,6 @@
 
     <loading-state
       key="loading"
-      data-
       v-if="props.loadingState && !props.hideLoading"
       :class="[data.staticClass,data.class]"
       />
@@ -24,13 +23,13 @@
     <div
       key="content"
       v-show="!props.loadingState && !props.errorState"
+      v-bind="data.attrs"
       :class="[
         $style['graph-layer-wrapper__content'],
         (props.justifyAround ? $style['graph-layer-wrapper__content--justify-around'] : ''),
         data.staticClass,
         data.class
        ]"
-      v-bind="data.attrs"
       >
       <slot />
     </div>
