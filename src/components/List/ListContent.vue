@@ -1,7 +1,6 @@
 <template>
   <graph-layer-wrapper
-    :loading-state="$loadingState"
-    :error-state="$errorState"
+    v-bind="$wrapperBind"
     :class="$style['list-content']"
     scroll
     >
@@ -30,8 +29,8 @@
           <icon
             medium button
             i="arrow-left"
-            :class="{ disabled: (pageNumber <= 0) }"
-            @click="pageBack"
+            :disabled="pageNumber <= 0"
+            @click.stop="pageBack"
             />
         </div>
 
@@ -39,8 +38,8 @@
           <icon
             medium button
             i="arrow-right"
-            :class="{ disabled: (!hasNextPage) }"
-            @click="pageForward"
+            :disabled="!hasNextPage"
+            @click.stop="pageForward"
             />
         </div>
       </div>

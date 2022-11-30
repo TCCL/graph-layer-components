@@ -1,7 +1,6 @@
 <template>
   <graph-layer-wrapper
-    :loading-state="$loadingState"
-    :error-state="$errorState"
+    v-bind="$wrapperBind"
     :class="[$themeClass,$style['graph-layer-drive']]"
     >
     <div :class="$style['title-region']">
@@ -126,7 +125,7 @@
       },
 
       meValue() {
-        if (this.string2boolean(this.me)) {
+        if (this.normalizeBoolean(this.me)) {
             return true;
         }
 

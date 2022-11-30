@@ -32,6 +32,14 @@ export default {
 
       return JSON.stringify(repr);
     },
+
+    storageType() {
+      return this.storage.type;
+    },
+
+    storageId() {
+      return this.storage.id;
+    }
   },
 
   created() {

@@ -14,12 +14,12 @@
     </div>
   </div>
   <div class="region-wrapper">
-    <div class="region region--large graph-layer">
+    <div class="region region--large">
       <div data-graph-layer="driveBrowserApplyTest"></div>
     </div>
   </div>
   <div class="region-wrapper">
-    <div class="region region--large graph-layer">
+    <div class="region region--large">
       <div data-graph-layer="driveBrowserInputTest"></div>
     </div>
   </div>
@@ -48,6 +48,19 @@
         <div>
           <input type="submit" value="Submit">
         </div>
+    </div>
+  </div>
+  <div class="region-wrapper region-wrapper--large">
+    <div class="region region--auto graph-layer">
+      <div
+        data-graph-layer="driveBrowser"
+        data-graph-layer--title="Drive Browser (Auto Height)"
+        data-graph-layer--browse-users="1"
+        data-graph-layer--browse-guests="1"
+        data-graph-layer--browse-me="1"
+        data-graph-layer--browse-groups="1"
+        data-graph-layer--browse-sites="1"
+        data-graph-layer--browse-followed-sites="1"></div>
     </div>
   </div>
 </div>

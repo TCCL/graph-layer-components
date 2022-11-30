@@ -10,6 +10,13 @@
   </div>
   <div class="region-wrapper">
     <div class="region graph-layer">
+      <div><b>Me (Anonymous)</b></div>
+      <hr>
+      <div data-graph-layer="user" data-graph-layer--anonymous="yes" data-graph-layer--me="1"></div>
+    </div>
+  </div>
+  <div class="region-wrapper">
+    <div class="region graph-layer">
       <div data-graph-layer="userInputTest"></div>
     </div>
   </div>

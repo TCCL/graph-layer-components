@@ -6,20 +6,31 @@ import globals from "../../globals.js";
 import * as WrapperComponents from "../Wrapper";
 import * as coreComponents from "../components";
 import Icon from "../icons";
-import { nop, string2boolean } from "../helpers.js";
+import { nop, normalizeBoolean } from "../helpers.js";
 
-function findParentItem($parent,key,subkey,undef) {
+function findParentItem($parent,undef,...keys) {
   if (!$parent) {
-    return null;
+    return undef;
   }
 
-  if (key in $parent && subkey in $parent[key]) {
-    if ($parent[key][subkey] !== undef) {
-      return $parent[key][subkey];
+  let i = 0;
+  let bucket = $parent;
+  while (bucket && i < keys.length) {
+    const key = keys[i];
+    if (typeof bucket === "object" && key in bucket) {
+      bucket = bucket[key];
     }
+    else {
+      bucket = undef;
+    }
+    i += 1;
   }
 
-  return findParentItem($parent.$parent,key,subkey,undef);
+  if (bucket === undef) {
+    return findParentItem($parent.$parent,undef,...keys);
+  }
+
+  return bucket;
 }
 
 function modifyPromise(promise) {
@@ -36,26 +47,35 @@ export default {
     Icon
   },
 
+  data: () => ({
+    hideContentFlag: false
+  }),
+
   props: {
     graphLayer: {
       type: Object,
       default: null
     },
 
-    shared: {
-      type: [Boolean,String],
-      default: false
+    anonymous: {
+      type: [Boolean,Number,String],
+      default: "fallback"
+    },
+
+    hideContentAccessDenied: {
+      type: [Boolean,Number,String],
+      default: "inherit"
     }
   },
 
   filters: {
-    string2boolean
+    normalizeBoolean
   },
 
   computed: {
     $graphLayer() {
       const inst = this.graphLayer
-            || findParentItem(this.$parent,"$props","graphLayer",null)
+            || findParentItem(this.$parent,null,"$props","graphLayer")
             || globals.graphLayer;
 
       if (!inst) {
@@ -63,6 +83,34 @@ export default {
       }
 
       return inst;
+    },
+
+    $wrapperBind() {
+      return {
+        "loading-state": this.$loadingState,
+        "error-state": this.$errorState,
+        "hide-error": this.$hideContentAccessDenied
+      };
+    },
+
+    $anonymous() {
+      if (!this.$graphLayer.isAnonymousEnabled()) {
+        return false;
+      }
+
+      // If fallback is set, fall back on a parent component value (for nested
+      // components that make up a component implementation) or fall back on
+      // the global "anonymousFallback" library option.
+      if (this.anonymous === "fallback") {
+        const parentValue = findParentItem(this.$parent,undefined,"$anonymous");
+        if (typeof parentValue !== "undefined") {
+          return parentValue;
+        }
+
+        return !this.$hasSession && this.$graphLayer.getOption("anonymousFallback");
+      }
+
+      return normalizeBoolean(this.anonymous);
     },
 
     $theme() {
@@ -78,7 +126,7 @@ export default {
         return this.$data.loadError;
       }
 
-      const result = findParentItem(this.$parent,"$data","loadError");
+      const result = findParentItem(this.$parent,undefined,"$data","loadError");
       if (result) {
         return result;
       }
@@ -107,30 +155,70 @@ export default {
       set(value) {
         this.$loadError.error = value;
       }
+    },
+
+    $hasSession() {
+      const cookieId = this.$graphLayer.getOption("cookieId");
+      const sessionId = Cookies.get(cookieId);
+
+      return !!sessionId;
+    },
+
+    $hideContentAccessDenied() {
+      let setting = this.hideContentAccessDenied;
+      if (setting == "inherit") {
+        setting = findParentItem(this.$parent,undefined,"hideContentAccessDenied");
+      }
+      if (typeof setting === "undefined" || setting == "inherit") {
+        setting = this.$graphLayer.getOption("hideContentAccessDenied");
+      }
+
+      const response = this.hideContentFlag;
+      if (normalizeBoolean(setting)) {
+        return response;
+      }
+
+      return false;
     }
   },
 
   methods: {
-    string2boolean,
+    normalizeBoolean,
 
     $fetch(resource,init,ignoreError) {
       this.$loadingState = true;
       this.$errorState = null;
+      this.hideContentFlag = false;
 
       let promise;
-      if (!this.$hasSession() && !this.shared) {
+      if (!this.$hasSession && !this.$anonymous) {
+        this.hideContentFlag = true;
         promise = Promise.reject({
           error: "Content Unavailable",
           message: "You are not signed into Microsoft Graph and cannot view this content.",
         });
       }
       else {
-        promise = this.$graphLayer.fetch(resource,init).then((response) => {
+        if (this.$anonymous) {
+          promise = this.$graphLayer.fetchAnonymous(resource,init);
+        }
+        else {
+          promise = this.$graphLayer.fetch(resource,init);
+        }
+        promise = promise.then((response) => {
           if (!response.ok) {
-            return response.json().then((payload) => Promise.reject({
-              code: response.status,
-              payload
-            }));
+            return response.json().then((payload) => {
+              switch (payload.error.code) {
+              case "accessDenied":
+                this.hideContentFlag = true;
+                break;
+              }
+
+              return Promise.reject({
+                code: response.status,
+                payload
+              });
+            });
           }
 
           this.$loadingState = false;
@@ -167,11 +255,9 @@ export default {
       return promise;
     },
 
-    $hasSession() {
-      const cookieId = this.$graphLayer.getOption("cookieId");
-      const sessionId = Cookies.get(cookieId);
-
-      return !!sessionId;
+    $warn(message,...args) {
+      const fmt = "[graph-layer-components]: " + message;
+      console.warn(fmt,...args);
     }
   }
 };

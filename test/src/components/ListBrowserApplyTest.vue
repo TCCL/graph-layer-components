@@ -14,7 +14,14 @@
       </div>
     </div>
 
-    <graph-layer-list-browser v-if="hasValue" browse-followed-sites :value="serialized" />
+    <graph-layer-list-browser
+      v-if="hasValue"
+      :value="serialized"
+      :title="title"
+      browse-followed-sites
+      :list-type="listType"
+      :filter-template="filterTemplate"
+      />
   </div>
 </template>
 
@@ -28,7 +35,18 @@
     }),
 
     props: {
-
+      title: {
+        type: String,
+        default: ""
+      },
+      listType: {
+        type: String,
+        default: "generic"
+      },
+      filterTemplate: {
+        type: [Array,String],
+        default: () => ([])
+      }
     },
 
     computed: {
@@ -57,6 +75,10 @@
 </script>
 
 <style scoped>
+  .list-browser-apply-test {
+    height: 100%;
+  }
+
   .top-section {
     display: flex;
     margin-bottom: 2em;

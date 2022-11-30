@@ -1,12 +1,21 @@
 <template>
   <div class="graph-layer input-test list-browser-input-test">
     <div class="top-section">
-      <input type="text" v-model="listValue" readonly>
+      <input type="text" v-model="listValue">
       <button v-if="!commit" @click="commit = true" :disabled="!hasValue">Render</button>
       <button v-else @click="reset">Clear</button>
     </div>
 
-    <graph-layer-list-browser v-show="!commit" v-model="listValue" browse-sites browse-followed-sites  />
+    <graph-layer-list-browser
+      v-show="!commit"
+      v-model="listValue"
+      :title="title"
+      browse-sites
+      browse-followed-sites
+      :list-type="listType"
+      :filter-template="filterTemplate"
+      />
+
     <graph-layer-list v-if="commit" :value="listValue" :top="top" />
   </div>
 </template>
@@ -21,9 +30,21 @@
     }),
 
     props: {
+      title: {
+        type: String,
+        default: ""
+      },
       top: {
         type: [String,Number],
         default: null
+      },
+      listType: {
+        type: String,
+        default: "generic"
+      },
+      filterTemplate: {
+        type: [Array,String],
+        default: () => ([])
       }
     },
 
@@ -47,6 +68,9 @@
 </script>
 
 <style scoped>
+  .list-browser-input-test {
+    height: 100%;
+  }
   .top-section {
     display: flex;
     margin-bottom: 2em;

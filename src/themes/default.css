@@ -30,10 +30,17 @@
 
   /* Drive */
   --graph-layer-drive-item-selected-background-color: var(--graph-layer-color-light-gray);
+  --graph-layer-drive-row-border-color: var(--graph-layer-color-light-gray);
 
   /* Drive Picker */
   --graph-layer-drive-picker-active-color: var(--graph-layer-color-primary);
   --graph-layer-drive-picker-heading-border-color: var(--graph-layer-color-light-gray);
   --graph-layer-drive-picker-hover-color: var(--graph-layer-color-light-gray);
   --graph-layer-drive-picker-selected-color: var(--graph-layer-color-secondary);
+
+  /* Calendar View */
+  --graph-layer-calendar-view-event-background-color: var(--graph-layer-color-primary);
+  --graph-layer-calendar-view-event-hover-background-color: var(--graph-layer-color-secondary);
+  --graph-layer-calendar-view-event-text-color: var(--graph-layer-color-background);
+  --graph-layer-calendar-view-event-border-color: var(--graph-layer-border-color);
 }

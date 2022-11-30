@@ -1,7 +1,7 @@
 <h3>Graph Layer Components / Drive Component</h3>
 
 <div class="testbed-wrapper">
-  <div class="region-wrapper">
+  <div class="region-wrapper region-wrapper--large">
     <div class="region graph-layer">
       <div data-graph-layer="drive" data-graph-layer--me="1"></div>
     </div>
@@ -17,13 +17,23 @@
     </div>
   </div>
   <div class="region-wrapper">
-    <div class="region graph-layer">
+    <div class="region">
       <div data-graph-layer="driveInputTest"></div>
     </div>
   </div>
   <div class="region-wrapper">
-    <div class="region graph-layer">
+    <div class="region">
       <div data-graph-layer="driveInputTest"></div>
+    </div>
+  </div>
+  <div class="region-wrapper region-wrapper--large">
+    <div class="region">
+      <div data-graph-layer="driveInputTest" data-graph-layer--anonymous="yes"></div>
+    </div>
+  </div>
+  <div class="region-wrapper region-wrapper--large">
+    <div class="region region--auto graph-layer">
+      <div data-graph-layer="drive" data-graph-layer--me="1"></div>
     </div>
   </div>
 </div>

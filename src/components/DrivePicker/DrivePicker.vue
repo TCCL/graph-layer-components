@@ -152,19 +152,19 @@
       },
 
       enableUsers() {
-        return !this.string2boolean(this.usersOff);
+        return !this.normalizeBoolean(this.usersOff);
       },
 
       enableGroups() {
-        return !this.string2boolean(this.groupsOff);
+        return !this.normalizeBoolean(this.groupsOff);
       },
 
       enableSites() {
-        return !this.string2boolean(this.sitesOff);
+        return !this.normalizeBoolean(this.sitesOff);
       },
 
       enableFollowedSites() {
-        return !this.string2boolean(this.followedSitesOff);
+        return !this.normalizeBoolean(this.followedSitesOff);
       }
     },
 

@@ -1,7 +1,6 @@
 <template>
   <graph-layer-wrapper
-    :loading-state="$loadingState"
-    :error-state="$errorState"
+    v-bind="$wrapperBind"
     :class="$style['graph-layer-drive-explorer']"
     scroll
     >
@@ -28,8 +27,8 @@
           <icon
             medium button
             i="arrow-left"
-            :class="{ disabled: (page <= 0) }"
-            @click="pageBack"
+            :disabled="page <= 0"
+            @click.stop="pageBack"
             />
         </div>
 
@@ -37,8 +36,8 @@
           <icon
             medium button
             i="arrow-right"
-            :class="{ disabled: (!hasNext) }"
-            @click="pageForward"
+            :disabled="!hasNext"
+            @click.stop="pageForward"
             />
         </div>
       </div>
@@ -266,9 +265,13 @@
 <style module>
   .entry-wrapper {
     border-bottom: 1px solid var(--graph-layer-drive-row-border-color);
+    padding: 0.25em 0;
   }
   .entry-wrapper:last-child {
     border-bottom: none;
+  }
+  .entry-wrapper:hover {
+    background-color: var(--graph-layer-drive-item-selected-background-color);
   }
 
   .empty {

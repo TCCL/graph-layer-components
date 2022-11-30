@@ -36,6 +36,23 @@
         classes.push(context.$style.error);
       }
 
+      if (context.props.disabled) {
+        classes.push(context.$style.disabled);
+      }
+
+      let on = context.listeners;
+      if (context.props.button) {
+        on = Object.assign({},on || {});
+
+        const mousedownOriginal = on.mousedown;
+        on.mousedown = ($event) => {
+          if (typeof mousedownOriginal === "function") {
+            mousedownOriginal($event);
+          }
+          $event.preventDefault();
+        };
+      }
+
       const e = h("i",{
         domProps: {
           innerHTML: getIconSvg(context.props.i)
@@ -44,7 +61,7 @@
         "class": classes,
         attrs: context.data.attrs,
         style: context.data.style,
-        on: context.listeners
+        on
       });
 
       return e;
@@ -54,31 +71,35 @@
       i: String,
       medium: {
         type: Boolean,
-        value: false
+        default: false
       },
       large: {
         type: Boolean,
-        value: false
+        default: false
       },
       xlarge: {
         type: Boolean,
-        value: false
+        default: false
       },
       button: {
         type: Boolean,
-        value: false
+        default: false
       },
       secondary: {
         type: Boolean,
-        value: false
+        default: false
       },
       accent: {
         type: Boolean,
-        value: false
+        default: false
+      },
+      disabled: {
+        type: Boolean,
+        default: false
       },
       error: {
         type: Boolean,
-        value: false
+        default: false
       }
     }
   };
@@ -110,7 +131,7 @@
   .icon.button:hover {
     opacity: 1;
   }
-  .icon.button:global(.disabled) {
+  .icon.button.disabled {
     cursor: initial;
     opacity: 0.2;
     fill: var(--graph-layer-color-light-gray);

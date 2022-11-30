@@ -1,7 +1,6 @@
 <template>
   <graph-layer-wrapper
-    :loading-state="$loadingState"
-    :error-state="$errorState"
+    v-bind="$wrapperBind"
     :class="$style['graph-layer-generic-browser-explorer']"
     scroll
    >
@@ -43,8 +42,8 @@
         <icon
           medium button
           i="arrow-left"
-          :class="{ disabled: !hasPrevPage }"
-          @click="previousPage"
+          :disabled="!hasPrevPage"
+          @click.stop="previousPage"
           />
       </div>
 
@@ -52,8 +51,8 @@
         <icon
           medium button
           i="arrow-right"
-          :class="{ disabled: !hasNextPage }"
-          @click="nextPage"
+          :disabled="!hasNextPage"
+          @click.stop="nextPage"
           />
       </div>
     </div>
