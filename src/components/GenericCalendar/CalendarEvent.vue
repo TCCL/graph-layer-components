@@ -2,8 +2,8 @@
   <div :class="$style['calendar-event']" @click="selected = true">
     <span :class="$style['calendar-event__text']">{{ eventInfo.event.title }}</span>
     <modal v-if="selected" :parent="$el.parentNode.parentNode" :title="eventInfo.event.title" @close="selected = false">
-      <p><b>Event Start</b>: {{ eventInfo.event.startDate }}</p>
-      <p><b>Event End</b>: {{ eventInfo.event.endDate }}</p>
+      <p><b>Event Start</b>: <disp-date :value="eventInfo.event.startDate" :format="fmt" /></p>
+      <p><b>Event End</b>: <disp-date :value="eventInfo.event.endDate" :format="fmt" /></p>
       <p><b>Created By</b>: {{ eventInfo.event.createdBy }}</p>
       <p :class="$style['calendar-event__description']">{{ eventInfo.event.description }}</p>
     </modal>
@@ -11,17 +11,20 @@
 </template>
 
 <script>
+  import DispDate from "../../core/components/DispDate.vue";
   import Modal from "../../core/components/Modal.vue";
 
   export default {
     name: "CalendarEvent",
 
     components: {
+      DispDate,
       Modal
     },
 
     data: () => ({
-      selected: false
+      selected: false,
+      fmt: "iii d MMM yyyy 'at' h:mm b"
     }),
 
     props: {
