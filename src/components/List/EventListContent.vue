@@ -43,12 +43,6 @@
         extracted[key] = item.fields[mapping[key]];
       }
       for (const key of ["startDate","endDate"]) {
-        // NOTE: For some reason, the Graph API gives us the time in UTC zero,
-        // even though they all should be interpreted in local time. To hack
-        // around this at this time, we just take off zulu to force local time.
-        if (extracted[key].endsWith("Z")) {
-          extracted[key] = extracted[key].substring(0,extracted[key].length-1);
-        }
         extracted[key] = parseISO(extracted[key]);
       }
       return extracted;
