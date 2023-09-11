@@ -8,6 +8,16 @@
         <option v-for="opt in options" :value="opt.value">{{ opt.label }}</option>
       </select>
     </div>
+
+    <div :class="$style['footer']">
+      <div>If a field is not enumerated in the drop-downs, you may add the machine name for the field here:</div>
+
+      <div :class="$style['field-entry']">
+        <span>Enter field name: </span>
+        <input v-model="addField" type="text" placeholder="Field Name..." size="40">
+        <click-text @click="addFieldToOptions">Add</click-text>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -20,7 +30,8 @@
     "startDate": "EventDate",
     "endDate": "EndDate",
     "description": "Description",
-    "createdBy": "Author"
+    "createdBy": "Author",
+    "recurrence": "RecurrenceData"
   };
 
   export default {
@@ -33,7 +44,14 @@
 
     data: () => ({
       columns: [],
-      mapping: {}
+      extraColumns: [
+        {
+          name: "RecurrenceData",
+          displayName: "Recurrence Data"
+        }
+      ],
+      mapping: {},
+      addField: ""
     }),
 
     props: {
@@ -53,12 +71,14 @@
           { key:"startDate", label:"Event Start Date" },
           { key:"endDate", label:"Event End Date" },
           { key:"description", label:"Event Description" },
-          { key:"createdBy", label:"Event Created By" }
+          { key:"createdBy", label:"Event Created By" },
+          { key:"recurrence", label:"Event Recurrence Data" },
         ];
       },
 
       options() {
         const options = [];
+
         for (let i = 0;i < this.columns.length;++i) {
           const col = this.columns[i];
           options.push({
@@ -66,6 +86,15 @@
             label: col.info.displayName
           });
         }
+
+        for (let i = 0;i < this.extraColumns.length;++i) {
+          const col = this.extraColumns[i];
+          options.push({
+            value: col.name,
+            label: col.displayName
+          });
+        }
+
         return options;
       },
 
@@ -144,6 +173,18 @@
             }
           }
         }
+      },
+
+      addFieldToOptions() {
+        if (this.addField.length == 0) {
+          return;
+        }
+
+        this.extraColumns.push({
+          name: this.addField,
+          displayName: this.addField
+        });
+        this.addField = "";
       }
     },
 
@@ -202,5 +243,23 @@
 
   .mapping-entry__select {
     flex: 1;
+  }
+
+  .footer {
+    margin-top: 1.25em;
+  }
+
+  .field-entry {
+    display: flex;
+    justify-content: flex-end;
+    gap: 1em;
+  }
+
+  .field-entry > input {
+    font-size: 12px;
+    outline: none;
+    padding: 4px;
+    border: none;
+    border-bottom: 2px solid var(--graph-layer-divider-color);
   }
 </style>
