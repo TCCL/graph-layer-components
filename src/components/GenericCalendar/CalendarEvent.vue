@@ -5,7 +5,7 @@
       <p><b>Event Start</b>: <disp-date :value="eventInfo.event.startDate" :format="fmt" /></p>
       <p><b>Event End</b>: <disp-date :value="eventInfo.event.endDate" :format="fmt" /></p>
       <p><b>Created By</b>: {{ eventInfo.event.createdBy }}</p>
-      <p :class="$style['calendar-event__description']">{{ eventInfo.event.description }}</p>
+      <p :class="$style['calendar-event__description']" v-html="eventInfo.event.description"></p>
     </modal>
   </div>
 </template>
