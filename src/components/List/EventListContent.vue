@@ -14,6 +14,8 @@
 <script>
   import parseISO from "date-fns/parseISO";
 
+  import { createRecurrenceData } from "./recurrence.js";
+
   import GraphLayerGenericCalendar from "../GenericCalendar/GenericCalendar.vue";
   import { DEFAULT_MAPPING } from "../ListBrowser/ListBrowserEventsConfigWidget.vue";
 
@@ -38,13 +40,24 @@
     }
 
     function extractFields(item) {
-      const extracted = { "id":item.id };
+      const extracted = {
+        id: item.id,
+        render_id: item.id
+      };
+
       for (const key in mapping) {
         extracted[key] = item.fields[mapping[key]];
       }
+
+      // Parse dates using the format given to us by the Microsoft platform.
       for (const key of ["startDate","endDate"]) {
         extracted[key] = parseISO(extracted[key]);
       }
+
+      if (extracted.recurrence) {
+        extracted.recurrence = createRecurrenceData(extracted.recurrence);
+      }
+
       return extracted;
     }
 
@@ -72,6 +85,8 @@
       filterString += ` and fields/${startDateField} lt '${endDate.toISOString()}')`;
       filterString += ` or (fields/${endDateField} ge '${startDate.toISOString()}'`;
       filterString += ` and fields/${endDateField} lt '${endDate.toISOString()}')`;
+      filterString += ` or (fields/${startDateField} lt '${startDate.toISOString()}'`;
+      filterString += ` and fields/${endDateField} ge '${endDate.toISOString()}')`;
 
       let url = new URL(`${endpoint}/items`,window.location.origin);
       url.searchParams.set("$filter",filterString);
@@ -86,8 +101,20 @@
       };
 
       return $instance.$fetchJson(url,init).then((payload) => {
+        const items = [];
         const extracted = payload.value.map(extractFields);
-        cacheEntry.items = extracted;
+
+        extracted.forEach((item) => {
+          if (item.recurrence) {
+            item.recurrence.replicate(item,endDate).forEach(
+              (x) => items.push(x)
+            );
+          }
+          else {
+            items.push(item);
+          }
+        });
+        cacheEntry.items = items;
         cacheEntry.hasNextPage = !!cacheEntry.skipToken;
 
         const skipToken = extractQueryParam(payload["@data.nextLink"],"$skiptoken");
