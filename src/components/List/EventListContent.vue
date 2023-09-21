@@ -106,7 +106,7 @@
 
         extracted.forEach((item) => {
           if (item.recurrence) {
-            item.recurrence.replicate(item,endDate).forEach(
+            item.recurrence.replicate(item,startDate,endDate).forEach(
               (x) => items.push(x)
             );
           }
