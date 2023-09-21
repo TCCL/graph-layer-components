@@ -192,6 +192,23 @@ function replicateEventForDate(dt,event) {
   return newEvent;
 }
 
+function setDateToWeekdayOfMonth(dateOfMonth,dayOfWeek,weekdayOfMonth) {
+  const dt = setDate(dateOfMonth,1);
+  const day = dow2int(dayOfWeek);
+  let nweeks = weekdayofmonth2weeks(weekdayOfMonth);
+
+  const dayOffset = day - getDay(dt);
+
+  if (dayOffset >= 0) {
+    nweeks -= 1;
+  }
+
+  return addDate(dt,{
+    days: dayOffset,
+    weeks: nweeks
+  });
+}
+
 function checkRepeat(rule,inst) {
   if (!rule.repeatInstances) {
     return true;
@@ -283,12 +300,6 @@ class Recurrence {
   _generateWeekly(event,startDate,endDate,rule) {
     const events = [];
 
-    // const dts = {};
-    // DOWS.forEach((dow) => {
-    //   const ndow = dow2int(dow);
-    //   dts[dow] = setDay(event.startDate,ndow);
-    // });
-
     let ndone;
     let inst = 0;
     let weekCount = 0;
@@ -341,46 +352,6 @@ class Recurrence {
       weekCount += 1;
     }
 
-    // do {
-    //   let nvalid = 0;
-    //   ndone = 0;
-    //   DOWS.forEach((dow) => {
-    //     const dt = dts[dow];
-    //     dts[dow] = addDate(dt,{ weeks:1 });
-    //
-    //     if (compareDate(dt,event.startDate) < 0) {
-    //       return;
-    //     }
-    //     if (compareDate(dt,event.endDate) > 0) {
-    //       ndone += 1;
-    //       return;
-    //     }
-    //
-    //     nvalid += 1;
-    //     if (compareDate(dt,startDate) < 0) {
-    //       return;
-    //     }
-    //     if (compareDate(dt,endDate) > 0) {
-    //       ndone += 1;
-    //       return;
-    //     }
-    //
-    //     if (!rule.repeat.weekly[dow]) {
-    //       return;
-    //     }
-    //
-    //     if (weekCount % rule.repeat.weekly.weekFrequency == 0) {
-    //       events.push(replicateEventForDate(dt,event));
-    //     }
-    //   });
-    //
-    //   if (weekCount % rule.repeat.weekly.weekFrequency == 0) {
-    //     inst += ( nvalid > 0 );
-    //   }
-    //
-    //   weekCount += 1;
-    // } while (ndone < DOWS.length && checkRepeat(rule,inst));
-
     return events;
   }
 
@@ -422,9 +393,6 @@ class Recurrence {
     let inst = 0;
     let monthCount = 0;
     let dt = setDate(event.startDate,1);
-    const addWeeks = {
-      weeks: weekdayofmonth2weeks(rule.repeat.monthlyByDay.weekdayOfMonth) - 1
-    };
 
     while (checkRepeat(rule,inst)) {
       const evdt = dt;
@@ -437,8 +405,11 @@ class Recurrence {
           return;
         }
 
-        const dowint = dow2int(dow);
-        let dowdt = addDate(setDay(evdt,dowint),addWeeks);
+        const dowdt = setDateToWeekdayOfMonth(
+          evdt,
+          dow,
+          rule.repeat.monthlyByDay.weekdayOfMonth
+        );
 
         if (compareDate(dowdt,event.startDate) < 0) {
           return;
@@ -520,9 +491,6 @@ class Recurrence {
       date: 1,
       month: rule.repeat.yearlyByDay.month-1
     });
-    const addWeeks = {
-      weeks: weekdayofmonth2weeks(rule.repeat.yearlyByDay.weekdayOfMonth) - 1
-    };
 
     while (checkRepeat(rule,inst)) {
       const evdt = dt;
@@ -535,8 +503,11 @@ class Recurrence {
           return;
         }
 
-        const dowint = dow2int(dow);
-        let dowdt = addDate(setDay(evdt,dowint),addWeeks);
+        const dowdt = setDateToWeekdayOfMonth(
+          evdt,
+          dow,
+          rule.repeat.yearlyByDay.weekdayOfMonth
+        );
 
         if (compareDate(dowdt,event.startDate) < 0) {
           return;
