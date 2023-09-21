@@ -119,6 +119,10 @@
 
         this.events = null;
         this.queryEvents(startDate,endDate).then((result) => {
+          if (!result) {
+            return;
+          }
+
           const { hasNextPage, items } = result;
 
           this.events = items;
