@@ -1,14 +1,10 @@
 <template>
-  <graph-layer-wrapper
-    v-bind="$wrapperBind"
-    :class="$style['event-list-content-wrapper']"
-    scroll
-    >
+  <div :class="$style['event-list-content-wrapper']">
     <graph-layer-generic-calendar
       :class="$style['event-list-content']"
       :event-provider="eventProvider"
       />
-  </graph-layer-wrapper>
+  </div>
 </template>
 
 <script>
@@ -20,7 +16,6 @@
   import { DEFAULT_MAPPING } from "../ListBrowser/ListBrowserEventsConfigWidget.vue";
 
   import GraphLayerMixin from "../../core/mixins/GraphLayerMixin.js";
-  import LoadErrorMixin from "../../core/mixins/LoadErrorMixin.js";
   import { extractQueryParam } from "../../core/helpers.js";
 
   function makeCacheKey(startDate,endDate,page) {
@@ -28,7 +23,7 @@
     return cacheKey;
   }
 
-  function makeProvider(endpoint,config,$instance) {
+  function makeProvider(endpoint,config) {
     const cache = new Map();
     const mapping = Object.assign({},DEFAULT_MAPPING,config || {});
 
@@ -100,7 +95,7 @@
         headers
       };
 
-      return $instance.$fetchJson(url,init).then((payload) => {
+      return this.$fetchJson(url,init).then((payload) => {
         const items = [];
         const extracted = payload.value.map(extractFields);
 
@@ -135,8 +130,7 @@
     name: "EventListContent",
 
     mixins: [
-      GraphLayerMixin,
-      LoadErrorMixin
+      GraphLayerMixin
     ],
 
     components: {
@@ -149,13 +143,12 @@
 
     props: {
       endpoint: String,
-      config: Object,
-      $instance: Object
+      config: Object
     },
 
     computed: {
       eventProvider() {
-        return makeProvider(this.endpoint,this.config,this);
+        return makeProvider(this.endpoint,this.config);
       }
     },
 
@@ -171,7 +164,8 @@
 
 <style module>
   .event-list-content-wrapper {
-
+    display: flex;
+    flex-flow: row nowrap;
   }
 
   .event-list-content {

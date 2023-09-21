@@ -2,11 +2,11 @@
   <div :class="$style['generic-calendar']">
     <div :class="$style['generic-calendar__header']">
       <div title="Previous Month">
-        <icon button i="arrow-left" @click.stop="navigatePrevious" :disabled="!canNavigatePrevious" />
+        <icon button i="arrow-left" @click.stop="navigatePrevious" :disabled="!canNavigatePrevious || $loadingState" />
       </div>
 
       <div title="Next Month">
-        <icon button i="arrow-right" @click.stop="navigateNext" :disabled="!canNavigateNext" />
+        <icon button i="arrow-right" @click.stop="navigateNext" :disabled="!canNavigateNext || $loadingState" />
       </div>
 
       <div>
@@ -14,7 +14,9 @@
       </div>
     </div>
 
-    <calendar-view v-if="hasEvents" :class="$style['generic-calendar__view']" :date="windowDate" :events="events" />
+    <graph-layer-wrapper v-bind="$wrapperBind">
+      <calendar-view v-if="hasEvents" :class="$style['generic-calendar__view']" :date="windowDate" :events="events" />
+    </graph-layer-wrapper>
   </div>
 </template>
 
@@ -30,6 +32,7 @@
   import CalendarView from "./CalendarView.vue";
 
   import GraphLayerMixin from "../../core/mixins/GraphLayerMixin.js";
+  import LoadErrorMixin from "../../core/mixins/LoadErrorMixin.js";
 
   const now = Date.now();
 
@@ -55,7 +58,8 @@
     name: "GraphLayerGenericCalendar",
 
     mixins: [
-      GraphLayerMixin
+      GraphLayerMixin,
+      LoadErrorMixin
     ],
 
     components: {
