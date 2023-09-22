@@ -48,6 +48,10 @@
       </div>
     </div>
 
+    <div v-if="$slots.header" :class="$style['user-header']">
+      <slot name="header"></slot>
+    </div>
+
     <generic-browser-explorer
       ref="explorer"
       v-model="selection"
@@ -59,16 +63,20 @@
 
     <slot></slot>
 
-    <div v-if="$slots.footer" v-show="nav.length == 0" :class="$style.footer">
-      <div :class="[$style.footer__menu,toggleFooter ? $style['footer__menu--toggled'] : '']">
+    <div v-if="$slots.options" v-show="nav.length == 0" :class="$style.options">
+      <div :class="[$style.options__menu,toggleOptions ? $style['options__menu--toggled'] : '']">
         <click-text
-          @click="toggleFooter = !toggleFooter"
+          @click="toggleOptions = !toggleOptions"
           >Manual Options<icon
-                          :class="$style['footer-icon']"
-                          :i="toggleFooter ? 'arrow-right' : 'arrow-down'" /></click-text>
+                          :class="$style['options__toggle-icon']"
+                          :i="toggleOptions ? 'arrow-right' : 'arrow-down'" /></click-text>
       </div>
 
-      <slot v-if="toggleFooter" name="footer"></slot>
+      <slot v-if="toggleOptions" name="options"></slot>
+    </div>
+
+    <div v-if="$slots.footer" :class="$style['user-footer']">
+      <slot name="footer"></slot>
     </div>
   </graph-layer-wrapper>
 </template>
@@ -95,7 +103,7 @@
 
       nav: [],
 
-      toggleFooter: false
+      toggleOptions: false
     }),
 
     props: {
@@ -217,21 +225,31 @@
     font-weight: bold;
   }
 
-  .footer {
+  .user-header {
+    border-bottom: 3px solid var(--graph-layer-divider-color);
+    padding: 0.75em 0.5em;
+  }
+
+  .options {
     display: flex;
     flex-flow: column nowrap;
   }
 
-  .footer__menu {
+  .options__menu {
 
   }
 
-  .footer__menu--toggled {
+  .options__menu--toggled {
     border-bottom: 2px solid var(--graph-layer-divider-color);
     padding-bottom: 0.5em;
   }
 
-  .footer-icon {
+  .options__toggle-icon {
     vertical-align: text-bottom;
+  }
+
+  .user-footer {
+    border-top: 3px solid var(--graph-layer-divider-color);
+    padding: 0.75em 0;
   }
 </style>

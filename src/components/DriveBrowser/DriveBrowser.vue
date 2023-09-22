@@ -9,7 +9,7 @@
     >
     <input v-if="formElement" type="hidden" :name="formElement" :value="storageValue" />
 
-    <template v-if="enableSites" #footer>
+    <template v-if="enableSites" #options>
       <generic-browser-options-form
         :schema-processing="schemaProcessing"
         :enable-sites="enableSites"

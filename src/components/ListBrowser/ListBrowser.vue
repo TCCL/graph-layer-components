@@ -18,7 +18,7 @@
       :site-id="storage.parentId"
       />
 
-    <template v-if="true" #footer>
+    <template #options>
       <generic-browser-options-form
         enable-sites
         :schema-processing="schemaProcessing"
