@@ -37,7 +37,7 @@
     function extractFields(item) {
       const extracted = {
         id: item.id,
-        render_id: item.id
+        render_id: `${endpoint}_${item.id}`
       };
 
       for (const key in mapping) {
@@ -126,6 +126,26 @@
     return queryEvents;
   }
 
+  function makeTopLevelProvider(endpoint,config,children) {
+    const providers = [makeProvider(endpoint,config)].concat(
+      children.map((child) => makeProvider(child.endpoint,child.config))
+    );
+
+    async function queryEvents(start,end,page) {
+      let result = { items:[], hasNextPage:false };
+
+      for (let i = 0;i < providers.length;++i) {
+        const { items, hasNextPage } = await providers[i].call(this,start,end,page);
+        result.items = result.items.concat(items);
+        result.hasNextPage = result.hasNextPage || hasNextPage;
+      }
+
+      return result;
+    }
+
+    return queryEvents;
+  }
+
   export default {
     name: "EventListContent",
 
@@ -143,12 +163,13 @@
 
     props: {
       endpoint: String,
-      config: Object
+      config: Object,
+      children: Array
     },
 
     computed: {
       eventProvider() {
-        return makeProvider(this.endpoint,this.config);
+        return makeTopLevelProvider(this.endpoint,this.config,this.children);
       }
     },
 

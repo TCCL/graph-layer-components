@@ -165,13 +165,20 @@
 
     watch: {
       value({ type, id }) {
-        // If the value changed to a top-level item, make sure it is selected.
+        if (id === undefined) {
+          this.selectedItem = null;
+        }
+        else {
+          // If the value changed to a top-level item, make sure it is selected.
+          const item = this.items.find(
+            (i) => i.type === type && i.id === id
+          );
+          this.selectedItem = item || this.selectedItem;
+        }
+      },
 
-        const item = this.items.find(
-          (i) => i.type === type && i.id === id
-        );
-
-        this.selectedItem = item || this.selectedItem;
+      selectedItem(value) {
+        this.$emit("item:update",value);
       }
     }
   };

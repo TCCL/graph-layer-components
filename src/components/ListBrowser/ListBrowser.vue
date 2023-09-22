@@ -2,12 +2,41 @@
   <graph-layer-generic-browser
     target-schema="list"
     v-model="selection"
+    @item:update="setItem"
     :schema-processing="schemaProcessing"
     :title="title"
     :domain-label="domainLabel"
     :items="items"
     >
     <input v-if="formElement" type="hidden" :name="formElement" :value="storageValue" />
+
+    <template v-if="listType == 'events'" #header>
+      <div :class="$style['header']">
+        <div :class="$style['header__nav']">
+          <div
+            v-for="item,index in selectedItems"
+            v-if="item !== null"
+            class="$style['header__nav-item']"
+            >
+            <click-text
+              @click="selectItem(index)"
+              :disabled="index === selectedItemIndex || !selectedItems[selectedItemIndex]"
+              >{{ item.label }}</click-text>
+          </div>
+        </div>
+
+        <div :class="$style['header__actions']">
+          <click-text
+            accent
+            @click="removeSecondary"
+            :disabled="selectedItems.length < 2"
+            >{{ selectedItems[selectedItemIndex] ? 'Remove' : 'Cancel' }}</click-text>
+          <click-text
+            @click="pushSecondary"
+            :disabled="!isSelected">Add Secondary Calendar</click-text>
+        </div>
+      </div>
+    </template>
 
     <component
       v-if="widget && isSelected"
@@ -92,7 +121,9 @@
     },
 
     data: () => ({
-      manualItems: []
+      manualItems: [],
+      selectedItemIndex: 0,
+      selectedItems: [null]
     }),
 
     props: {
@@ -225,8 +256,9 @@
 
     created() {
       this.registerStorageKey("parentId","p");
-      this.registerStorageKey("listType","l",this.listType);
+      this.registerStorageKey("listType","l");
       this.registerStorageKey("config","c",defaultConfigValue(this.listType));
+      this.storage.listType = this.listType;
       this.$options.manualIdTop = 1;
     },
 
@@ -284,12 +316,67 @@
         }
 
         this.manualItems.push(item);
+      },
+
+      pushSecondary() {
+        this.selectedItemIndex = this.selectedItems.length;
+        this.selectedItems.push(null);
+        this.pushStorage();
+      },
+
+      removeSecondary() {
+        if (this.selectedItems.length < 2) {
+          return;
+        }
+
+        this.selectedItems.splice(this.selectedItemIndex,1);
+        this.selectedItemIndex = this.removeStorage(this.selectedItemIndex);
+      },
+
+      setItem(item) {
+        this.selectedItems[this.selectedItemIndex] = item;
+      },
+
+      selectItem(index) {
+        this.selectedItemIndex = index;
+        this.selectStorage(index);
+      }
+    },
+
+    watch: {
+      listType() {
+        this.registerStorageKey("config","c",defaultConfigValue(this.listType));
       }
     }
   };
 </script>
 
 <style module>
+  .header {
+    display: flex;
+    justify-content: space-between;
+  }
+
+  .header__nav {
+    display: flex;
+    justify-content: flex-start;
+    gap: 1em;
+  }
+
+  .header__nav-item {
+    padding: 0.5em;
+    border-right: 3px solid var(--graph-layer-divider-color);
+  }
+  .header__nav-item:last-child {
+    border-right: none;
+  }
+
+  .header__actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 1em;
+  }
+
   .widget {
     flex: 1.5;
     border-top: 2px solid var(--graph-layer-divider-color);
