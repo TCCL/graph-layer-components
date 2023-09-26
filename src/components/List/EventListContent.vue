@@ -136,6 +136,7 @@
 
       for (let i = 0;i < providers.length;++i) {
         const { items, hasNextPage } = await providers[i].call(this,start,end,page);
+        items.forEach((item) => item._calendar_index = i);
         result.items = result.items.concat(items);
         result.hasNextPage = result.hasNextPage || hasNextPage;
       }
