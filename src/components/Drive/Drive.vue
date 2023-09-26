@@ -31,6 +31,8 @@
     <drive-explorer
       ref="explorer"
       :endpoint="endpoint"
+      :sort-by="defaultSortBy"
+      :sort-asc="defaultSortAsc"
       :top="top"
       @change="items = $event"
       />
@@ -100,6 +102,16 @@
       top: {
         type: [Number,String],
         default: null
+      },
+
+      sortBy: {
+        type: [String],
+        default: null
+      },
+
+      sortDirection: {
+        type: [String],
+        default: null
       }
     },
 
@@ -110,7 +122,8 @@
             const repr = JSON.parse(this.value);
             return {
               driveType: repr.t,
-              driveId: repr.i
+              driveId: repr.i,
+              config: repr.c
             };
 
           } catch (err) {
@@ -120,7 +133,8 @@
 
         return {
           driveType: null,
-          driveValue: null
+          driveValue: null,
+          config: null
         };
       },
 
@@ -253,6 +267,30 @@
 
       pathParts() {
         return this.items.map((item) => item.name);
+      },
+
+      defaultSortBy() {
+        if (this.sortBy) {
+          return this.sortBy;
+        }
+
+        if (this.parsedValue.config) {
+          return this.parsedValue.config.sortBy;
+        }
+
+        return "";
+      },
+
+      defaultSortAsc() {
+        if (this.sortDirection) {
+          return ( this.sortDirection == "asc" );
+        }
+
+        if (this.parsedValue.config) {
+          return this.parsedValue.config.asc;
+        }
+
+        return true;
       }
     },
 

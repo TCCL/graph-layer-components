@@ -71,7 +71,15 @@ export default {
         defaultValue,
         JSON.stringify(defaultValue)
       ];
-      this.$set(this.storage,key,defaultValue || "");
+
+      let assignValue;
+      if (typeof defaultValue !== "undefined") {
+        assignValue = defaultValue;
+      }
+      else {
+        assignValue = "";
+      }
+      this.$set(this.storage,key,assignValue);
     },
 
     setUpStorage(value) {

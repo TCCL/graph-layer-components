@@ -9,6 +9,12 @@
     >
     <input v-if="formElement" type="hidden" :name="formElement" :value="storageValue" />
 
+    <drive-browser-config-widget
+      v-if="isSelected"
+      v-model="storage.config"
+      :class="$style['config-widget']"
+      />
+
     <template v-if="enableSites" #options>
       <generic-browser-options-form
         :schema-processing="schemaProcessing"
@@ -23,10 +29,10 @@
   import GraphLayerMixin from "../../core/mixins/GraphLayerMixin.js";
   import LoadErrorMixin from "../../core/mixins/LoadErrorMixin.js";
   import StorageMixin from "../../core/mixins/StorageMixin.js";
-
   import GraphLayerGenericBrowser from "../GenericBrowser/GenericBrowser.vue";
   import GenericBrowserOptionsForm from "../GenericBrowser/GenericBrowserOptionsForm.vue";
 
+  import DriveBrowserConfigWidget from "./DriveBrowserConfigWidget.vue";
   import DriveSchemaProcessing from "./DriveSchemaProcessing.js";
 
   function makeEndpoint(driveType,id) {
@@ -55,7 +61,8 @@
 
     components: {
       GraphLayerGenericBrowser,
-      GenericBrowserOptionsForm
+      GenericBrowserOptionsForm,
+      DriveBrowserConfigWidget
     },
 
     data: () => ({
@@ -221,11 +228,18 @@
         set({ type, id }) {
           this.storage.type = type || "";
           this.storage.id = id || "";
+          this.storage.config = null;
         }
+      },
+
+      isSelected() {
+        return this.storageType == "drive"
+          && this.storageId != "";
       }
     },
 
     created() {
+      this.registerStorageKey("config","c",null);
       this.$options.manualIdTop = 1;
     },
 
@@ -244,6 +258,13 @@
 
             this.storage.type = item.type;
             this.storage.id = drive.id;
+
+            if (repr.c) {
+              this.storage.config = repr.c;
+            }
+            else {
+              this.storage.config = null;
+            }
 
             this.addManualItem(item);
           });
@@ -272,3 +293,10 @@
     }
   };
 </script>
+
+<style module>
+  .config-widget {
+    flex: 1.5;
+    border-top: 2px solid var(--graph-layer-divider-color);
+  }
+</style>

@@ -2,13 +2,9 @@
   <div class="graph-layer drive-browser-apply-test input-test">
     <div class="top-section">
       <div class="top-section__controls">
-        <label for="input-drive-type">Drive Type</label>
+        <label for="input-serialized">Serialized Drive Browser Value</label>
         <div class="top-section__input">
-          <input id="input-drive-type" type="text" v-model="driveType">
-        </div>
-        <label for="input-drive-id">Drive ID</label>
-        <div class="top-section__input">
-          <input id="input-drive-id" type="text" v-model="driveId">
+          <textarea id="input-serialized" v-model="serialized" placeholder="Enter serialized value"></textarea>
         </div>
       </div>
 
@@ -18,7 +14,12 @@
       </div>
     </div>
 
-    <graph-layer-drive-browser v-if="hasValue" browse-followed-sites :value="driveValue" />
+    <graph-layer-drive-browser
+      v-if="hasValue"
+      v-model="applyValue"
+      :title="title"
+      browse-followed-sites
+      />
   </div>
 </template>
 
@@ -27,27 +28,39 @@
     name: "DriveBrowserApplyTest",
 
     data: () => ({
-      driveType: "",
-      driveId: "",
+      serialized: "",
       submitted: false
     }),
 
     props: {
-
+      title: {
+        type: String,
+        default: ""
+      },
+      filterTemplate: {
+        type: [Array,String],
+        default: () => ([])
+      }
     },
 
     computed: {
       hasValue() {
-        return this.driveType && this.driveId && this.submitted;
+        return this.serialized && this.submitted;
       },
 
-      driveValue() {
-        const value = {
-          t: this.driveType,
-          i: this.driveId
-        };
-
-        return JSON.stringify(value);
+      applyValue: {
+        get() {
+          return this.serialized;
+        },
+        set(value) {
+          try {
+            const un = JSON.parse(value);
+            this.serialized = JSON.stringify(un,null,"  ");
+          }
+          catch (err) {
+            this.serialized = value;
+          }
+        }
       }
     },
 
@@ -57,15 +70,14 @@
 
     methods: {
       submit() {
-        if (this.driveType && this.driveId) {
+        if (this.serialized) {
           this.submitted = true;
         }
       },
 
       reset() {
         this.submitted = false;
-        this.driveType = "";
-        this.driveId = "";
+        this.serialized = true;
       }
     }
   };
@@ -75,6 +87,7 @@
   .drive-browser-apply-test {
     height: 100%;
   }
+
   .top-section {
     display: flex;
     margin-bottom: 2em;
@@ -89,7 +102,8 @@
   .top-section__input {
     display: flex;
   }
-  .top-section__input > input {
+  .top-section__input > textarea {
     flex: 1;
+    height: 5em;
   }
 </style>

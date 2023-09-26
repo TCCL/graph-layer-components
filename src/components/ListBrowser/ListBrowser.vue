@@ -42,7 +42,7 @@
       v-if="widget && isSelected"
       :is="widget"
       v-model="storage.config"
-      :class="$style['widget']"
+      :class="$style['config-widget']"
       :list-id="storage.id"
       :site-id="storage.parentId"
       />
@@ -377,7 +377,7 @@
     gap: 1em;
   }
 
-  .widget {
+  .config-widget {
     flex: 1.5;
     border-top: 2px solid var(--graph-layer-divider-color);
   }
