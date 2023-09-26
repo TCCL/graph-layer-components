@@ -32,10 +32,6 @@
   min-height: 10vh;
 }
 
-.testbed-wrapper .input-test {
-  flex: 1 0;
-}
-
 .testbed-wrapper .form-test {
   display: flex;
   flex-flow: column nowrap;

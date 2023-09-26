@@ -164,7 +164,7 @@
 
 <style module>
   .list-browser-column-widget {
-
+    overflow: hidden;
   }
 
   .header {
@@ -175,6 +175,7 @@
     margin: 1.5em;
     display: flex;
     flex-flow: row wrap;
+    justify-content: space-between;
     align-items: baseline;
     gap: 1.5em;
   }

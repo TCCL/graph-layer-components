@@ -218,7 +218,8 @@
 
 <style module>
   .list-browser-events-config-widget {
-
+    overflow: hidden;
+    justify-content: space-between;
   }
 
   .help-text {
