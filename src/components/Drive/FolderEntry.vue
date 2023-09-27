@@ -1,7 +1,13 @@
 <template>
   <div :class="$style['graph-layer-drive-folder-entry']">
-    <div :class="$style['navigate']" @click="navigate" :title="item.name">
-      <icon i="folder" /><a :class="$style['text']">{{ item.name }}</a>
+    <div :class="$style['name']" @click="navigate" :title="item.name">
+      <div :class="$style['name__navigate']">
+        <icon i="folder" /><a :class="$style['name__navigate-text']">{{ item.name }}</a>
+      </div>
+
+      <div :class="$style['name__dircount']">
+        <span>{{ item.folder.childCount}} item{{ item.folder.childCount == 1 ? '' : 's' }}</span>
+      </div>
     </div>
     <div :class="$style['size']">
       <caption-text>{{ sizeFormatted }}</caption-text>
@@ -54,21 +60,35 @@
     flex-flow: row nowrap;
   }
 
-  .graph-layer-drive-folder-entry > .navigate {
-    flex: 6 0;
+  .graph-layer-drive-folder-entry .name {
     cursor: pointer;
-    user-select: none;
+    flex: 6 0;
     font-size: 14px;
+    user-select: none;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .graph-layer-drive-folder-entry .name__navigate {
+    flex: 1.5 0;
     padding: 4px;
     display: flex;
     align-items: center;
   }
-  .graph-layer-drive-folder-entry > .navigate > .text {
+
+  .graph-layer-drive-folder-entry .name__navigate-text {
     margin-left: 5px;
   }
-  .graph-layer-drive-folder-entry > .navigate:hover > .text {
+  .graph-layer-drive-folder-entry .name:hover .name__navigate-text {
     text-decoration: underline;
     font-weight: bold;
+  }
+
+  .graph-layer-drive-folder-entry .name__dircount {
+    flex: 1 0;
+    font-size: 13px;
+    color: var(--graph-layer-color-dark-gray);
   }
 
   .graph-layer-drive-folder-entry > .size,
