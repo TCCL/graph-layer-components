@@ -166,7 +166,7 @@
 
     computed: {
       items() {
-        return this.topLevelItems.concat(this.manualItems);
+        return this.topLevelItems.concat(this.manualItems.filter((x) => !!x));
       },
 
       topLevelItems() {
@@ -263,43 +263,55 @@
     },
 
     methods: {
-      applyValue(repr) {
+      applyValue(repr,index) {
         // Called from StorageMixin.created()
 
-        if (repr.t && repr.i && repr.p) {
-          const endpoint = makeEndpoint(repr.t,repr.i,repr.p);
-          this.$fetchJson(endpoint).then((list) => {
-            const parent = { id: repr.p };
-            const result = { value: [list] };
-            const [ item ] = this.schemaProcessing.listList(result,parent);
+        if (!repr || !(repr.i && repr.t && repr.p)) {
+          const storage = this.getStorageAtIndex(index);
+          if (storage) {
+            storage.type = "";
+            storage.id = "";
+            storage.parentId = "";
+            storage.listType = this.listType;
+            storage.config = defaultConfigValue(this.listType);
+          }
+          return;
+        }
 
-            item.current = true;
-
-            this.storage.type = item.type;
-            this.storage.id = item.id;
-            this.storage.parentId = item.parentId;
-            this.storage.listType = item.listType || this.listType;
-            if (repr.c) {
-              this.storage.config = validateConfigValue(repr.c,this.storage.listType);
-            }
-            else if (repr.cs) {
-              // NOTE: this maintains compatibility with previous storage key.
-              this.storage.config = validateConfigValue(repr.cs,this.storage.listType);
-            }
-            else {
-              this.storage.config = defaultConfigValue(this.storage.listType);
-            }
-
-            this.addManualItem(item);
-          });
+        let storage;
+        if (index != 0) {
+          this.selectedItems.push(null);
+          storage = this.pushStorage(true);
         }
         else {
-          this.storage.type = "";
-          this.storage.id = "";
-          this.storage.parentId = "";
-          this.storage.listType = this.listType;
-          this.storage.config = defaultConfigValue(this.listType);
+          storage = this.storage;
         }
+
+        const endpoint = makeEndpoint(repr.t,repr.i,repr.p);
+        this.$fetchJson(endpoint).then((list) => {
+          const parent = { id: repr.p };
+          const result = { value: [list] };
+          const [ item ] = this.schemaProcessing.listList(result,parent);
+
+          item.current = true;
+          this.setManualItem(item,index);
+          this.$set(this.selectedItems,index,item);
+
+          storage.type = item.type;
+          storage.id = item.id;
+          storage.parentId = item.parentId;
+          storage.listType = item.listType || this.listType;
+          if (repr.c) {
+            storage.config = validateConfigValue(repr.c,storage.listType);
+          }
+          else if (repr.cs) {
+            // NOTE: this maintains compatibility with previous storage key.
+            storage.config = validateConfigValue(repr.cs,storage.listType);
+          }
+          else {
+            storage.config = defaultConfigValue(storage.listType);
+          }
+        });
       },
 
       addManualItem(item) {
@@ -316,6 +328,24 @@
         }
 
         this.manualItems.push(item);
+      },
+
+      setManualItem(item,index) {
+        if (index < 0) {
+          return;
+        }
+
+        for (let i = this.manualItems.length;i <= index;++i) {
+          this.manualItems.push(null);
+        }
+
+        if (!item.id) {
+          const id = this.$options.manualIdTop++;
+          item.id = "toplv-manual-" + id.toString();
+          item.type = "toplv";
+        }
+
+        this.$set(this.manualItems,index,item);
       },
 
       pushSecondary() {

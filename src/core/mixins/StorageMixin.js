@@ -46,20 +46,22 @@ export default {
         && typeof this.value === "string"
         && this.value.length > 0)
     {
+      let repr;
       try {
-        const repr = JSON.parse(this.value);
-        this.applyValue(repr);
-
-        // Apply secondary storage items.
-        if (Array.isArray(repr._)) {
-          repr._.forEach((item) => {
-            this.pushStorage();
-            this.applyValue(repr);
-          });
-          this.selectStorage(0);
-        }
+        repr = JSON.parse(this.value);
       } catch (ex) {
         this.applyValue(false);
+        return;
+      }
+
+      let index = 0;
+      this.applyValue(repr,index++);
+
+      // Apply secondary storage items.
+      if (Array.isArray(repr._)) {
+        repr._.forEach((item) => {
+          this.applyValue(item,index++);
+        });
       }
     }
   },
@@ -119,11 +121,21 @@ export default {
       return repr;
     },
 
-    pushStorage() {
+    getStorageAtIndex(index) {
+      if (index < 0 || index >= this.storageList.length) {
+        return null;
+      }
+      return this.storageList[index];
+    },
+
+    pushStorage(preventUpdate) {
       const newStorage = {};
       this.setUpStorage(newStorage);
       this.storageList.push(newStorage);
-      this.storage = newStorage;
+      if (!preventUpdate) {
+        this.storage = newStorage;
+      }
+      return newStorage;
     },
 
     selectStorage(index) {
