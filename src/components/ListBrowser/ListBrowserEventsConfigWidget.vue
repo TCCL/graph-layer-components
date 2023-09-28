@@ -4,7 +4,7 @@
 
     <graph-layer-wrapper
       v-bind="$wrapperBind"
-      justify-around
+      justify-between
       scroll
       >
       <div v-for="prop in properties" :class="$style['mapping-entry']">

@@ -27,6 +27,7 @@
       :class="[
         $style['graph-layer-wrapper__content'],
         (props.justifyAround ? $style['graph-layer-wrapper__content--justify-around'] : ''),
+        (props.justifyBetween ? $style['graph-layer-wrapper__content--justify-between'] : ''),
         data.staticClass,
         data.class
        ]"
@@ -67,6 +68,11 @@
       },
 
       justifyAround: {
+        type: Boolean,
+        default: false
+      },
+
+      justifyBetween: {
         type: Boolean,
         default: false
       }
@@ -116,5 +122,8 @@
   }
   .graph-layer-wrapper__content--justify-around {
     justify-content: space-around;
+  }
+  .graph-layer-wrapper__content--justify-between {
+    justify-content: space-between;
   }
 </style>
