@@ -22,15 +22,33 @@
     </div>
 
     <div :class="$style['header']">
-      <div :class="[$style['column'],$style['name']]">Name</div>
-      <div :class="$style['column']">Size</div>
-      <div :class="$style['column']">Last Modified By</div>
-      <div :class="[$style['column'],$style['last-modified']]">Last Modified</div>
+      <div
+        :class="[$style['column'],$style['column--name'],...colSel('name')]"
+        @click="updateSorting('name')"
+        title="Click to sort by name"
+        >Name</div>
+      <div
+        :class="[$style['column'],...colSel('size')]"
+        @click="updateSorting('size')"
+        title="Click to sort by column"
+        >Size</div>
+      <div
+        :class="[$style['column'],...colSel('lastModifiedBy.user.displayName')]"
+        @click="updateSorting('lastModifiedBy.user.displayName')"
+        title="Click to sort by last modified user name"
+        >Last Modified By</div>
+      <div
+        :class="[$style['column'],$style['column--last-modified'],...colSel('lastModifiedDateTime')]"
+        @click="updateSorting('lastModifiedDateTime')"
+        title="Click to sort by last modified time"
+        >Last Modified</div>
     </div>
 
     <drive-explorer
       ref="explorer"
       :endpoint="endpoint"
+      :sort-by="activeSortBy"
+      :sort-asc="activeSortAsc"
       :top="top"
       @change="items = $event"
       />
@@ -58,7 +76,9 @@
       driveInfo: {},
       items: [],
       siteInfo: null,
-      groupInfo: null
+      groupInfo: null,
+      activeSortBy: "",
+      activeSortAsc: true
     }),
 
     props: {
@@ -100,6 +120,16 @@
       top: {
         type: [Number,String],
         default: null
+      },
+
+      sortBy: {
+        type: [String],
+        default: null
+      },
+
+      sortDirection: {
+        type: [String],
+        default: null
       }
     },
 
@@ -110,7 +140,8 @@
             const repr = JSON.parse(this.value);
             return {
               driveType: repr.t,
-              driveId: repr.i
+              driveId: repr.i,
+              config: repr.c
             };
 
           } catch (err) {
@@ -120,7 +151,8 @@
 
         return {
           driveType: null,
-          driveValue: null
+          driveValue: null,
+          config: null
         };
       },
 
@@ -253,11 +285,38 @@
 
       pathParts() {
         return this.items.map((item) => item.name);
+      },
+
+      defaultSortBy() {
+        if (this.sortBy) {
+          return this.sortBy;
+        }
+
+        if (this.parsedValue.config) {
+          return this.parsedValue.config.sortBy;
+        }
+
+        return "";
+      },
+
+      defaultSortAsc() {
+        if (this.sortDirection) {
+          return ( this.sortDirection == "asc" );
+        }
+
+        if (this.parsedValue.config) {
+          return this.parsedValue.config.asc;
+        }
+
+        return true;
       }
     },
 
     created() {
       this.load();
+
+      this.activeSortBy = this.defaultSortBy;
+      this.activeSortAsc = this.defaultSortAsc;
     },
 
     methods: {
@@ -298,12 +357,46 @@
         }
 
         window.open(this.currentItem.webUrl,"_blank");
+      },
+
+      colSel(name) {
+        if (name != this.activeSortBy) {
+          return;
+        }
+
+        const cls = [this.$style["column--selected"]];
+
+        if (this.activeSortAsc) {
+          cls.push(this.$style["column--sort-asc"]);
+        }
+        else {
+          cls.push(this.$style["column--sort-dsc"]);
+        }
+
+        return cls;
+      },
+
+      updateSorting(sortBy) {
+        if (sortBy == this.activeSortBy) {
+          this.activeSortAsc = !this.activeSortAsc;
+        }
+        else {
+          this.activeSortBy = sortBy;
+          this.activeSortAsc = true;
+        }
       }
     },
 
     watch: {
       endpoint() {
         this.load();
+      },
+
+      defaultSortBy(value) {
+        this.activeSortBy = value;
+      },
+      defaultSortAsc(value) {
+        this.activeSortAsc = value;
       }
     }
   };
@@ -344,15 +437,27 @@
     border-bottom: 2px solid var(--graph-layer-border-color);
   }
   .header > .column {
-    font-size: 12px;
+    user-select: none;
+    cursor: pointer;
+    font-size: 14px;
     font-weight: bold;
     padding: 0.5em 0;
     flex: 2 0;
   }
-  .header > .column.name {
+  .header > .column.column--name {
     flex: 6 0;
   }
-  .header > .column.last-modified {
+  .header > .column.column--last-modified {
     text-align: right;
+  }
+
+  .header > .column.column--selected {
+    color: var(--graph-layer-color-primary);
+  }
+  .header > .column.column--selected.column--sort-dsc::after {
+    content: '↑';
+  }
+  .header > .column.column--selected.column--sort-asc::after {
+    content: '↓';
   }
 </style>

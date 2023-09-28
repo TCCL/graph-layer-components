@@ -46,10 +46,13 @@
 </template>
 
 <script>
-  import GraphLayerMixin from "../../core/mixins/GraphLayerMixin.js";
-  import LoadErrorMixin from "../../core/mixins/LoadErrorMixin.js";
   import FolderEntry from "./FolderEntry.vue";
   import FileEntry from "./FileEntry.vue";
+
+  import { DEFAULT_CONFIG_VALUE } from "../DriveBrowser/DriveBrowserConfigWidget.vue";
+
+  import GraphLayerMixin from "../../core/mixins/GraphLayerMixin.js";
+  import LoadErrorMixin from "../../core/mixins/LoadErrorMixin.js";
   import { extractQueryParam } from "../../core/helpers.js";
 
   function makeDriveKey(id,_page) {
@@ -64,6 +67,57 @@
       id: parts[0],
       page: parseInt(parts[1])
     };
+  }
+
+  function sortListing(listing,sortBy,asc) {
+    const partitions = [[],[]];
+    const fieldParts = sortBy.split(".");
+
+    if (fieldParts.length == 0 || !sortBy) {
+      return listing;
+    }
+
+    function extractField(value) {
+      let field = value;
+      for (let i = 0;i < fieldParts.length;++i) {
+        if (fieldParts[i] in field) {
+          field = field[fieldParts[i]];
+        }
+      }
+      return field;
+    }
+
+    function sortFunc(a,b) {
+      let av = extractField(a);
+      let bv = extractField(b);
+
+      if (!asc) {
+        const tmp = av;
+        av = bv;
+        bv = tmp;
+      }
+
+      if (av < bv) {
+        return -1;
+      }
+      if (av > bv) {
+        return 1;
+      }
+      return 0;
+    }
+
+    listing.forEach((item) => {
+      if (item.folder) {
+        partitions[0].push(item);
+      }
+      else {
+        partitions[1].push(item);
+      }
+    });
+
+    partitions.forEach((x) => x.sort(sortFunc));
+
+    return [].concat(...partitions);
   }
 
   export default {
@@ -88,6 +142,14 @@
 
     props: {
       endpoint: String,
+      sortBy: {
+        type: String,
+        default: DEFAULT_CONFIG_VALUE.sortBy
+      },
+      sortAsc: {
+        type: Boolean,
+        default: DEFAULT_CONFIG_VALUE.asc
+      },
       top: {
         type: [Number,String],
         default: null
@@ -109,7 +171,7 @@
 
       currentListing() {
         if (this.currentInfo) {
-          return this.currentInfo.listing;
+          return sortListing(this.currentInfo.listing,this.sortBy,this.sortAsc);
         }
         return [];
       },

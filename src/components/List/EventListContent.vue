@@ -1,24 +1,21 @@
 <template>
-  <graph-layer-wrapper
-    v-bind="$wrapperBind"
-    :class="$style['event-list-content-wrapper']"
-    scroll
-    >
+  <div :class="$style['event-list-content-wrapper']">
     <graph-layer-generic-calendar
       :class="$style['event-list-content']"
       :event-provider="eventProvider"
       />
-  </graph-layer-wrapper>
+  </div>
 </template>
 
 <script>
   import parseISO from "date-fns/parseISO";
 
+  import { createRecurrenceData } from "./recurrence.js";
+
   import GraphLayerGenericCalendar from "../GenericCalendar/GenericCalendar.vue";
   import { DEFAULT_MAPPING } from "../ListBrowser/ListBrowserEventsConfigWidget.vue";
 
   import GraphLayerMixin from "../../core/mixins/GraphLayerMixin.js";
-  import LoadErrorMixin from "../../core/mixins/LoadErrorMixin.js";
   import { extractQueryParam } from "../../core/helpers.js";
 
   function makeCacheKey(startDate,endDate,page) {
@@ -26,7 +23,7 @@
     return cacheKey;
   }
 
-  function makeProvider(endpoint,config,$instance) {
+  function makeProvider(endpoint,config) {
     const cache = new Map();
     const mapping = Object.assign({},DEFAULT_MAPPING,config || {});
 
@@ -38,19 +35,24 @@
     }
 
     function extractFields(item) {
-      const extracted = { "id":item.id };
+      const extracted = {
+        id: item.id,
+        render_id: `${endpoint}_${item.id}`
+      };
+
       for (const key in mapping) {
         extracted[key] = item.fields[mapping[key]];
       }
+
+      // Parse dates using the format given to us by the Microsoft platform.
       for (const key of ["startDate","endDate"]) {
-        // NOTE: For some reason, the Graph API gives us the time in UTC zero,
-        // even though they all should be interpreted in local time. To hack
-        // around this at this time, we just take off zulu to force local time.
-        if (extracted[key].endsWith("Z")) {
-          extracted[key] = extracted[key].substring(0,extracted[key].length-1);
-        }
         extracted[key] = parseISO(extracted[key]);
       }
+
+      if (extracted.recurrence) {
+        extracted.recurrence = createRecurrenceData(extracted.recurrence);
+      }
+
       return extracted;
     }
 
@@ -78,6 +80,8 @@
       filterString += ` and fields/${startDateField} lt '${endDate.toISOString()}')`;
       filterString += ` or (fields/${endDateField} ge '${startDate.toISOString()}'`;
       filterString += ` and fields/${endDateField} lt '${endDate.toISOString()}')`;
+      filterString += ` or (fields/${startDateField} lt '${startDate.toISOString()}'`;
+      filterString += ` and fields/${endDateField} ge '${endDate.toISOString()}')`;
 
       let url = new URL(`${endpoint}/items`,window.location.origin);
       url.searchParams.set("$filter",filterString);
@@ -91,9 +95,21 @@
         headers
       };
 
-      return $instance.$fetchJson(url,init).then((payload) => {
+      return this.$fetchJson(url,init).then((payload) => {
+        const items = [];
         const extracted = payload.value.map(extractFields);
-        cacheEntry.items = extracted;
+
+        extracted.forEach((item) => {
+          if (item.recurrence) {
+            item.recurrence.replicate(item,startDate,endDate).forEach(
+              (x) => items.push(x)
+            );
+          }
+          else {
+            items.push(item);
+          }
+        });
+        cacheEntry.items = items;
         cacheEntry.hasNextPage = !!cacheEntry.skipToken;
 
         const skipToken = extractQueryParam(payload["@data.nextLink"],"$skiptoken");
@@ -110,12 +126,32 @@
     return queryEvents;
   }
 
+  function makeTopLevelProvider(endpoint,config,children) {
+    const providers = [makeProvider(endpoint,config)].concat(
+      children.map((child) => makeProvider(child.endpoint,child.config))
+    );
+
+    async function queryEvents(start,end,page) {
+      let result = { items:[], hasNextPage:false };
+
+      for (let i = 0;i < providers.length;++i) {
+        const { items, hasNextPage } = await providers[i].call(this,start,end,page);
+        items.forEach((item) => item._calendar_index = i);
+        result.items = result.items.concat(items);
+        result.hasNextPage = result.hasNextPage || hasNextPage;
+      }
+
+      return result;
+    }
+
+    return queryEvents;
+  }
+
   export default {
     name: "EventListContent",
 
     mixins: [
-      GraphLayerMixin,
-      LoadErrorMixin
+      GraphLayerMixin
     ],
 
     components: {
@@ -129,12 +165,12 @@
     props: {
       endpoint: String,
       config: Object,
-      $instance: Object
+      children: Array
     },
 
     computed: {
       eventProvider() {
-        return makeProvider(this.endpoint,this.config,this);
+        return makeTopLevelProvider(this.endpoint,this.config,this.children);
       }
     },
 
@@ -150,7 +186,8 @@
 
 <style module>
   .event-list-content-wrapper {
-
+    display: flex;
+    flex-flow: row nowrap;
   }
 
   .event-list-content {

@@ -16,7 +16,7 @@
 
     <graph-layer-list-browser
       v-if="hasValue"
-      :value="serialized"
+      v-model="applyValue"
       :title="title"
       browse-followed-sites
       :list-type="listType"
@@ -52,6 +52,21 @@
     computed: {
       hasValue() {
         return this.serialized && this.submitted;
+      },
+
+      applyValue: {
+        get() {
+          return this.serialized;
+        },
+        set(value) {
+          try {
+            const un = JSON.parse(value);
+            this.serialized = JSON.stringify(un,null,"  ");
+          }
+          catch (err) {
+            this.serialized = value;
+          }
+        }
       }
     },
 

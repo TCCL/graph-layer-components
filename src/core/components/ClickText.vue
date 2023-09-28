@@ -18,6 +18,10 @@
       title: {
         type: String,
         default: ""
+      },
+      accent: {
+        type: Boolean,
+        default: false
       }
     },
 
@@ -29,6 +33,10 @@
 
         if (this.disabled) {
           cls.push(this.$style["disabled"]);
+        }
+
+        if (this.accent) {
+          cls.push(this.$style['accent']);
         }
 
         return cls;
@@ -56,9 +64,15 @@
     font-size: 15px;
     cursor: pointer;
     user-select: none;
+    color: var(--graph-layer-color-primary);
   }
   .click-text:hover {
     text-decoration: underline;
+  }
+
+  .click-text.accent {
+    color: var(--graph-layer-color-accent);
+    font-weight: bold;
   }
 
   .click-text.disabled {

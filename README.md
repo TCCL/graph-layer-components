@@ -163,6 +163,8 @@ The following components are provided by this library:
 | `graph-layer-list` | `list` | Renders a Sharepoint site list |
 | `graph-layer-list-browser` | `listBrowser` | Widget for selecting a site list |
 
+> Browser components (e.g. `graph-layer-drive-browser`, ETC.) generate serialized strings that are designed to be passed to a corresponding component's `value` property (or via `data-graph-layer--value` if scanning). All configuration that can be done through `value` can also be done via individual properties.
+
 ### User
 
 The _User_ component renders a user profile summary.
@@ -191,10 +193,12 @@ The _Drive_ component renders a folder/file listing from a Microsoft drive objec
 | `userIdOrPrincipleName` | Loads a drive by its parent user ID or user principle name |
 | `me` | Loads the drive belonging to the current user |
 | `top` | The maximum number of items to show per page |
+| `sortBy` | The field that will be initially used to sort the items in the drive; if omitted, then the sort order returned by the API will be used |
+| `sortDirection` | Either `asc` or `dsc` to indicate the sort direction |
 
 ### Drive Browser
 
-The _DriveBrowser_ component is used to browse and select a drive (i.e. document library) within an organization. This includes document libraries under users, groups and sites.
+The _DriveBrowser_ component is used to browse and select a drive (i.e. document library) within an organization. This includes document libraries under users, groups and sites. The browser allows the initial drive sort field and sort order to be configured.
 
 **Properties**:
 
@@ -220,13 +224,15 @@ The _DriveBrowser_ component is used to browse and select a drive (i.e. document
 | `id` | The ID of the list to query and render. |
 | `siteId` | The ID of the list's parent site. |
 | `columns` | List of columns to load by ID or Name. (This overrides any columns specified via `value`.) |
+| `config` | List configuration object or serialized object string |
+| `children` | For `events` lists only. Array of child list objects. Each object has the schema `{ id, siteId, config }`. |
 | `overrideLabel` | Title label to render in place of list name. |
-| `listType` | The type of list to render. (e.g. "generic" or "events") |
+| `listType` | The type of list to render. (e.g. `generic` or `events`) |
 | `top` | Determines the number of items shown per page |
 
 ### List Browser
 
-The _ListBrowser_ component is used to browse and select a Sharepoint site list within an organization. Site lists only exist under sites.
+The _ListBrowser_ component is used to browse and select a SharePoint site list within an organization. Site lists only exist under sites.
 
 **Properties**
 
@@ -237,3 +243,16 @@ The _ListBrowser_ component is used to browse and select a Sharepoint site list 
 | `formElement` | Allows the component to function as a `<form>` element; the property value is assigned as the form element `name`. |
 | `browseSites` | Flag enabling browsing of sites |
 | `browseFollowedSites` | Flag enabling browsing of followed sites |
+| `listType` | Indicates the type of list to render. Supported values include: `generic`, `events` |
+| `filterTemplate` | Indicates the list template(s) to display in the browser. |
+
+**About list types and template filtering**
+
+SharePoint site lists can be used to represent multiple types of content. Currently, `graph-layer-components` supports the following list types:
+
+- Generic: renders a default 2-dimensional list view
+- Events: renders a calendar view
+
+The list type in the upstream list object is indicated by its `template` property. When you create a SharePoint calendar, the system creates a list with a template of `events`. A generic list has template type `genericList`.
+
+You can use the `filterTemplate` property to filter which templates are displayed in the list browser. This is either an Array of template names or a singleton string with template names separated by a `:` character.

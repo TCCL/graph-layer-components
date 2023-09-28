@@ -3,64 +3,67 @@
 
   export default {
     name: "Icon",
-    functional: true,
 
     render(h,context) {
       const classes = [
-          context.$style.icon,
-          context.data.staticClass,
-          context.data.class
+          this.$style.icon,
       ];
 
-      if (context.props.medium) {
-        classes.push(context.$style.medium);
+      if (this.medium) {
+        classes.push(this.$style.medium);
       }
-      else if (context.props.large) {
-        classes.push(context.$style.large);
+      else if (this.large) {
+        classes.push(this.$style.large);
       }
-      else if (context.props.xlarge) {
-        classes.push(context.$style.xlarge);
-      }
-
-      if (context.props.button) {
-        classes.push(context.$style.button);
+      else if (this.xlarge) {
+        classes.push(this.$style.xlarge);
       }
 
-      if (context.props.secondary) {
-        classes.push(context.$style.secondary);
-      }
-      else if (context.props.accent) {
-        classes.push(context.$style.accent);
-      }
-      else if (context.props.error) {
-        classes.push(context.$style.error);
+      if (this.button) {
+        classes.push(this.$style.button);
       }
 
-      if (context.props.disabled) {
-        classes.push(context.$style.disabled);
+      if (this.secondary) {
+        classes.push(this.$style.secondary);
+      }
+      else if (this.accent) {
+        classes.push(this.$style.accent);
+      }
+      else if (this.error) {
+        classes.push(this.$style.error);
       }
 
-      let on = context.listeners;
-      if (context.props.button) {
-        on = Object.assign({},on || {});
+      if (this.disabled) {
+        classes.push(this.$style.disabled);
+      }
 
-        const mousedownOriginal = on.mousedown;
-        on.mousedown = ($event) => {
-          if (typeof mousedownOriginal === "function") {
-            mousedownOriginal($event);
-          }
-          $event.preventDefault();
-        };
+      let on;
+      if (this.disabled) {
+        on = null;
+      }
+      else {
+        on = this.$listeners;
+        if (this.button) {
+          on = Object.assign({},on || {});
+
+          const mousedownOriginal = on.mousedown;
+          on.mousedown = ($event) => {
+            if (typeof mousedownOriginal === "function") {
+              mousedownOriginal($event);
+            }
+            $event.preventDefault();
+          };
+        }
       }
 
       const e = h("i",{
         domProps: {
-          innerHTML: getIconSvg(context.props.i)
+          innerHTML: getIconSvg(this.i)
         },
 
         "class": classes,
-        attrs: context.data.attrs,
-        style: context.data.style,
+        attrs: this.$attrs,
+        style: this.$style,
         on
       });
 

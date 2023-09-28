@@ -66,6 +66,14 @@
         default: ""
       },
 
+      children: {
+        // NOTE: The children property is only used for the "events" list type.
+        // It is a list of child lists having the structure:
+        //   { id, siteId, config }.
+        type: Array,
+        default: null
+      },
+
       overrideLabel: {
         type: String,
         default: ""
@@ -228,6 +236,52 @@
         return "generic";
       },
 
+      childEventLists() {
+        if (this.selectedListType != "events") {
+          return [];
+        }
+
+        let list;
+        if (Array.isArray(this.children)) {
+          list = this.children.filter((item) => item.id && item.siteId);
+        }
+        else if (this.parsedValue && this.parsedValue._) {
+          list = this.parsedValue._.filter(
+            (item) => typeof item === "object"
+              && item.t == "list"
+              && item.l == "events"
+              && item.i
+              && item.p
+          );
+        }
+        else {
+          list = [];
+        }
+
+        return list.map((item) => {
+          const child = {};
+
+          if (item.id && item.siteId) {
+            child.endpoint = `/sites/${item.siteId}/lists/${item.id}`;
+          }
+          else if (item.i && item.p) {
+            child.endpoint = `/sites/${item.p}/lists/${item.i}`;
+          }
+
+          if (item.config) {
+            child.config = item.config;
+          }
+          else if (item.c && typeof item.c === "object") {
+            child.config = item.c;
+          }
+          else {
+            child.config = null;
+          }
+
+          return child;
+        });
+      },
+
       content() {
         switch (this.selectedListType) {
         case "events":
@@ -235,7 +289,8 @@
             is: EventListContent,
             "class": this.$style["graph-layer-list__content"],
             endpoint: this.endpoint,
-            config: this.selectedConfig
+            config: this.selectedConfig,
+            children: this.childEventLists
           };
         default:
           break;

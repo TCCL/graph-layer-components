@@ -2,7 +2,7 @@
   <div :class="$style['calendar-week']" :style="styles">
     <calendar-event
       v-for="eventInfo in eventsForWeek"
-      :key="eventInfo.event.id"
+      :key="eventInfo.event.render_id"
       :event-info="eventInfo"
       :class="$style['calendar-week__event']"
       :style="eventStyles(eventInfo)"

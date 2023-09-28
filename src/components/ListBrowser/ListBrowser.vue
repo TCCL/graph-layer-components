@@ -2,6 +2,7 @@
   <graph-layer-generic-browser
     target-schema="list"
     v-model="selection"
+    @item:update="setItem"
     :schema-processing="schemaProcessing"
     :title="title"
     :domain-label="domainLabel"
@@ -9,16 +10,44 @@
     >
     <input v-if="formElement" type="hidden" :name="formElement" :value="storageValue" />
 
+    <template v-if="listType == 'events'" #header>
+      <div :class="$style['header']">
+        <div :class="$style['header__nav']">
+          <div
+            v-for="item,index in selectedItems"
+            v-if="item !== null"
+            class="$style['header__nav-item']"
+            >
+            <click-text
+              @click="selectItem(index)"
+              :disabled="index === selectedItemIndex || !selectedItems[selectedItemIndex]"
+              >{{ item.label }}</click-text>
+          </div>
+        </div>
+
+        <div :class="$style['header__actions']">
+          <click-text
+            accent
+            @click="removeSecondary"
+            :disabled="selectedItems.length < 2"
+            >{{ selectedItems[selectedItemIndex] ? 'Remove' : 'Cancel' }}</click-text>
+          <click-text
+            @click="pushSecondary"
+            :disabled="!isSelected">Add Secondary Calendar</click-text>
+        </div>
+      </div>
+    </template>
+
     <component
       v-if="widget && isSelected"
       :is="widget"
       v-model="storage.config"
-      :class="$style['widget']"
+      :class="$style['config-widget']"
       :list-id="storage.id"
       :site-id="storage.parentId"
       />
 
-    <template v-if="true" #footer>
+    <template #options>
       <generic-browser-options-form
         enable-sites
         :schema-processing="schemaProcessing"
@@ -92,7 +121,9 @@
     },
 
     data: () => ({
-      manualItems: []
+      manualItems: [],
+      selectedItemIndex: 0,
+      selectedItems: [null]
     }),
 
     props: {
@@ -135,7 +166,7 @@
 
     computed: {
       items() {
-        return this.topLevelItems.concat(this.manualItems);
+        return this.topLevelItems.concat(this.manualItems.filter((x) => !!x));
       },
 
       topLevelItems() {
@@ -225,49 +256,62 @@
 
     created() {
       this.registerStorageKey("parentId","p");
-      this.registerStorageKey("listType","l",this.listType);
+      this.registerStorageKey("listType","l");
       this.registerStorageKey("config","c",defaultConfigValue(this.listType));
+      this.storage.listType = this.listType;
       this.$options.manualIdTop = 1;
     },
 
     methods: {
-      applyValue(repr) {
+      applyValue(repr,index) {
         // Called from StorageMixin.created()
 
-        if (repr.t && repr.i && repr.p) {
-          const endpoint = makeEndpoint(repr.t,repr.i,repr.p);
-          this.$fetchJson(endpoint).then((list) => {
-            const parent = { id: repr.p };
-            const result = { value: [list] };
-            const [ item ] = this.schemaProcessing.listList(result,parent);
+        if (!repr || !(repr.i && repr.t && repr.p)) {
+          const storage = this.getStorageAtIndex(index);
+          if (storage) {
+            storage.type = "";
+            storage.id = "";
+            storage.parentId = "";
+            storage.listType = this.listType;
+            storage.config = defaultConfigValue(this.listType);
+          }
+          return;
+        }
 
-            item.current = true;
-
-            this.storage.type = item.type;
-            this.storage.id = item.id;
-            this.storage.parentId = item.parentId;
-            this.storage.listType = item.listType || this.listType;
-            if (repr.c) {
-              this.storage.config = validateConfigValue(repr.c,this.storage.listType);
-            }
-            else if (repr.cs) {
-              // NOTE: this maintains compatibility with previous storage key.
-              this.storage.config = validateConfigValue(repr.cs,this.storage.listType);
-            }
-            else {
-              this.storage.config = defaultConfigValue(this.storage.listType);
-            }
-
-            this.addManualItem(item);
-          });
+        let storage;
+        if (index != 0) {
+          this.selectedItems.push(null);
+          storage = this.pushStorage(true);
         }
         else {
-          this.storage.type = "";
-          this.storage.id = "";
-          this.storage.parentId = "";
-          this.storage.listType = this.listType;
-          this.storage.config = defaultConfigValue(this.listType);
+          storage = this.storage;
         }
+
+        const endpoint = makeEndpoint(repr.t,repr.i,repr.p);
+        this.$fetchJson(endpoint).then((list) => {
+          const parent = { id: repr.p };
+          const result = { value: [list] };
+          const [ item ] = this.schemaProcessing.listList(result,parent);
+
+          item.current = true;
+          this.setManualItem(item,index);
+          this.$set(this.selectedItems,index,item);
+
+          storage.type = item.type;
+          storage.id = item.id;
+          storage.parentId = item.parentId;
+          storage.listType = item.listType || this.listType;
+          if (repr.c) {
+            storage.config = validateConfigValue(repr.c,storage.listType);
+          }
+          else if (repr.cs) {
+            // NOTE: this maintains compatibility with previous storage key.
+            storage.config = validateConfigValue(repr.cs,storage.listType);
+          }
+          else {
+            storage.config = defaultConfigValue(storage.listType);
+          }
+        });
       },
 
       addManualItem(item) {
@@ -284,13 +328,86 @@
         }
 
         this.manualItems.push(item);
+      },
+
+      setManualItem(item,index) {
+        if (index < 0) {
+          return;
+        }
+
+        for (let i = this.manualItems.length;i <= index;++i) {
+          this.manualItems.push(null);
+        }
+
+        if (!item.id) {
+          const id = this.$options.manualIdTop++;
+          item.id = "toplv-manual-" + id.toString();
+          item.type = "toplv";
+        }
+
+        this.$set(this.manualItems,index,item);
+      },
+
+      pushSecondary() {
+        this.selectedItemIndex = this.selectedItems.length;
+        this.selectedItems.push(null);
+        this.pushStorage();
+      },
+
+      removeSecondary() {
+        if (this.selectedItems.length < 2) {
+          return;
+        }
+
+        this.selectedItems.splice(this.selectedItemIndex,1);
+        this.selectedItemIndex = this.removeStorage(this.selectedItemIndex);
+      },
+
+      setItem(item) {
+        this.selectedItems[this.selectedItemIndex] = item;
+      },
+
+      selectItem(index) {
+        this.selectedItemIndex = index;
+        this.selectStorage(index);
+      }
+    },
+
+    watch: {
+      listType() {
+        this.registerStorageKey("config","c",defaultConfigValue(this.listType));
       }
     }
   };
 </script>
 
 <style module>
-  .widget {
+  .header {
+    display: flex;
+    justify-content: space-between;
+  }
+
+  .header__nav {
+    display: flex;
+    justify-content: flex-start;
+    gap: 1em;
+  }
+
+  .header__nav-item {
+    padding: 0.5em;
+    border-right: 3px solid var(--graph-layer-divider-color);
+  }
+  .header__nav-item:last-child {
+    border-right: none;
+  }
+
+  .header__actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 1em;
+  }
+
+  .config-widget {
     flex: 1.5;
     border-top: 2px solid var(--graph-layer-divider-color);
   }

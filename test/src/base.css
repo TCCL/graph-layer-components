@@ -22,18 +22,14 @@
 }
 
 .testbed-wrapper > .region-wrapper > .region--large {
-  max-height: 600px;
-  height: 600px;
+  max-height: 850px;
+  height: 850px;
 }
 
 .testbed-wrapper > .region-wrapper > .region--auto {
   height: auto;
   max-height: initial;
   min-height: 10vh;
-}
-
-.testbed-wrapper .input-test {
-  flex: 1 0;
 }
 
 .testbed-wrapper .form-test {
