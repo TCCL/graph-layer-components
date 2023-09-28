@@ -2,22 +2,28 @@
   <div :class="[$style['list-browser-events-config-widget'],'graph-layer']">
     <div :class="$style['help-text']">Select the list columns to use for rendering the events calendar.</div>
 
-    <div v-for="prop in properties" :class="$style['mapping-entry']">
-      <div :class="$style['mapping-entry__label']">{{ prop.label }}</div>
-      <select v-model="mapping[prop.key]" :class="$style['mapping-entry__select']">
-        <option v-for="opt in options" :value="opt.value">{{ opt.label }}</option>
-      </select>
-    </div>
-
-    <div :class="$style['footer']">
-      <div>If a field is not enumerated in the drop-downs, you may add the machine name for the field here:</div>
-
-      <div :class="$style['field-entry']">
-        <span>Enter field name: </span>
-        <input v-model="addField" type="text" placeholder="Field Name..." size="40">
-        <click-text @click="addFieldToOptions">Add</click-text>
+    <graph-layer-wrapper
+      v-bind="$wrapperBind"
+      justify-around
+      scroll
+      >
+      <div v-for="prop in properties" :class="$style['mapping-entry']">
+        <div :class="$style['mapping-entry__label']">{{ prop.label }}</div>
+        <select v-model="mapping[prop.key]" :class="$style['mapping-entry__select']">
+          <option v-for="opt in options" :value="opt.value">{{ opt.label }}</option>
+        </select>
       </div>
-    </div>
+
+      <div :class="$style['footer']">
+        <div>If a field is not enumerated in the drop-downs, you may add the machine name for the field here:</div>
+
+        <div :class="$style['field-entry']">
+          <span>Enter field name: </span>
+          <input v-model="addField" type="text" placeholder="Field Name..." size="40">
+          <click-text @click="addFieldToOptions">Add</click-text>
+        </div>
+      </div>
+    </graph-layer-wrapper>
   </div>
 </template>
 
