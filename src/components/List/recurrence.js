@@ -54,16 +54,27 @@ function weekdayofmonth2weeks(value) {
 }
 
 function collectDOW(info,el) {
+  let count = 0;
   DOWS.forEach((dow) => {
     if (dow in el.attributes) {
       let value = el.attributes[dow].nodeValue;
       value = value.toLowerCase();
       info[dow] = ( value === "true" );
+      if (info[dow]) {
+        count += 1;
+      }
     }
     else {
       info[dow] = false;
     }
   });
+
+  if (count > 0) {
+    info["hasDow"] = true;
+  }
+  else {
+    info["hasDow"] = false;
+  }
 }
 
 function collectInteger(name,info,el,defaultValue) {
@@ -75,7 +86,17 @@ function collectInteger(name,info,el,defaultValue) {
     info[name] = value;
   }
   else if (typeof defaultValue !== "undefined") {
-    info[name] = 1;
+    info[name] = defaultValue;
+  }
+}
+
+function collectBoolean(name,info,el,defaultValue) {
+  if (name in el.attributes) {
+    const nodeValue = el.attributes[name].nodeValue.toLowerCase();
+    info[name] = ( nodeValue == "true" || nodeValue == "1" );
+  }
+  else if (typeof defaultValue !== "undefined") {
+    info[name] = defaultValue;
   }
 }
 
@@ -132,6 +153,8 @@ function parseRepeat(node) {
     const info = {};
 
     collectDOW(info,el);
+    collectBoolean("day",info,el);
+    collectBoolean("weekday",info,el);
     collectString("weekdayOfMonth",info,el);
     collectInteger("monthFrequency",info,el,1);
 
@@ -154,6 +177,8 @@ function parseRepeat(node) {
     const info = {};
 
     collectDOW(info,el);
+    collectBoolean("day",info,el);
+    collectBoolean("weekday",info,el);
     collectInteger("month",info,el);
     collectString("weekdayOfMonth",info,el);
     collectInteger("yearFrequency",info,el,1);
@@ -192,7 +217,7 @@ function replicateEventForDate(dt,event) {
   return newEvent;
 }
 
-function setDateToWeekdayOfMonth(dateOfMonth,dayOfWeek,weekdayOfMonth) {
+function setDateToWeekdayOfMonthForDayOfWeek(dateOfMonth,dayOfWeek,weekdayOfMonth) {
   const dt = setDate(dateOfMonth,1);
   const day = dow2int(dayOfWeek);
   let nweeks = weekdayofmonth2weeks(weekdayOfMonth);
@@ -207,6 +232,63 @@ function setDateToWeekdayOfMonth(dateOfMonth,dayOfWeek,weekdayOfMonth) {
     days: dayOffset,
     weeks: nweeks
   });
+}
+
+function setDateToWeekdayOfMonthForDay(dateOfMonth,weekdayOfMonth) {
+  const dt = setDate(dateOfMonth,1);
+
+  let days = 0;
+  let months = 0;
+
+  if (weekdayOfMonth == "last") {
+    months = 1;
+    days = -1;
+  }
+  else {
+    days = weekdayofmonth2weeks(weekdayOfMonth) - 1;
+  }
+
+  return addDate(dt,{
+    days,
+    months
+  });
+}
+
+function setDateToWeekdayOfMonthForWeekday(dateOfMonth,weekdayOfMonth) {
+  let offset;
+  let dt = setDate(dateOfMonth,1);
+
+  if (weekdayOfMonth == "last") {
+    offset = -1;
+    dt = addDate(dt,{ months:1, days:-1 });
+  }
+  else {
+    offset = 1;
+  }
+
+  let days;
+  if (weekdayOfMonth != "last") {
+    days = weekdayofmonth2weeks(weekdayOfMonth);
+  }
+  else {
+    days = 1;
+  }
+
+  let count = 0;
+  while (true) {
+    const dow = getDay(dt);
+    if (dow >= 1 && dow <= 5) {
+      count += 1;
+    }
+
+    if (count >= days) {
+      break;
+    }
+
+    dt = addDate(dt,{ days:offset });
+  }
+
+  return dt;
 }
 
 function checkRepeat(rule,inst) {
@@ -400,38 +482,64 @@ class Recurrence {
 
       let done = false;
       let valid = false;
-      DOWS.forEach((dow) => {
-        if (!rule.repeat.monthlyByDay[dow]) {
+
+      function generateEvent(testdt) {
+        if (compareDate(testdt,event.startDate) < 0) {
           return;
         }
-
-        const dowdt = setDateToWeekdayOfMonth(
-          evdt,
-          dow,
-          rule.repeat.monthlyByDay.weekdayOfMonth
-        );
-
-        if (compareDate(dowdt,event.startDate) < 0) {
-          return;
-        }
-        if (compareDate(dowdt,event.endDate) > 0) {
+        if (compareDate(testdt,event.endDate) > 0) {
           done = true;
           return;
         }
 
         valid = true;
-        if (compareDate(dowdt,endDate) > 0) {
+        if (compareDate(testdt,endDate) > 0) {
           done = true;
           return;
         }
-        if (compareDate(dowdt,startDate) < 0) {
+        if (compareDate(testdt,startDate) < 0) {
           return;
         }
 
         if (monthCount % rule.repeat.monthlyByDay.monthFrequency == 0) {
-          events.push(replicateEventForDate(dowdt,event));
+          events.push(replicateEventForDate(testdt,event));
         }
-      });
+      }
+
+      if (rule.repeat.monthlyByDay.hasDow) {
+        DOWS.forEach((dow) => {
+          if (!rule.repeat.monthlyByDay[dow]) {
+            return;
+          }
+
+          const dowdt = setDateToWeekdayOfMonthForDayOfWeek(
+            evdt,
+            dow,
+            rule.repeat.monthlyByDay.weekdayOfMonth
+          );
+
+          generateEvent(dowdt);
+        });
+      }
+      else if (rule.repeat.monthlyByDay.day) {
+        const daydt = setDateToWeekdayOfMonthForDay(
+          evdt,
+          rule.repeat.monthlyByDay.weekdayOfMonth
+        );
+
+        generateEvent(daydt);
+      }
+      else if (rule.repeat.monthlyByDay.weekday) {
+        const weekdaydt = setDateToWeekdayOfMonthForWeekday(
+          evdt,
+          rule.repeat.monthlyByDay.weekdayOfMonth
+        );
+
+        generateEvent(weekdaydt);
+      }
+      else {
+        done = true;
+      }
 
       if (done) {
         break;
@@ -498,38 +606,64 @@ class Recurrence {
 
       let done = false;
       let valid = false;
-      DOWS.forEach((dow) => {
-        if (!rule.repeat.yearlyByDay[dow]) {
+
+      function generateEvent(testdt) {
+        if (compareDate(testdt,event.startDate) < 0) {
           return;
         }
-
-        const dowdt = setDateToWeekdayOfMonth(
-          evdt,
-          dow,
-          rule.repeat.yearlyByDay.weekdayOfMonth
-        );
-
-        if (compareDate(dowdt,event.startDate) < 0) {
-          return;
-        }
-        if (compareDate(dowdt,event.endDate) > 0) {
+        if (compareDate(testdt,event.endDate) > 0) {
           done = true;
           return;
         }
 
         valid = true;
-        if (compareDate(dowdt,endDate) > 0) {
+        if (compareDate(testdt,endDate) > 0) {
           done = true;
           return;
         }
-        if (compareDate(dowdt,startDate) < 0) {
+        if (compareDate(testdt,startDate) < 0) {
           return;
         }
 
         if (yearCount % rule.repeat.yearlyByDay.yearFrequency == 0) {
-          events.push(replicateEventForDate(dowdt,event));
+          events.push(replicateEventForDate(testdt,event));
         }
-      });
+      }
+
+      if (rule.repeat.yearlyByDay.hasDow) {
+        DOWS.forEach((dow) => {
+          if (!rule.repeat.yearlyByDay[dow]) {
+            return;
+          }
+
+          const dowdt = setDateToWeekdayOfMonthForDayOfWeek(
+            evdt,
+            dow,
+            rule.repeat.yearlyByDay.weekdayOfMonth
+          );
+
+          generateEvent(dowdt);
+        });
+      }
+      else if (rule.repeat.yearlyByDay.day) {
+        const daydt = setDateToWeekdayOfMonthForDay(
+          evdt,
+          rule.repeat.yearlyByDay.weekdayOfMonth
+        );
+
+        generateEvent(daydt);
+      }
+      else if (rule.repeat.yearlyByDay.weekday) {
+        const weekdaydt = setDateToWeekdayOfMonthForWeekday(
+          evdt,
+          rule.repeat.yearlyByDay.weekdayOfMonth
+        );
+
+        generateEvent(weekdaydt);
+      }
+      else {
+        done = true;
+      }
 
       if (done) {
         break;
