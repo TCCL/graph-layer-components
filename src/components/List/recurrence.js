@@ -155,6 +155,7 @@ function parseRepeat(node) {
     collectDOW(info,el);
     collectBoolean("day",info,el);
     collectBoolean("weekday",info,el);
+    collectBoolean("weekend_day",info,el);
     collectString("weekdayOfMonth",info,el);
     collectInteger("monthFrequency",info,el,1);
 
@@ -179,6 +180,7 @@ function parseRepeat(node) {
     collectDOW(info,el);
     collectBoolean("day",info,el);
     collectBoolean("weekday",info,el);
+    collectBoolean("weekend_day",info,el);
     collectInteger("month",info,el);
     collectString("weekdayOfMonth",info,el);
     collectInteger("yearFrequency",info,el,1);
@@ -278,6 +280,43 @@ function setDateToWeekdayOfMonthForWeekday(dateOfMonth,weekdayOfMonth) {
   while (true) {
     const dow = getDay(dt);
     if (dow >= 1 && dow <= 5) {
+      count += 1;
+    }
+
+    if (count >= days) {
+      break;
+    }
+
+    dt = addDate(dt,{ days:offset });
+  }
+
+  return dt;
+}
+
+function setDateToWeekdayOfMonthForWeekendDay(dateOfMonth,weekdayOfMonth) {
+  let offset;
+  let dt = setDate(dateOfMonth,1);
+
+  if (weekdayOfMonth == "last") {
+    offset = -1;
+    dt = addDate(dt,{ months:1, days:-1 });
+  }
+  else {
+    offset = 1;
+  }
+
+  let days;
+  if (weekdayOfMonth != "last") {
+    days = weekdayofmonth2weeks(weekdayOfMonth);
+  }
+  else {
+    days = 1;
+  }
+
+  let count = 0;
+  while (true) {
+    const dow = getDay(dt);
+    if (dow < 1 || dow > 5) {
       count += 1;
     }
 
@@ -537,6 +576,14 @@ class Recurrence {
 
         generateEvent(weekdaydt);
       }
+      else if (rule.repeat.monthlyByDay.weekend_day) {
+        const weekenddaydt = setDateToWeekdayOfMonthForWeekendDay(
+          evdt,
+          rule.repeat.monthlyByDay.weekdayOfMonth
+        );
+
+        generateEvent(weekenddaydt);
+      }
       else {
         done = true;
       }
@@ -660,6 +707,14 @@ class Recurrence {
         );
 
         generateEvent(weekdaydt);
+      }
+      else if (rule.repeat.yearlyByDay.weekend_day) {
+        const weekenddaydt = setDateToWeekdayOfMonthForWeekendDay(
+          evdt,
+          rule.repeat.yearlyByDay.weekdayOfMonth
+        );
+
+        generateEvent(weekenddaydt);
       }
       else {
         done = true;
