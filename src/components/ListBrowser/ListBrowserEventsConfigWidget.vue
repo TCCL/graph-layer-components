@@ -35,6 +35,7 @@
     "title": "Title",
     "startDate": "EventDate",
     "endDate": "EndDate",
+    "allDay": "fAllDayEvent",
     "description": "Description",
     "createdBy": "Author",
     "recurrence": "RecurrenceData"
@@ -76,6 +77,7 @@
           { key:"title", label:"Event Title" },
           { key:"startDate", label:"Event Start Date" },
           { key:"endDate", label:"Event End Date" },
+          { key:"allDay", label:"All Day Event" },
           { key:"description", label:"Event Description" },
           { key:"createdBy", label:"Event Created By" },
           { key:"recurrence", label:"Event Recurrence Data" },
