@@ -220,14 +220,23 @@ function replicateEventForDate(dt,event) {
 }
 
 function setDateToWeekdayOfMonthForDayOfWeek(dateOfMonth,dayOfWeek,weekdayOfMonth) {
-  const dt = setDate(dateOfMonth,1);
-  const day = dow2int(dayOfWeek);
-  let nweeks = weekdayofmonth2weeks(weekdayOfMonth);
+  let dt = setDate(dateOfMonth,1);
+  if (weekdayOfMonth == "last") {
+    dt = addDate(dt,{ months:1, weeks:-1 });
+  }
 
+  const day = dow2int(dayOfWeek);
   const dayOffset = day - getDay(dt);
 
-  if (dayOffset >= 0) {
-    nweeks -= 1;
+  let nweeks;
+  if (weekdayOfMonth == "last") {
+    nweeks = (dayOffset < 0) ? 1 : 0;
+  }
+  else {
+    nweeks = weekdayofmonth2weeks(weekdayOfMonth);
+    if (dayOffset >= 0) {
+      nweeks -= 1;
+    }
   }
 
   return addDate(dt,{
