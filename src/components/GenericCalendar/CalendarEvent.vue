@@ -2,8 +2,9 @@
   <div :class="[$style['calendar-event'],...classes]" @click="selected = true">
     <span :class="$style['calendar-event__text']">{{ eventInfo.event.title }}</span>
     <modal v-if="selected" :parent="$el.parentNode.parentNode" :title="eventInfo.event.title" @close="selected = false">
-      <p><b>Event Start</b>: <disp-date :value="eventInfo.event.startDate" :format="fmt" /></p>
-      <p><b>Event End</b>: <disp-date :value="eventInfo.event.endDate" :format="fmt" /></p>
+      <p v-if="!eventInfo.event.allDay"><b>Event Start</b>: <disp-date :value="eventInfo.event.startDate" :format="fmt" /></p>
+      <p v-if="!eventInfo.event.allDay"><b>Event End</b>: <disp-date :value="eventInfo.event.endDate" :format="fmt" /></p>
+      <p v-if="eventInfo.event.allDay"><b>All Day Event</b>: <disp-date :value="eventInfo.event.startDate" :format="allDayFmt" /></p>
       <p><b>Created By</b>: {{ eventInfo.event.createdBy }}</p>
       <p :class="$style['calendar-event__description']" v-html="eventInfo.event.description"></p>
     </modal>
@@ -24,7 +25,8 @@
 
     data: () => ({
       selected: false,
-      fmt: "iii d MMM yyyy 'at' h:mm b"
+      fmt: "eeee, MMMM do, yyyy, 'at' h:mm b",
+      allDayFmt: "eeee, MMMM do, yyyy"
     }),
 
     props: {

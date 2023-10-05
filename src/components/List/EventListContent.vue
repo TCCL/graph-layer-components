@@ -9,6 +9,7 @@
 
 <script>
   import parseISO from "date-fns/parseISO";
+  import parseDateWithFormat from "date-fns/parse";
 
   import { createRecurrenceData } from "./recurrence.js";
 
@@ -26,6 +27,12 @@
   function makeProvider(endpoint,config) {
     const cache = new Map();
     const mapping = Object.assign({},DEFAULT_MAPPING,config || {});
+    const refDate = new Date();
+
+    refDate.setMilliseconds(0);
+    refDate.setSeconds(0);
+    refDate.setMinutes(0);
+    refDate.setHours(0);
 
     function getCacheEntry(key) {
       if (!cache.has(key)) {
@@ -46,7 +53,17 @@
 
       // Parse dates using the format given to us by the Microsoft platform.
       for (const key of ["startDate","endDate"]) {
-        extracted[key] = parseISO(extracted[key]);
+        if (extracted.allDay) {
+          let dateString = extracted[key];
+          const index = dateString.search("T.+$");
+          if (index >= 0) {
+            dateString = dateString.slice(0,index);
+          }
+          extracted[key] = parseDateWithFormat(dateString,"yyyy-MM-dd",refDate);
+        }
+        else {
+          extracted[key] = parseISO(extracted[key]);
+        }
       }
 
       if (extracted.recurrence) {
