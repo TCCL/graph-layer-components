@@ -1,12 +1,12 @@
 <template>
   <div :class="[$style['calendar-event'],...classes]" @click="selected = true">
-    <span :class="$style['calendar-event__text']">{{ eventInfo.event.title }}</span>
-    <modal v-if="selected" :parent="$el.parentNode.parentNode" :title="eventInfo.event.title" @close="selected = false">
-      <p v-if="!eventInfo.event.allDay"><b>Event Start</b>: <disp-date :value="eventInfo.event.startDate" :format="fmt" /></p>
-      <p v-if="!eventInfo.event.allDay"><b>Event End</b>: <disp-date :value="eventInfo.event.endDate" :format="fmt" /></p>
-      <p v-if="eventInfo.event.allDay"><b>All Day Event</b>: <disp-date :value="eventInfo.event.startDate" :format="allDayFmt" /></p>
-      <p><b>Created By</b>: {{ eventInfo.event.createdBy }}</p>
-      <p :class="$style['calendar-event__description']" v-html="eventInfo.event.description"></p>
+    <span :class="$style['calendar-event__text']">{{ event.title }}</span>
+    <modal v-if="selected" :parent="$el.parentNode.parentNode" :title="event.title" @close="selected = false">
+      <p v-if="!event.allDay"><b>Event Start</b>: <disp-date :value="event.startDate" :format="fmt" /></p>
+      <p v-if="!event.allDay"><b>Event End</b>: <disp-date :value="event.endDate" :format="fmt" /></p>
+      <p v-if="event.allDay"><b>All Day Event</b>: <disp-date :value="event.startDate" :format="allDayFmt" /> <span v-if="isMultiDay">through <disp-date :value="event.endDate" :format="allDayFmt" /></span></p>
+      <p><b>Created By</b>: {{ event.createdBy }}</p>
+      <p :class="$style['calendar-event__description']" v-html="event.description"></p>
     </modal>
   </div>
 </template>
@@ -37,13 +37,22 @@
       classes() {
         const cls = [];
 
-        if ("_calendar_index" in this.eventInfo.event) {
-          const idx = this.eventInfo.event._calendar_index % 5;
+        if ("_calendar_index" in this.event) {
+          const idx = this.event._calendar_index % 5;
           const style = `calendar-event--idx-${idx}`;
           cls.push(this.$style[style]);
         }
 
         return cls;
+      },
+
+      event() {
+        return this.eventInfo.event;
+      },
+
+      isMultiDay() {
+        return this.event.allDay
+          && this.event.startDate.getTime() != this.event.endDate.getTime();
       }
     },
 
